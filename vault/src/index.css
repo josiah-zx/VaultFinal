@@ -15,7 +15,8 @@ body {
   justify-content: center;
   align-items :center;
   min-height: 100vh;
-  background: lightcyan;
+  background: url(./Components/Assets/5039684.jpg)
+  no-repeat;
 }
 
 code {
