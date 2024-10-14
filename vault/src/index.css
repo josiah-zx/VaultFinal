@@ -15,7 +15,7 @@ body {
   justify-content: center;
   align-items :center;
   min-height: 100vh;
-  background: url(./Components/Assets/5039684.jpg)
+  background: linear-gradient(135deg, #3245d2 0%, #fbeaf8 100%)
   no-repeat;
 }
 
