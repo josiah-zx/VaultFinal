@@ -10,7 +10,7 @@ def init_db():
     cursor = connection.cursor()
 
     # Creates table for storing user data
-    cursor.excecute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -24,25 +24,26 @@ def init_db():
     ''')
 
     # Creates table for storing user posts
-    cursor.excecute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS posts (
             post_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             content TEXT NOT NULL,
-            image_url TEXT,                                                     
+            image_url TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE    
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        )
     ''')
 
     # Creates table for followers
-    cursor.excecute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS followers (
             follower_id INTEGER NOT NULL,
             followed_id INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (follower_id, followed_id),
-            FOREIGN KEY(follower_id) REFERENCES users(user_id) ON DELETE CASCADE, 
+            FOREIGN KEY(follower_id) REFERENCES users(user_id) ON DELETE CASCADE,
             FOREIGN KEY(followed_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
     ''')
@@ -71,6 +72,6 @@ def get_users():
     return jsonify(users)
 
 if __name__ == '__main__':
-    init_db()  # Optionally call this to initialize on start
+    init_db()
     app.run(debug=True)
 
