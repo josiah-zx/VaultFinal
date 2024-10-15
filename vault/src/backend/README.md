@@ -1,6 +1,6 @@
 # Backend Guide
 
-## 1. Ensure you have SQLite and Flask downloaded
+## 1. Ensure you have SQLite, Flask, and Flask-cors downloaded
 
 
 ### Table Format Example:
