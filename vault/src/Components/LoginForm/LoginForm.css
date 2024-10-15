@@ -86,3 +86,9 @@
 .register-link p a:hover{
     text-decoration: underline;
 }
+
+.wrapper .error-message{
+    font-size: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
