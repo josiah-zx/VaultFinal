@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 const LoginForm = () => {
     // State to store the username and password
@@ -53,7 +54,7 @@ const LoginForm = () => {
                 </div>
                 <button type="submit">Login</button>
                 <div className="register-link">
-                    <p>Need an account?<a href="#">Register</a></p>
+                    <p>Need an account? <Link to="/register">Sign Up</Link></p>
                 </div>
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
             </form>
