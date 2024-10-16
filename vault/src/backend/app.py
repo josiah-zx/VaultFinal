@@ -129,59 +129,6 @@ def register():
     conn.close()
     return jsonify({"status": "success", "message": "Account created!"}), 201
 
-
-# Retrieve single user by ID
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = cursor.fetchone()
-    conn.close()
-
-    if user:
-        return jsonify(user), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
-
-# Update user profile information
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        UPDATE users
-        SET username = ?, email = ?, profile_pic = ?, bio = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE user_id = ?
-    ''', (data['username'], data['email'], data['profile_pic'], data['bio'], user_id))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"message": "User profile updated!"}), 200
-
-# Create a time capsule / post
-@app.route('/posts', methods=['POST'])
-def create_post():
-    data = request.json
-    user_id = data['user_id']
-    content = data['content']
-    image_url = data.get('image_url')  # null if no image
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO posts (user_id, content, image_url)
-        VALUES (?, ?, ?)
-    ''', (user_id, content, image_url))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"message": "Post created!"}), 201
-
-
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
