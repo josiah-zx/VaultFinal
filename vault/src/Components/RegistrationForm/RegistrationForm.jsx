@@ -44,7 +44,7 @@ const RegistrationForm = () => {
                 </div>
                 <button type="submit">Sign Up</button>
                 <div className="login-link">
-                    <p>Already have an account? <Link to="/">Login</Link></p>
+                    <p>Already have an account? <Link to="/login">Login</Link></p>
                 </div>
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
             </form>
