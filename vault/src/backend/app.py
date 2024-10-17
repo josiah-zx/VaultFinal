@@ -57,6 +57,18 @@ def get_db_connection():
     connection = sqlite3.connect('vault_database.db', timeout=10.0)
     return connection
 
+def insert_new_user(username, password):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT INTO users (username, password) VALUES (?, ?)
+    ''', (username, password))
+
+    conn.commit()
+    conn.close()
+
+
 #  Initializes the database (will only need to be run when first creating the DB and anytime we add new fields/schemas to the tables
 @app.route('/init', methods=['GET'])
 def initialize_database():
