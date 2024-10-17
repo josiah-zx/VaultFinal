@@ -70,20 +70,20 @@
     font-weight: 700;
 }
 
-.wrapper .register-link{
+.wrapper .login-link{
     font-size: 15px;
     text-align: center;
     margin-top: 20px;
 }
 
-.register-link p a {
+.login-link p a {
     color: white;
     text-decoration: none;
     font-weight: 650;
     margin-left: 5px;
 }
 
-.register-link p a:hover{
+.login-link p a:hover{
     text-decoration: underline;
 }
 
