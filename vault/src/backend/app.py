@@ -16,8 +16,10 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE,
+            email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
             profile_pic TEXT,                               
             bio TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -57,18 +59,6 @@ def get_db_connection():
     connection = sqlite3.connect('vault_database.db', timeout=10.0)
     return connection
 
-def insert_new_user(username, password):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        INSERT INTO users (username, password) VALUES (?, ?)
-    ''', (username, password))
-
-    conn.commit()
-    conn.close()
-
-
 #  Initializes the database (will only need to be run when first creating the DB and anytime we add new fields/schemas to the tables
 @app.route('/init', methods=['GET'])
 def initialize_database():
@@ -95,10 +85,16 @@ def login():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Checking if username is in database and if password is correct
-    cursor.execute("SELECT username, password FROM users WHERE username = ? AND password = ?", (username, password))
-    user = cursor.fetchone()
-    conn.close()
+    if '@' not in username:
+        # Checking if username is in database and if password is correct
+        cursor.execute("SELECT username, password FROM users WHERE username = ? AND password = ?", (username, password))
+        user = cursor.fetchone()
+        conn.close()
+    else:
+        # Checking if email is in database and if password is correct
+        cursor.execute("SELECT email, password FROM users WHERE email = ? AND password = ?", (username, password))
+        user = cursor.fetchone()
+        conn.close()
 
     if user:
         return jsonify({"status": "success", "message": "Login successful!"}), 200
@@ -109,8 +105,13 @@ def login():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
+
+    firstName = data['firstName']
+    lastName = data['lastName']
+    email = data['email']
     username = data['username']
     password = data['password']
+    confirmedPassword = data['confirmedPassword']
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -121,14 +122,18 @@ def register():
     if existing_user:
         # Username is already in database/is taken
         conn.close()
-        return jsonify({"error": "Username already taken"}), 409
+        return jsonify({"status": "failure", "message": "Username already taken"}), 409
+    
+    # Checking if passwords match
+    if password != confirmedPassword:
+        return jsonify({"status": "failure", "message": "Passwords do not match."}), 401
 
-    # Adding username and password into the database
-    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+    # Adding user info into the database
+    cursor.execute("INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)", 
+                   (username, email, password, firstName, lastName))
     conn.commit()
     conn.close()
     return jsonify({"status": "success", "message": "Account created!"}), 201
-
 
 # Retrieve single user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])
