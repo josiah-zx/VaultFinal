@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
     // State to store the username and password
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     // Function to handle form submission
     const handleSubmit = async (e) => {
@@ -27,8 +28,10 @@ const LoginForm = () => {
             
             if (response.ok) {
                 console.log('Login successful:', data.message);
+                setErrorMessage('');
+                navigate('/home');
             } else {
-                setErrorMessage(data.message); // Show error message to the user
+                setErrorMessage(data.message);
             }
         } catch (error) {
             console.error('Error during login:', error);
@@ -41,7 +44,7 @@ const LoginForm = () => {
             <form onSubmit={handleSubmit}>
                 <h1>Login</h1>
                 <div className="input-box">
-                    <input type="text" placeholder='Username' required value={username} onChange={(e) => setUsername(e.target.value)} />
+                    <input type="text" placeholder='Username/Email' required value={username} onChange={(e) => setUsername(e.target.value)} />
                     <FaUser className= 'icons' />
                 </div>
                 <div className="input-box">
