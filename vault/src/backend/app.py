@@ -186,6 +186,29 @@ def create_post():
 
     return jsonify({"message": "Post created!"}), 201
 
+# Searching for users
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('q', '')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Search users by username and gets usernames (and profile pic later)
+    cursor.execute('''
+        SELECT username FROM users
+        WHERE username LIKE ? LIMIT 7
+    ''', ('%' + query + '%',)) # Match any part of the username
+
+    results = cursor.fetchall()
+
+    # Format the results as a list of dictionaries
+    users = [{'username': row[0]} for row in results]
+
+    conn.close()
+
+    return jsonify(users)
+    
 
 if __name__ == '__main__':
     init_db()
