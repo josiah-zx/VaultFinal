@@ -209,6 +209,38 @@ def search():
 
     return jsonify(users)
     
+# route for reseting password #
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
+    email_or_username = data['email_or_username']
+    new_password = data['new_password']
+    confirmed_password = data['confirmed_password']
+
+    if new_password != confirmed_password:
+        return jsonify({"status": "failure", "message": "Passwords do not match."}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the user exists using email or username
+    if '@' in email_or_username:
+        cursor.execute("SELECT user_id FROM users WHERE email = ?", (email_or_username,))
+    else:
+        cursor.execute("SELECT user_id FROM users WHERE username = ?", (email_or_username,))
+
+    user = cursor.fetchone()
+
+    if user:
+        # If user exists, update the password
+        cursor.execute("UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?", (new_password, user[0]))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "message": "Password reset successful!"}), 200
+    else:
+        conn.close()
+        return jsonify({"status": "failure", "message": "User not found."}), 404
+   
 
 if __name__ == '__main__':
     init_db()
