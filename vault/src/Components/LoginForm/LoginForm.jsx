@@ -48,12 +48,12 @@ const LoginForm = () => {
                     <FaUser className= 'icons' />
                 </div>
                 <div className="input-box">
-                    <input type="text" placeholder='Password' required value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input type="password" placeholder='Password' required value={password} onChange={(e) => setPassword(e.target.value)} />
                     <FaLock className= 'icons'/>
                 </div>
                 <div className="remember-forgot">
                     <label><input type="checkbox" /> Remember Me</label>
-                    <a href="#">Forgot Password?</a>
+                    <Link to="/reset-password">Forgot Password?</Link>  
                 </div>
                 <button type="submit">Login</button>
                 <div className="register-link">
@@ -64,4 +64,5 @@ const LoginForm = () => {
         </div>
     );
 };
+
 export default LoginForm;
