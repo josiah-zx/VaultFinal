@@ -16,9 +16,9 @@ const HomeHeader = () => {
                     <img src="/nav_vault_logo.png" alt="Vault Logo" className="logo"/>
                 </NavLink>
             </div>
+            <Search />
             <ul className="navbar-links">
                 <li>
-
                     <NavLink to="/home" activeClassName="active-link">
                         <FaHouseChimney className= 'icons'/>
                         <span>Home</span>
