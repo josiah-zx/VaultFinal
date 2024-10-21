@@ -1,0 +1,65 @@
+.profile-avatar {
+   color: white;
+   font-size: 125px;
+   position: absolute;
+   top: 150px;
+   left: calc(50% - 265px);
+}
+
+.profile-info {
+    position: absolute;
+    top: 150px;
+    left: calc(50% - 90px);
+    flex-direction: column;
+}
+
+.profile-info h2 {
+    margin-bottom: 15px;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+
+.profile-tab-navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 200px;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+
+.profile-tab-navbar button {
+    padding: 0px 0px;
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+
+.profile-tab-navbar button.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.capsule-icon {
+    width: 20;
+    height: 20;
+}
+
+.profile-content {
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    position: absolute;
+    align-items: center;
+    top: 405px;
+    left: calc(50% - 265px);
+    width: 550px;
+    padding: 20px;
+}
