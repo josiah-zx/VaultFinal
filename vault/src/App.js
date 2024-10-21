@@ -7,6 +7,7 @@ import RegistrationForm from "./Components/RegistrationForm/RegistrationForm";
 import ResetPasswordForm from './Components/ResetPasswordForm/ResetPasswordForm';
 import Home from "./Components/Home/Home";
 import Search from "./Components/Search/Search";
+import Profile from "./Components/Profile/Profile";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/home" element={<Home />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/profile" element={<Profile />} />
       </Routes>
   );
 }
