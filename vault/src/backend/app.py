@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 import sqlite3
 from datetime import datetime
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 CORS(app)
+bcrypt = Bcrypt(app)
 
 # Creates the database with multiple tables
 def init_db():
@@ -87,19 +89,23 @@ def login():
 
     if '@' not in username:
         # Checking if username is in database and if password is correct
-        cursor.execute("SELECT username, password FROM users WHERE username = ? AND password = ?", (username, password))
+        cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
         user = cursor.fetchone()
         conn.close()
     else:
         # Checking if email is in database and if password is correct
-        cursor.execute("SELECT email, password FROM users WHERE email = ? AND password = ?", (username, password))
+        cursor.execute("SELECT password FROM users WHERE email = ?", (username,))
         user = cursor.fetchone()
         conn.close()
 
-    if user:
-        return jsonify({"status": "success", "message": "Login successful!"}), 200
-    else:
-        return jsonify({"status": "failure", "message": "Username or password incorrect."}), 400
+    if user is None:
+        return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
+
+    if not bcrypt.check_password_hash(user[0], password):
+        return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
+
+    return jsonify({"status": "success", "message": "Login successful!"}), 200
+        
     
 # Registration handling
 @app.route('/register', methods=['POST'])
@@ -128,9 +134,11 @@ def register():
     if password != confirmedPassword:
         return jsonify({"status": "failure", "message": "Passwords do not match."}), 401
 
+    hashed_password = bcrypt.generate_password_hash(password)
+
     # Adding user info into the database
     cursor.execute("INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)", 
-                   (username, email, password, firstName, lastName))
+                   (username, email, hashed_password, firstName, lastName))
     conn.commit()
     conn.close()
     return jsonify({"status": "success", "message": "Account created!"}), 201
