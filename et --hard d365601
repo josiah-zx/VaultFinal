@@ -1,0 +1,26 @@
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-22 04:20:35 -0400}: reset: moving to 75f817a
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-22 04:20:34 -0400}: reset: moving to 75f817a
+[33md365601[m[33m ([m[1;31morigin/Fabian[m[33m, [m[1;32mFabian[m[33m)[m HEAD@{2024-10-22 04:18:55 -0400}: reset: moving to d365601
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-22 04:18:22 -0400}: reset: moving to 75f817a
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-22 04:16:19 -0400}: reset: moving to 75f817a
+[33md365601[m[33m ([m[1;31morigin/Fabian[m[33m, [m[1;32mFabian[m[33m)[m HEAD@{2024-10-22 04:13:27 -0400}: reset: moving to d365601
+[33m48878ff[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2024-10-22 00:30:14 -0400}: pull --rebase origin main: Fast-forward
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-22 00:28:43 -0400}: checkout: moving from Fabian to main
+[33md365601[m[33m ([m[1;31morigin/Fabian[m[33m, [m[1;32mFabian[m[33m)[m HEAD@{2024-10-21 05:03:07 -0400}: commit: Attempted to implement flask session and sqlalchemy'
+[33ma60dbcc[m HEAD@{2024-10-21 03:21:05 -0400}: pull origin main: Fast-forward
+[33m16a5593[m[33m ([m[1;31mupstream/Fabian[m[33m)[m HEAD@{2024-10-19 04:24:23 -0400}: checkout: moving from main to Fabian
+[33m75f817a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{2024-10-19 04:07:45 -0400}: commit: Added Forgot Password UI
+[33mf28749d[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31morigin/feature-login-form[m[33m, [m[1;32mfeature-login-form[m[33m)[m HEAD@{2024-10-19 03:56:41 -0400}: reset: moving to upstream/main
+[33m3a42f84[m HEAD@{2024-10-19 03:55:40 -0400}: commit (amend): Missing ReadMe Files on my end
+[33m13e219d[m HEAD@{2024-10-19 03:55:04 -0400}: commit (amend): Missing ReadMe Files on my end
+[33m0a3a2f3[m HEAD@{2024-10-19 03:51:14 -0400}: checkout: moving from main to main
+[33m0a3a2f3[m HEAD@{2024-10-19 03:48:34 -0400}: checkout: moving from Christian to main
+[33me3f43eb[m[33m ([m[1;31mupstream/Christian[m[33m, [m[1;31morigin/Christian[m[33m, [m[1;32mChristian[m[33m)[m HEAD@{2024-10-19 03:46:21 -0400}: checkout: moving from main to Christian
+[33m0a3a2f3[m HEAD@{2024-10-19 03:26:39 -0400}: commit (amend): Missing ReadMe Files on my end
+[33mbd1afc2[m[33m ([m[1;31morigin/Reset-Password[m[33m)[m HEAD@{2024-10-19 03:14:26 -0400}: commit: Missing ReadMe Files on my end
+[33m8f688ca[m HEAD@{2024-10-19 03:01:33 -0400}: checkout: moving from feature-login-form to main
+[33mf28749d[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31morigin/feature-login-form[m[33m, [m[1;32mfeature-login-form[m[33m)[m HEAD@{2024-10-19 03:00:31 -0400}: checkout: moving from main to feature-login-form
+[33m8f688ca[m HEAD@{2024-10-19 02:05:47 -0400}: commit: Added some forgot password front-end logic
+[33mf0882e8[m HEAD@{2024-10-19 02:04:09 -0400}: commit: Added some forgot password front-end logic
+[33mf28749d[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31morigin/feature-login-form[m[33m, [m[1;32mfeature-login-form[m[33m)[m HEAD@{2024-10-19 00:33:16 -0400}: pull origin main: Fast-forward
+[33m599ae67[m HEAD@{2024-10-12 23:56:34 -0400}: clone: from https://github.com/Fabiang120/Vault.git

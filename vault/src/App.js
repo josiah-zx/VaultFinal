@@ -7,6 +7,7 @@ import RegistrationForm from "./Components/RegistrationForm/RegistrationForm";
 import ResetPasswordForm from './Components/ResetPasswordForm/ResetPasswordForm';
 import Home from "./Components/Home/Home";
 import Profile from "./Components/Profile/Profile";
+import Messages from './Components/Messages/Messages';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/messages" element={<Messages/>} />
           <Route path="/profile" element={<Profile />} />
       </Routes>
   );
