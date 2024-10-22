@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import Navbar from '../HomeHeader/HomeHeader';
-import { Link } from 'react-router-dom';
 import { FaUserCircle } from "react-icons/fa";
 import { BsGrid3X3 } from "react-icons/bs";
 import { IoIosStarOutline } from "react-icons/io";
 
 const Profile = () => {
+    const [username, setUsername] = useState('');
+    const [selectedTab, setSelectedTab] = useState('capsules');
 
-    const [selectedTab, setSelectedTab] = useState('capsules')
+    // Fetch username from local storage
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            setUsername(storedUsername); 
+        }
+    }, []);
 
     const handleTabClick = (tab) => {
         setSelectedTab(tab);
@@ -18,40 +25,40 @@ const Profile = () => {
         <div>
             <Navbar />
             <div className="profile">
-                <div className="profile-header">
-                    <div className="profile-avatar">
-                        <FaUserCircle />
-                    </div>
-                    <div className="profile-info">
-                        <h2>user</h2>
-                        <div className="profile-stats">
-                            <span># posts</span>
-                            <span># followers</span>
-                            <span># following</span>
-                        </div>
-                        <p>bio</p>
-                    </div>
+                <div className="profile-avatar">
+                    <FaUserCircle />
                 </div>
+                <div className="profile-info">
+                    <h2>{username}</h2> 
+                    <div className="profile-stats">
+                        <span># posts</span>
+                        <span># followers</span>
+                        <span># following</span>
+                    </div>
+                    <p>bio</p>
+                </div>
+
                 <div className="profile-tab-navbar">
                     <button
-                        classname={selectedTab === "capsules" ? "active-profile-tab" : ""}
+                        className={selectedTab === "capsules" ? "active-profile-tab" : ""}
                         onClick={() => handleTabClick("capsules")}
                     >
-                        <img src="/capsule.png" className="capsule-icon" width="24" height="24" />
+                        <img src="/capsule.png" className="capsule-icon" alt="Capsules" width="24" height="24" />
                     </button>
                     <button
-                        classname={selectedTab === "posts" ? "active-profile-tab" : ""}
+                        className={selectedTab === "posts" ? "active-profile-tab" : ""}
                         onClick={() => handleTabClick("posts")}
                     >
                         <BsGrid3X3 size={22}/>
                     </button>
                     <button
-                        classname={selectedTab === "favorites" ? "active-profile-tab" : ""}
+                        className={selectedTab === "favorites" ? "active-profile-tab" : ""}
                         onClick={() => handleTabClick("favorites")}
                     >
                         <IoIosStarOutline size={30}/>
                     </button>
                 </div>
+
                 <div className="profile-content">
                     {selectedTab === "capsules" && (
                         <div className="capsules-tab">
@@ -77,4 +84,4 @@ const Profile = () => {
     );
 };
 
-export default Profile
+export default Profile;

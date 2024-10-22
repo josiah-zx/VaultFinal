@@ -92,7 +92,9 @@ def login():
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
 
-    return jsonify({"status": "success", "message": "Login successful!"}), 200
+    # Return username in the response
+    return jsonify({"status": "success", "message": "Login successful!", "username": user.username}), 200
+
         
     
 # Registration handling
@@ -118,7 +120,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"status": "success", "message": "Account created!"}), 201
+    return jsonify({"status": "success", "message": "Account created!", "username": username}), 201
 
 # Retrieve single user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])

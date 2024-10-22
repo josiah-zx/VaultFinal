@@ -25,7 +25,7 @@ const RegistrationForm = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ firstName, lastName, email, username, password, confirmedPassword }), // Send user info
+                body: JSON.stringify({ firstName, lastName, email, username, password, confirmedPassword }), 
             });
             
             const data = await response.json();
@@ -33,7 +33,8 @@ const RegistrationForm = () => {
             if (response.ok) {
                 console.log('Account created!', data.message);
                 setErrorMessage('');
-                navigate('/home');
+                localStorage.setItem('username', data.username);  // Store the username in localStorage
+                navigate('/home');  // Redirect to home after successful registration
             } else {
                 setErrorMessage(data.message);
             }
