@@ -1,6 +1,10 @@
 # Backend Guide
 
-## 1. Ensure you have SQLite, Flask, Flask-cors, and Flask-bcrypt downloaded
+## 1. Ensure you have SQLite, Flask, Flask-bcrypt, Flask-cors, and Flask-sqlalchemy downloaded
+
+## For easy installation:
+1. Navigate to the backend folder
+2. Type: pip install -r requirements.txt
 
 
 ### Table Format Example:

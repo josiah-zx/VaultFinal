@@ -28,6 +28,7 @@
 
 .search-result {
     width: 100%;
+    max-width: 337px;
     background-color: white;
     display: flex;
     flex-direction: column;
