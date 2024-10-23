@@ -52,6 +52,22 @@ class Follower(db.Model):
     followed_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Define the Message model
+class Message(db.Model):
+    __tablename__ = 'messages'
+    message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    read_status = db.Column(db.Boolean, default=False)
+    attachment_url = db.Column(db.String(255), nullable=True)
+
+    # relations to User for querying
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+
 # Initialize the database
 with app.app_context():
     db.create_all()
@@ -94,13 +110,13 @@ def login():
 
     # Return username and email in the response
     return jsonify({
-        "status": "success", 
-        "message": "Login successful!", 
+        "status": "success",
+        "message": "Login successful!",
         "username": user.username,
-        "email": user.email   
+        "email": user.email
     }), 200
 
-    
+
 # Registration handling
 @app.route('/register', methods=['POST'])
 def register():
@@ -115,7 +131,7 @@ def register():
     existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
     if existing_user:
         return jsonify({"status": "failure", "message": "Username or email already taken"}), 409
-    
+
     if password != confirmedPassword:
         return jsonify({"status": "failure", "message": "Passwords do not match."}), 401
 
@@ -165,7 +181,7 @@ def update_user(user_id):
     user.bio = data.get('bio', user.bio)
     user.updated_at = datetime.utcnow()
 
-    db.session.commit() 
+    db.session.commit()
 
     return jsonify({"message": "User profile updated!"}), 200
 
@@ -252,7 +268,54 @@ def reset_password():
 
     return jsonify({"status": "success", "message": "Password reset successful!"}), 200
 
+# Route to send a message
+@app.route('/send-message', methods=['POST'])
+def send_message():
+    data = request.json
+    sender_id = data['sender_id']
+    receiver_id = data['receiver_id']
+    content = data['content']
+    attachment_url = data.get('attachment_url')
 
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
+
+    db.session.add(message)
+    db.session.commit()
+
+    return jsonify({"status": "success", "message": "Message sent!"}), 201
+
+# Route to get a conversation (list of all msgs ) between user1 and user2 by ID
+@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
+def get_messages(user1_id, user2_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
+        ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
+    ).order_by(Message.timestamp).all()
+
+    messages_list = [
+        {
+            "message_id": message.message_id,
+            "sender_id": message.sender_id,
+            "receiver_id": message.receiver_id,
+            "content": message.content,
+            "timestamp": message.timestamp,
+            "read_status": message.read_status,
+            "attachment_url": message.attachment_url
+        } for message in messages
+    ]
+
+    return jsonify(messages_list)
+
+# Route to mark messages as read
+@app.route('/read-message/<int:message_id>', methods=['POST'])
+def mark_message_as_read(message_id):
+    message = Message.query.get(message_id)
+    if message:
+        message.read_status = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Message marked as read."}), 200
+    else:
+        return jsonify({"status": "failure", "message": "Message not found."}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
