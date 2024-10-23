@@ -1,14 +1,15 @@
 from datetime import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
-import sqlite3
+# import sqlite3 (unused)
 
 
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'vault_database.db?timeout=30')
@@ -108,7 +109,8 @@ def login():
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
 
-    # Return username and email in the response
+    # Return username and email in the response, as well as adding user ID to session.
+    session['user_id'] = user.user_id
     return jsonify({
         "status": "success",
         "message": "Login successful!",
@@ -139,6 +141,9 @@ def register():
     new_user = User(username=username, email=email, password=hashed_password, first_name=firstName, last_name=lastName)
     db.session.add(new_user)
     db.session.commit()
+
+    # initialize session w/ new user
+    session['user_id'] = new_user.user_id
 
     # Return both username and email in the response
     return jsonify({"status": "success", "message": "Account created!", "username": username, "email": email}), 201
@@ -316,6 +321,12 @@ def mark_message_as_read(message_id):
         return jsonify({"status": "success", "message": "Message marked as read."}), 200
     else:
         return jsonify({"status": "failure", "message": "Message not found."}), 404
+
+# Route to log out user session
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({"message": "Logged out successfully!"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
