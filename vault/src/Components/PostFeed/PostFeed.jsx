@@ -34,8 +34,8 @@ const PostFeed = () => {
                 <div className="post-info">
                     <p className="caption"><strong>username</strong> Caption goes here.</p>
                     <div className="post-stats">
-                        <span>100 likes</span>
-                        <span>30 comments</span>
+                        <span>{likes} likes</span>
+                        <span>0 comments</span>
                     </div>
                     <div className="post-actions">
                         <span className="like-icon" onClick={handleLike}>
