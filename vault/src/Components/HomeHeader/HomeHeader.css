@@ -1,10 +1,10 @@
 .navbar {
     display: flex;
-    justify-content: space-between;
+    background: linear-gradient(135deg, #3245d2 0%, #fbeaf8 100%);
     align-items: center;
-    background: rgba(0, 0, 0, 0.2);
+    justify-content: space-between;
     position: fixed;
-    height: 80px;
+    height: 60px;
     width: 100%;
     top: 0;
     left: 0;
@@ -12,25 +12,24 @@
 }
 
 .navbar-logo img.logo {
-    height: 120px;
+    height: 110px;
     width: auto;
 }
 
 .navbar-links {
     list-style: none;
     display: flex;
-    padding-top: 4px;
-}
-
-.navbar-links {
-    list-style: none;
-    display: flex;
     justify-content: space-around;
+    align-items: center;
     flex: 1;
+
 }
 
 .navbar-links li {
-    margin: 0 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Make sure the list items fill the navbar height */
 }
 
 .navbar-links a {
@@ -50,6 +49,6 @@
 }
 
 .icons {
-    font-size: 24px; /* Adjust this size as needed */
-    margin-bottom: 4px; /* Space between icon and text (if needed) */
+    font-size: 24px;
+    margin-bottom: 4px;
 }

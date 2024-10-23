@@ -21,8 +21,7 @@ const Messages = () => {
 
     return (
         <div>
-            <Navbar /> 
-
+            <Navbar />
             {/* Main container for the messages layout */}
             <div className="messages-container">
                 {/* Sidebar for user info */}
