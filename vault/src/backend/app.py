@@ -92,10 +92,14 @@ def login():
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
 
-    # Return username in the response
-    return jsonify({"status": "success", "message": "Login successful!", "username": user.username}), 200
+    # Return username and email in the response
+    return jsonify({
+        "status": "success", 
+        "message": "Login successful!", 
+        "username": user.username,
+        "email": user.email   
+    }), 200
 
-        
     
 # Registration handling
 @app.route('/register', methods=['POST'])
@@ -120,7 +124,9 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"status": "success", "message": "Account created!", "username": username}), 201
+    # Return both username and email in the response
+    return jsonify({"status": "success", "message": "Account created!", "username": username, "email": email}), 201
+
 
 # Retrieve single user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])
@@ -162,6 +168,28 @@ def update_user(user_id):
     db.session.commit() 
 
     return jsonify({"message": "User profile updated!"}), 200
+
+@app.route('/settings', methods=['POST'])
+def update_settings():
+    data = request.json  # Get the JSON data from the request
+    username = data.get('username')  # Username from the form
+    email = data.get('email')  # Email from the form
+    notifications_enabled = data.get('notificationsEnabled')  # Notifications preference from the form
+
+    # Retrieve the user from the database using the username (assuming username is unique)
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"status": "failure", "message": "User not found"}), 404
+
+    # Update the user's email and notification preferences
+    user.email = email
+    # Assuming you want to store notificationsEnabled in the User model
+    # user.notifications_enabled = notifications_enabled
+
+    db.session.commit()  # Commit the changes to the database
+
+    return jsonify({"status": "success", "message": "Settings updated successfully!"}), 200
 
 # Create a post (time capsule)
 @app.route('/posts', methods=['POST'])

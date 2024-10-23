@@ -30,6 +30,7 @@ const LoginForm = () => {
                 console.log('Login successful:', data.message);
                 setErrorMessage('');
                 localStorage.setItem('username', data.username); 
+                localStorage.setItem('email', data.email);
                 navigate('/home');
             } else {
                 setErrorMessage(data.message);
