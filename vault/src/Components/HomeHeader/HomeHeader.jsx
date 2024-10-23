@@ -21,25 +21,25 @@ const HomeHeader = () => {
                 <li>
                     <NavLink to="/home" activeClassName="active-link">
                         <FaHouseChimney className= 'icons'/>
-                        <span>Home</span>
+                        <span className='text'>Home</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to="/profile" activeClassName="active-link">
                         <FaUserCircle className= 'icons'/>
-                        <span>Profile</span>
+                        <span className='text'>Profile</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to="/messages" activeClassName="active-link">
                         <BiSolidMessageDots className= 'icons'/>
-                        <span>Messages</span>
+                        <span className='text'>Messages</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to="/settings" activeClassName="active-link">
                         <FaGear className= 'icons'/>
-                        <span>Settings</span>
+                        <span className='text'>Settings</span>
                     </NavLink>
                 </li>
             </ul>
