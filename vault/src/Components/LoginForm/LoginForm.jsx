@@ -21,14 +21,16 @@ const LoginForm = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }), // Send username and password
+                body: JSON.stringify({ username, password }), 
             });
-            
+    
             const data = await response.json();
-            
+    
             if (response.ok) {
                 console.log('Login successful:', data.message);
                 setErrorMessage('');
+                localStorage.setItem('username', data.username); 
+                localStorage.setItem('email', data.email);
                 navigate('/home');
             } else {
                 setErrorMessage(data.message);

@@ -1,0 +1,104 @@
+/* Set background and alignment for settings container */
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 75vh;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: rgba(22, 22, 24, 0.95);
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* Settings box with the rgba color */
+.settings-box {
+    background-color: rgba(22, 22, 24, 0.95); 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    text-align: center;
+}
+
+/* Profile Avatar Styling */
+.profile-avatar {
+    font-size: 100px;
+    color: #f1f1f1;
+    margin-bottom: 20px;
+}
+
+/* Each setting item is a row */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.icons {
+    color: #fff;
+    margin-right: 10px;
+}
+
+.label {
+    font-weight: bold;
+    color: #bbb; 
+    margin-right: 10px;
+}
+
+.info {
+    font-size: 16px;
+    color: #fff; 
+}
+
+/* Notification checkbox styling */
+.notification-label {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 16px;
+}
+
+.notification-label input {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* Button styling */
+.save-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.save-btn:hover {
+    background-color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 600px) {
+    .settings-box {
+        width: 100%;
+        padding: 15px;
+    }
+}

@@ -5,7 +5,6 @@ import { FaLock } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 
 const RegistrationForm = () => {
-
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -17,7 +16,7 @@ const RegistrationForm = () => {
 
     // Function to handle form submission
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevents page reload or default form submission
+        e.preventDefault();
         try {
             // Send a POST request to backend
             const response = await fetch('http://127.0.0.1:5000/register', {
@@ -25,7 +24,7 @@ const RegistrationForm = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ firstName, lastName, email, username, password, confirmedPassword }), // Send user info
+                body: JSON.stringify({ firstName, lastName, email, username, password, confirmedPassword }), 
             });
             
             const data = await response.json();
@@ -33,7 +32,9 @@ const RegistrationForm = () => {
             if (response.ok) {
                 console.log('Account created!', data.message);
                 setErrorMessage('');
-                navigate('/home');
+                localStorage.setItem('username', data.username);  
+                localStorage.setItem('email', data.email);  
+                navigate('/home'); 
             } else {
                 setErrorMessage(data.message);
             }
@@ -42,7 +43,6 @@ const RegistrationForm = () => {
             setErrorMessage('Something went wrong. Please try again.');
         }
     };
-
 
     return (
         <div className='wrapper'>
@@ -69,12 +69,12 @@ const RegistrationForm = () => {
                     <FaUser className='icons'/>
                 </div>
                 <div className="input-box">
-                    <input type="text" placeholder='Password' required value={password}
+                    <input type="password" placeholder='Password' required value={password}
                            onChange={(e) => setPassword(e.target.value)}/>
                     <FaLock className='icons'/>
                 </div>
                 <div className="input-box">
-                    <input type="text" placeholder='Confirm Password' required value={confirmedPassword}
+                    <input type="password" placeholder='Confirm Password' required value={confirmedPassword}
                            onChange={(e) => setConfirmedPassword(e.target.value)}/>
                     <FaLock className='icons'/>
                 </div>
@@ -89,4 +89,3 @@ const RegistrationForm = () => {
 };
 
 export default RegistrationForm;
-

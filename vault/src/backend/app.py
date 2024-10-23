@@ -1,81 +1,96 @@
-from flask import Flask, jsonify, request
-import sqlite3
 from datetime import datetime
-from flask_cors import CORS
+from flask import Flask, jsonify, request, session
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+import os
+# import sqlite3 (unused)
+
+
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'vault_database.db?timeout=30')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 CORS(app)
 bcrypt = Bcrypt(app)
 
 # Creates the database with multiple tables
-def init_db():
-    connection = sqlite3.connect('vault_database.db')
-    cursor = connection.cursor()
+class User(db.Model):
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    profile_pic = db.Column(db.String(255), nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Creates table for storing user data
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
-            profile_pic TEXT,                               
-            bio TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    # Define relationship to posts
+    posts = db.relationship('Post', backref='author', lazy=True)
 
-    # Creates table for storing user posts
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS posts (
-            post_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            content TEXT NOT NULL,
-            image_url TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-        )
-    ''')
+# Define the Post model
+class Post(db.Model):
+    __tablename__ = 'posts'
+    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Creates table for followers
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS followers (
-            follower_id INTEGER NOT NULL,
-            followed_id INTEGER NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (follower_id, followed_id),
-            FOREIGN KEY(follower_id) REFERENCES users(user_id) ON DELETE CASCADE,
-            FOREIGN KEY(followed_id) REFERENCES users(user_id) ON DELETE CASCADE
-        )
-    ''')
+# Define the Follower model
+class Follower(db.Model):
+    __tablename__ = 'followers'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    connection.commit()
-    connection.close()
+# Define the Message model
+class Message(db.Model):
+    __tablename__ = 'messages'
+    message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    read_status = db.Column(db.Boolean, default=False)
+    attachment_url = db.Column(db.String(255), nullable=True)
 
-def get_db_connection():
-    connection = sqlite3.connect('vault_database.db', timeout=10.0)
-    return connection
+    # relations to User for querying
 
-#  Initializes the database (will only need to be run when first creating the DB and anytime we add new fields/schemas to the tables
-@app.route('/init', methods=['GET'])
-def initialize_database():
-    init_db()
-    return jsonify({"message": "Database initialized!"})
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
-#  Returns all the users in the users table
+# Initialize the database
+with app.app_context():
+    db.create_all()
+
+# Returns all the users in the users table
 @app.route('/users', methods=['GET'])
 def get_users():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users")
-    users = cursor.fetchall()
-    conn.close()
-    return jsonify(users)
+    users = User.query.all()
+    users_list = [
+        {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "profile_pic": user.profile_pic,
+            "bio": user.bio,
+            "created_at": user.created_at,
+            "updated_at": user.updated_at
+        } for user in users
+    ]
+    return jsonify(users_list)
 
 # Login handling
 @app.route('/login', methods=['POST'])
@@ -84,34 +99,30 @@ def login():
     username = data['username']
     password = data['password']
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    if '@' not in username:
-        # Checking if username is in database and if password is correct
-        cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
-        user = cursor.fetchone()
-        conn.close()
+    # Find user by username or email
+    if '@' in username:
+        user = User.query.filter_by(email=username).first()
     else:
-        # Checking if email is in database and if password is correct
-        cursor.execute("SELECT password FROM users WHERE email = ?", (username,))
-        user = cursor.fetchone()
-        conn.close()
+        user = User.query.filter_by(username=username).first()
 
-    if user is None:
+    # Check if user exists and password is correct
+    if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
 
-    if not bcrypt.check_password_hash(user[0], password):
-        return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
+    # Return username and email in the response, as well as adding user ID to session.
+    session['user_id'] = user.user_id
+    return jsonify({
+        "status": "success",
+        "message": "Login successful!",
+        "username": user.username,
+        "email": user.email
+    }), 200
 
-    return jsonify({"status": "success", "message": "Login successful!"}), 200
-        
-    
+
 # Registration handling
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
-
     firstName = data['firstName']
     lastName = data['lastName']
     email = data['email']
@@ -119,42 +130,43 @@ def register():
     password = data['password']
     confirmedPassword = data['confirmedPassword']
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    existing_user = cursor.fetchone()
-
+    existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
     if existing_user:
-        # Username is already in database/is taken
-        conn.close()
-        return jsonify({"status": "failure", "message": "Username already taken"}), 409
-    
-    # Checking if passwords match
+        return jsonify({"status": "failure", "message": "Username or email already taken"}), 409
+
     if password != confirmedPassword:
         return jsonify({"status": "failure", "message": "Passwords do not match."}), 401
 
-    hashed_password = bcrypt.generate_password_hash(password)
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    new_user = User(username=username, email=email, password=hashed_password, first_name=firstName, last_name=lastName)
+    db.session.add(new_user)
+    db.session.commit()
 
-    # Adding user info into the database
-    cursor.execute("INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)", 
-                   (username, email, hashed_password, firstName, lastName))
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success", "message": "Account created!"}), 201
+    # initialize session w/ new user
+    session['user_id'] = new_user.user_id
+
+    # Return both username and email in the response
+    return jsonify({"status": "success", "message": "Account created!", "username": username, "email": email}), 201
+
 
 # Retrieve single user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = cursor.fetchone()
-    conn.close()
+    user = User.query.get(user_id)
 
     if user:
-        return jsonify(user), 200
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "profile_pic": user.profile_pic,
+            "bio": user.bio,
+            "created_at": user.created_at,
+            "updated_at": user.updated_at
+        }
+        return jsonify(user_data), 200
     else:
         return jsonify({"error": "User not found"}), 404
 
@@ -162,35 +174,62 @@ def get_user(user_id):
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    user = User.query.get(user_id)
 
-    cursor.execute('''
-        UPDATE users
-        SET username = ?, email = ?, profile_pic = ?, bio = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE user_id = ?
-    ''', (data['username'], data['email'], data['profile_pic'], data['bio'], user_id))
-    conn.commit()
-    conn.close()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Update user details
+    user.username = data.get('username', user.username)
+    user.email = data.get('email', user.email)
+    user.profile_pic = data.get('profile_pic', user.profile_pic)
+    user.bio = data.get('bio', user.bio)
+    user.updated_at = datetime.utcnow()
+
+    db.session.commit()
 
     return jsonify({"message": "User profile updated!"}), 200
 
-# Create a time capsule / post
+@app.route('/settings', methods=['POST'])
+def update_settings():
+    data = request.json  # Get the JSON data from the request
+    username = data.get('username')  # Username from the form
+    email = data.get('email')  # Email from the form
+    notifications_enabled = data.get('notificationsEnabled')  # Notifications preference from the form
+
+    # Retrieve the user from the database using the username (assuming username is unique)
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"status": "failure", "message": "User not found"}), 404
+
+    # Update the user's email and notification preferences
+    user.email = email
+    # Assuming you want to store notificationsEnabled in the User model
+    # user.notifications_enabled = notifications_enabled
+
+    db.session.commit()  # Commit the changes to the database
+
+    return jsonify({"status": "success", "message": "Settings updated successfully!"}), 200
+
+# Create a post (time capsule)
 @app.route('/posts', methods=['POST'])
 def create_post():
     data = request.json
-    user_id = data['user_id']
-    content = data['content']
-    image_url = data.get('image_url')  # null if no image
+    user = User.query.get(data['user_id'])
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO posts (user_id, content, image_url)
-        VALUES (?, ?, ?)
-    ''', (user_id, content, image_url))
-    conn.commit()
-    conn.close()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Create a new post
+    new_post = Post(
+        user_id=user.user_id,
+        content=data['content'],
+        image_url=data.get('image_url')  # Optional image
+    )
+
+    db.session.add(new_post)
+    db.session.commit()
 
     return jsonify({"message": "Post created!"}), 201
 
@@ -199,25 +238,14 @@ def create_post():
 def search():
     query = request.args.get('q', '')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    # Search users by username using a LIKE query
+    users = User.query.filter(User.username.like(f"%{query}%")).limit(7).all()
 
-    # Search users by username and gets usernames (and profile pic later)
-    cursor.execute('''
-        SELECT username FROM users
-        WHERE username LIKE ? LIMIT 7
-    ''', ('%' + query + '%',)) # Match any part of the username
+    results = [{'username': user.username} for user in users]
 
-    results = cursor.fetchall()
+    return jsonify(results)
 
-    # Format the results as a list of dictionaries
-    users = [{'username': row[0]} for row in results]
-
-    conn.close()
-
-    return jsonify(users)
-    
-# route for reseting password #
+# Route for resetting password
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
@@ -228,28 +256,77 @@ def reset_password():
     if new_password != confirmed_password:
         return jsonify({"status": "failure", "message": "Passwords do not match."}), 400
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Check if the user exists using email or username
+    # Find the user by email or username
     if '@' in email_or_username:
-        cursor.execute("SELECT user_id FROM users WHERE email = ?", (email_or_username,))
+        user = User.query.filter_by(email=email_or_username).first()
     else:
-        cursor.execute("SELECT user_id FROM users WHERE username = ?", (email_or_username,))
+        user = User.query.filter_by(username=email_or_username).first()
 
-    user = cursor.fetchone()
-
-    if user:
-        # If user exists, update the password
-        cursor.execute("UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?", (new_password, user[0]))
-        conn.commit()
-        conn.close()
-        return jsonify({"status": "success", "message": "Password reset successful!"}), 200
-    else:
-        conn.close()
+    if not user:
         return jsonify({"status": "failure", "message": "User not found."}), 404
-   
 
-if __name__ == '__main__':
-    init_db()
+    # Update the password
+    user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    user.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({"status": "success", "message": "Password reset successful!"}), 200
+
+# Route to send a message
+@app.route('/send-message', methods=['POST'])
+def send_message():
+    data = request.json
+    sender_id = data['sender_id']
+    receiver_id = data['receiver_id']
+    content = data['content']
+    attachment_url = data.get('attachment_url')
+
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
+
+    db.session.add(message)
+    db.session.commit()
+
+    return jsonify({"status": "success", "message": "Message sent!"}), 201
+
+# Route to get a conversation (list of all msgs ) between user1 and user2 by ID
+@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
+def get_messages(user1_id, user2_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
+        ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
+    ).order_by(Message.timestamp).all()
+
+    messages_list = [
+        {
+            "message_id": message.message_id,
+            "sender_id": message.sender_id,
+            "receiver_id": message.receiver_id,
+            "content": message.content,
+            "timestamp": message.timestamp,
+            "read_status": message.read_status,
+            "attachment_url": message.attachment_url
+        } for message in messages
+    ]
+
+    return jsonify(messages_list)
+
+# Route to mark messages as read
+@app.route('/read-message/<int:message_id>', methods=['POST'])
+def mark_message_as_read(message_id):
+    message = Message.query.get(message_id)
+    if message:
+        message.read_status = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Message marked as read."}), 200
+    else:
+        return jsonify({"status": "failure", "message": "Message not found."}), 404
+
+# Route to log out user session
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({"message": "Logged out successfully!"}), 200
+
+if __name__ == "__main__":
     app.run(debug=True)
