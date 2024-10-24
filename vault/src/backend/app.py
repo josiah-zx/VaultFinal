@@ -1,14 +1,15 @@
 from datetime import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
-import sqlite3
+# import sqlite3 (unused)
 
 
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'vault_database.db?timeout=30')
@@ -52,6 +53,22 @@ class Follower(db.Model):
     followed_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Define the Message model
+class Message(db.Model):
+    __tablename__ = 'messages'
+    message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    read_status = db.Column(db.Boolean, default=False)
+    attachment_url = db.Column(db.String(255), nullable=True)
+
+    # relations to User for querying
+
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+
 # Initialize the database
 with app.app_context():
     db.create_all()
@@ -92,11 +109,16 @@ def login():
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"status": "failure", "message": "Username or password incorrect."}), 401
 
-    # Return username in the response
-    return jsonify({"status": "success", "message": "Login successful!", "username": user.username}), 200
+    # Return username and email in the response, as well as adding user ID to session.
+    session['user_id'] = user.user_id
+    return jsonify({
+        "status": "success",
+        "message": "Login successful!",
+        "username": user.username,
+        "email": user.email
+    }), 200
 
-        
-    
+
 # Registration handling
 @app.route('/register', methods=['POST'])
 def register():
@@ -111,7 +133,7 @@ def register():
     existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
     if existing_user:
         return jsonify({"status": "failure", "message": "Username or email already taken"}), 409
-    
+
     if password != confirmedPassword:
         return jsonify({"status": "failure", "message": "Passwords do not match."}), 401
 
@@ -120,7 +142,12 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"status": "success", "message": "Account created!", "username": username}), 201
+    # initialize session w/ new user
+    session['user_id'] = new_user.user_id
+
+    # Return both username and email in the response
+    return jsonify({"status": "success", "message": "Account created!", "username": username, "email": email}), 201
+
 
 # Retrieve single user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])
@@ -159,9 +186,31 @@ def update_user(user_id):
     user.bio = data.get('bio', user.bio)
     user.updated_at = datetime.utcnow()
 
-    db.session.commit() 
+    db.session.commit()
 
     return jsonify({"message": "User profile updated!"}), 200
+
+@app.route('/settings', methods=['POST'])
+def update_settings():
+    data = request.json  # Get the JSON data from the request
+    username = data.get('username')  # Username from the form
+    email = data.get('email')  # Email from the form
+    notifications_enabled = data.get('notificationsEnabled')  # Notifications preference from the form
+
+    # Retrieve the user from the database using the username (assuming username is unique)
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"status": "failure", "message": "User not found"}), 404
+
+    # Update the user's email and notification preferences
+    user.email = email
+    # Assuming you want to store notificationsEnabled in the User model
+    # user.notifications_enabled = notifications_enabled
+
+    db.session.commit()  # Commit the changes to the database
+
+    return jsonify({"status": "success", "message": "Settings updated successfully!"}), 200
 
 # Create a post (time capsule)
 @app.route('/posts', methods=['POST'])
@@ -224,7 +273,60 @@ def reset_password():
 
     return jsonify({"status": "success", "message": "Password reset successful!"}), 200
 
+# Route to send a message
+@app.route('/send-message', methods=['POST'])
+def send_message():
+    data = request.json
+    sender_id = data['sender_id']
+    receiver_id = data['receiver_id']
+    content = data['content']
+    attachment_url = data.get('attachment_url')
 
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
+
+    db.session.add(message)
+    db.session.commit()
+
+    return jsonify({"status": "success", "message": "Message sent!"}), 201
+
+# Route to get a conversation (list of all msgs ) between user1 and user2 by ID
+@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
+def get_messages(user1_id, user2_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
+        ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
+    ).order_by(Message.timestamp).all()
+
+    messages_list = [
+        {
+            "message_id": message.message_id,
+            "sender_id": message.sender_id,
+            "receiver_id": message.receiver_id,
+            "content": message.content,
+            "timestamp": message.timestamp,
+            "read_status": message.read_status,
+            "attachment_url": message.attachment_url
+        } for message in messages
+    ]
+
+    return jsonify(messages_list)
+
+# Route to mark messages as read
+@app.route('/read-message/<int:message_id>', methods=['POST'])
+def mark_message_as_read(message_id):
+    message = Message.query.get(message_id)
+    if message:
+        message.read_status = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Message marked as read."}), 200
+    else:
+        return jsonify({"status": "failure", "message": "Message not found."}), 404
+
+# Route to log out user session
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({"message": "Logged out successfully!"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

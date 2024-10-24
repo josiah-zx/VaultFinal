@@ -5,9 +5,9 @@
     align-items: center;
     border-radius: 20px 20px 20px 20px;
     padding: 50px 20px;
-    background: rgba(10, 10, 10, 0.8); 
+    background-color: rgba(22, 22, 24, 0.95);
     color: white;
-    height: calc(100vh - 70px); 
+    height: calc(97vh - 70px); 
     justify-content: center;
     margin-top: 70px; 
 }
