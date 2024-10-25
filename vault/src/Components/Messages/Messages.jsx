@@ -9,14 +9,23 @@ const Messages = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch username from local storage
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername); 
-        } else {
-            console.error('Not logged in.');
-            navigate('/login');  
-        }
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);
+                } else {
+                    console.error('Not logged in.');
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+        fetchSessionUser();
     }, [navigate]);
 
     return (
