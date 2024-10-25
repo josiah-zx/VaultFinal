@@ -22,6 +22,7 @@ const LoginForm = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }), 
+                credentials: 'include',  // Include credentials (session cookies)
             });
     
             const data = await response.json();
@@ -29,9 +30,7 @@ const LoginForm = () => {
             if (response.ok) {
                 console.log('Login successful:', data.message);
                 setErrorMessage('');
-                localStorage.setItem('username', data.username); 
-                localStorage.setItem('email', data.email);
-                navigate('/home');
+                navigate('/home');  // Redirect after successful login
             } else {
                 setErrorMessage(data.message);
             }
@@ -40,6 +39,7 @@ const LoginForm = () => {
             setErrorMessage('Something went wrong. Please try again.');
         }
     };
+    
 
     return (
         <div className='wrapper'>

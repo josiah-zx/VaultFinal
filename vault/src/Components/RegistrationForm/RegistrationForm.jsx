@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './RegistrationForm.css';
-import { FaUser } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
+import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 
 const RegistrationForm = () => {
@@ -24,6 +23,7 @@ const RegistrationForm = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Include credentials for the session
                 body: JSON.stringify({ firstName, lastName, email, username, password, confirmedPassword }), 
             });
             
@@ -32,8 +32,7 @@ const RegistrationForm = () => {
             if (response.ok) {
                 console.log('Account created!', data.message);
                 setErrorMessage('');
-                localStorage.setItem('username', data.username);  
-                localStorage.setItem('email', data.email);  
+                // No need to store username and email in local storage; session is handled by Flask
                 navigate('/home'); 
             } else {
                 setErrorMessage(data.message);
