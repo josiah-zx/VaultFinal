@@ -7,14 +7,28 @@ import { IoIosStarOutline } from "react-icons/io";
 
 const Profile = () => {
     const [username, setUsername] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [selectedTab, setSelectedTab] = useState('capsules');
 
-    // Fetch username from local storage
+    // Fetch username from Flask session
     useEffect(() => {
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername); 
-        }
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include',  // Include session cookies
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);  // Set the username from session data
+                } else {
+                    setErrorMessage('Failed to load user info');
+                }
+            } catch (error) {
+                console.error("Failed to fetch session user:", error);
+                setErrorMessage('An error occurred while fetching user data.');
+            }
+        };
+        fetchSessionUser();
     }, []);
 
     const handleTabClick = (tab) => {
@@ -29,7 +43,7 @@ const Profile = () => {
                     <FaUserCircle />
                 </div>
                 <div className="profile-info">
-                    <h2>{username}</h2> 
+                    <h2>{username || errorMessage}</h2> {/* Display username or error message */}
                     <div className="profile-stats">
                         <span># posts</span>
                         <span># followers</span>

@@ -3,20 +3,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 20px 20px 20px 20px;
     padding: 50px 20px;
-    background-color: rgba(22, 22, 24, 0.95);
+    background: rgba(10, 10, 10, 0.8); /* Darker background */
     color: white;
-    height: calc(97vh - 70px); 
-    justify-content: center;
-    margin-top: 70px; 
+    height: calc(100vh - 70px); /* Adjust to fit below the navbar */
+    justify-content: center; /* Center the content */
+    margin-top: 70px; /* Account for navbar height */
 }
 
 /* Avatar Styling */
 .profile-avatar {
     font-size: 140px;
     margin-bottom: 20px;
-    color: #f1f1f1; 
+    color: #f1f1f1; /* Slightly lighter color for the avatar */
 }
 
 /* Profile Information */
@@ -54,7 +53,7 @@
     width: 300px;
     margin-top: 30px;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.08); 
+    background-color: rgba(255, 255, 255, 0.08); /* Subtle background for the tab section */
     border-radius: 30px;
 }
 
@@ -64,7 +63,7 @@
     cursor: pointer;
     background: none;
     color: white;
-    transition: color 0.3s ease, background 0.3s ease; 
+    transition: color 0.3s ease, background 0.3s ease; /* Smooth transition on hover */
 }
 
 .profile-tab-navbar button.active-profile-tab {
@@ -74,7 +73,7 @@
 }
 
 .profile-tab-navbar button:hover {
-    background-color: #3d4f73; 
+    background-color: #3d4f73; /* Slight hover effect for buttons */
     color: #e0e0e0;
 }
 
@@ -84,7 +83,7 @@
     padding: 30px;
     background-color: rgba(255, 255, 255, 0.12);
     border-radius: 20px;
-    width: 70%; 
+    width: 70%; /* Make the content area wider */
     text-align: center;
     color: #f1f1f1;
 }

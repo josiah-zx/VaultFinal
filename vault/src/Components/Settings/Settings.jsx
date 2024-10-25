@@ -1,28 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Settings.css';
-import { FaUser, FaEnvelope, FaBell, FaUserCircle } from "react-icons/fa";  // Importing FaUserCircle for the avatar
+import { FaUser, FaEnvelope, FaBell, FaUserCircle } from "react-icons/fa";  
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../HomeHeader/HomeHeader';
 
 const Settings = () => {
     // State to store the user's settings
-    const [username, setUsername] = useState(localStorage.getItem('username') || '');
-    const [email, setEmail] = useState(localStorage.getItem('email') || 'johndoe@example.com');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    // Function to handle form submission
+    // Fetch the session user data when the component loads
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);
+                    setEmail(data.email);
+                } else {
+                    setErrorMessage('Failed to load user info.');
+                }
+            } catch (error) {
+                console.error('Error fetching session user:', error);
+                setErrorMessage('An error occurred while fetching user data.');
+            }
+        };
+        fetchSessionUser();
+    }, []);
+
+    // Handle form submission to update settings in the backend
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Send a POST request to update settings in the backend
-            const response = await fetch('http://127.0.0.1:5000/update-settings', {
+            const response = await fetch('http://127.0.0.1:5000/settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, email, notificationsEnabled }), 
+                credentials: 'include',
             });
     
             const data = await response.json();
@@ -30,9 +52,7 @@ const Settings = () => {
             if (response.ok) {
                 console.log('Settings updated successfully:', data.message);
                 setErrorMessage('');
-                localStorage.setItem('username', username);
-                localStorage.setItem('email', email);
-                navigate('/home');  
+                navigate('/home');
             } else {
                 setErrorMessage(data.message);
             }
@@ -48,7 +68,6 @@ const Settings = () => {
             <div className="settings-container">
                 <h1>Settings</h1>
                 <div className="settings-box">
-                    {/* Profile Avatar Section */}
                     <div className="profile-avatar">
                         <FaUserCircle />
                     </div>
