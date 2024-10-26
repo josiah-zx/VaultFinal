@@ -44,43 +44,45 @@ const ResetPasswordForm = () => {
     };
 
     return (
-        <div className="wrapper">  
-            <form onSubmit={handleSubmit}>
-                <h1>Reset Password</h1>
-                <div className="input-box">
-                    <input 
-                        type="text" 
-                        placeholder="Email/Username" 
-                        required 
-                        value={emailOrUsername} 
-                        onChange={(e) => setEmailOrUsername(e.target.value)} 
-                    />
-                </div>
-                <div className="input-box">
-                    <input 
-                        type="password" 
-                        placeholder="New Password" 
-                        required 
-                        value={newPassword} 
-                        onChange={(e) => setNewPassword(e.target.value)} 
-                    />
-                </div>
-                <div className="input-box">
-                    <input 
-                        type="password" 
-                        placeholder="Confirm Password" 
-                        required 
-                        value={confirmPassword} 
-                        onChange={(e) => setConfirmPassword(e.target.value)} 
-                    />
-                </div>
-                <button type="submit">Reset Password</button>
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-                {successMessage && <p className="success-message">{successMessage}</p>}
-                <div className="register-link">
-                    <p>Remember your password? <Link to="/login">Login</Link></p>
-                </div>
-            </form>
+        <div className='reset-password-page'>
+            <div className="wrapper">
+                <form onSubmit={handleSubmit}>
+                    <h1>Reset Password</h1>
+                    <div className="input-box">
+                        <input
+                            type="text"
+                            placeholder="Email/Username"
+                            required
+                            value={emailOrUsername}
+                            onChange={(e) => setEmailOrUsername(e.target.value)}
+                        />
+                    </div>
+                    <div className="input-box">
+                        <input
+                            type="password"
+                            placeholder="New Password"
+                            required
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                    </div>
+                    <div className="input-box">
+                        <input
+                            type="password"
+                            placeholder="Confirm Password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </div>
+                    <button type="submit">Reset Password</button>
+                    {errorMessage && <p className="error-message">{errorMessage}</p>}
+                    {successMessage && <p className="success-message">{successMessage}</p>}
+                    <div className="register-link">
+                        <p>Remember your password? <Link to="/login">Login</Link></p>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };
