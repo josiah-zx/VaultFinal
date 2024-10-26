@@ -58,7 +58,7 @@ const PostFeed = () => {
                     <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic" />
                     <span className="username">{username || errorMessage}</span>
                 </div>
-                <img src="/time-stopwatch-sand.jpg" alt="Post content" className="post-content" />
+                <img src="/vault_count_1.jpeg" alt="Post content" className="post-content" />
                 <div className="post-info">
                     <p className="caption"><strong>{username || errorMessage}</strong> Caption goes here.</p>
                     <div className="post-stats">

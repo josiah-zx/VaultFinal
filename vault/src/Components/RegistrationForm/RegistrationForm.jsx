@@ -44,45 +44,47 @@ const RegistrationForm = () => {
     };
 
     return (
-        <div className='wrapper'>
-            <form onSubmit={handleSubmit}>
-                <h1>Create an Account</h1>
-                <div className="input-box">
-                    <input type="text" placeholder='First Name' required value={firstName}
-                           onChange={(e) => setFirstName(e.target.value)}/>
-                    <FaUser className='icons'/>
-                </div>
-                <div className="input-box">
-                    <input type="text" placeholder='Last Name' required value={lastName}
-                           onChange={(e) => setLastName(e.target.value)}/>
-                    <FaUser className='icons'/>
-                </div>
-                <div className="input-box">
-                    <input type="text" placeholder='Email' required value={email}
-                           onChange={(e) => setEmail(e.target.value)}/>
-                    <FaUser className='icons'/>
-                </div>
-                <div className="input-box">
-                    <input type="text" placeholder='Username' required value={username}
-                           onChange={(e) => setUsername(e.target.value)}/>
-                    <FaUser className='icons'/>
-                </div>
-                <div className="input-box">
-                    <input type="password" placeholder='Password' required value={password}
-                           onChange={(e) => setPassword(e.target.value)}/>
-                    <FaLock className='icons'/>
-                </div>
-                <div className="input-box">
-                    <input type="password" placeholder='Confirm Password' required value={confirmedPassword}
-                           onChange={(e) => setConfirmedPassword(e.target.value)}/>
-                    <FaLock className='icons'/>
-                </div>
-                <button type="submit">Sign Up</button>
-                <div className="login-link">
-                    <p>Already have an account? <Link to="/login">Login</Link></p>
-                </div>
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-            </form>
+        <div className='registration-page'>
+            <div className='wrapper'>
+                <form onSubmit={handleSubmit}>
+                    <h1>Create an Account</h1>
+                    <div className="input-box">
+                        <input type="text" placeholder='First Name' required value={firstName}
+                               onChange={(e) => setFirstName(e.target.value)}/>
+                        <FaUser className='icons'/>
+                    </div>
+                    <div className="input-box">
+                        <input type="text" placeholder='Last Name' required value={lastName}
+                               onChange={(e) => setLastName(e.target.value)}/>
+                        <FaUser className='icons'/>
+                    </div>
+                    <div className="input-box">
+                        <input type="text" placeholder='Email' required value={email}
+                               onChange={(e) => setEmail(e.target.value)}/>
+                        <FaUser className='icons'/>
+                    </div>
+                    <div className="input-box">
+                        <input type="text" placeholder='Username' required value={username}
+                               onChange={(e) => setUsername(e.target.value)}/>
+                        <FaUser className='icons'/>
+                    </div>
+                    <div className="input-box">
+                        <input type="password" placeholder='Password' required value={password}
+                               onChange={(e) => setPassword(e.target.value)}/>
+                        <FaLock className='icons'/>
+                    </div>
+                    <div className="input-box">
+                        <input type="password" placeholder='Confirm Password' required value={confirmedPassword}
+                               onChange={(e) => setConfirmedPassword(e.target.value)}/>
+                        <FaLock className='icons'/>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                    <div className="login-link">
+                        <p>Already have an account? <Link to="/login">Login</Link></p>
+                    </div>
+                    {errorMessage && <p className="error-message">{errorMessage}</p>}
+                </form>
+            </div>
         </div>
     );
 };

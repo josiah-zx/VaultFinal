@@ -44,9 +44,6 @@ const LoginForm = () => {
     return (
         <div className='login-page'>
             <div className='login-container'>
-                <div className='welcome-message'>
-                    <h1>Welcome to Vault</h1>
-                </div>
                 <div className='wrapper'>
                     <form onSubmit={handleSubmit}>
                         <h1>Login</h1>

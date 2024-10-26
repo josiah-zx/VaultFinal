@@ -1,23 +1,34 @@
+.login-page {
+    background-image:
+            linear-gradient(135deg, rgba(224, 218, 253, 0.8) 0%, rgba(106, 135, 214, 0.8) 33%, rgba(58, 79, 146, 0.8) 66%, rgba(17, 35, 88, 0.8) 100%),
+            url("/public/vault_count_bw.jpeg");
+    height: 100vh;
+    width: 100vw;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .login-container{
-    margin-top: -100px;
+    position: absolute;
+    margin-top: -88px;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6rem;
-}
-
-.welcome-message{
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    gap: 4rem;
 }
 
 .wrapper {
     width: 420px;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     color:white;
     border-radius: 12px;
     padding: 30px 40px;
