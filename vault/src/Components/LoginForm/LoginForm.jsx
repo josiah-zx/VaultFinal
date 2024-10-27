@@ -22,6 +22,7 @@ const LoginForm = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }), 
+                credentials: 'include',  // Include credentials (session cookies)
             });
     
             const data = await response.json();
@@ -29,9 +30,7 @@ const LoginForm = () => {
             if (response.ok) {
                 console.log('Login successful:', data.message);
                 setErrorMessage('');
-                localStorage.setItem('username', data.username); 
-                localStorage.setItem('email', data.email);
-                navigate('/home');
+                navigate('/home');  // Redirect after successful login
             } else {
                 setErrorMessage(data.message);
             }
@@ -40,29 +39,34 @@ const LoginForm = () => {
             setErrorMessage('Something went wrong. Please try again.');
         }
     };
+    
 
     return (
-        <div className='wrapper'>
-            <form onSubmit={handleSubmit}>
-                <h1>Login</h1>
-                <div className="input-box">
-                    <input type="text" placeholder='Username/Email' required value={username} onChange={(e) => setUsername(e.target.value)} />
-                    <FaUser className= 'icons' />
+        <div className='login-page'>
+            <div className='login-container'>
+                <div className='wrapper'>
+                    <form onSubmit={handleSubmit}>
+                        <h1>Login</h1>
+                        <div className="input-box">
+                            <input type="text" placeholder='Username/Email' required value={username} onChange={(e) => setUsername(e.target.value)} />
+                            <FaUser className= 'icons' />
+                        </div>
+                        <div className="input-box">
+                            <input type="password" placeholder='Password' required value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <FaLock className= 'icons'/>
+                        </div>
+                        <div className="remember-forgot">
+                            <label><input type="checkbox" /> Remember Me</label>
+                            <Link to="/reset-password">Forgot Password?</Link>
+                        </div>
+                        <button type="submit">Login</button>
+                        <div className="register-link">
+                            <p>Need an account? <Link to="/register">Sign Up</Link></p>
+                        </div>
+                        {errorMessage && <p className="error-message">{errorMessage}</p>}
+                    </form>
                 </div>
-                <div className="input-box">
-                    <input type="password" placeholder='Password' required value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <FaLock className= 'icons'/>
-                </div>
-                <div className="remember-forgot">
-                    <label><input type="checkbox" /> Remember Me</label>
-                    <Link to="/reset-password">Forgot Password?</Link>  
-                </div>
-                <button type="submit">Login</button>
-                <div className="register-link">
-                    <p>Need an account? <Link to="/register">Sign Up</Link></p>
-                </div>
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-            </form>
+            </div>
         </div>
     );
 };

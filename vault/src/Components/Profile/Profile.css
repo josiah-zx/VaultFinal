@@ -3,12 +3,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 20px 20px 20px 20px;
     padding: 50px 20px;
-    background-color: rgba(22, 22, 24, 0.95);
+    background: rgba(10, 10, 10, 0.8); 
     color: white;
-    height: calc(97vh - 70px); 
-    justify-content: center;
+    height: calc(100vh - 70px); 
+    justify-content: center; 
     margin-top: 70px; 
 }
 
@@ -31,6 +30,7 @@
     font-size: 32px;
     margin-bottom: 15px;
     font-weight: bold;
+    color: white;
 }
 
 .profile-stats {
@@ -84,7 +84,7 @@
     padding: 30px;
     background-color: rgba(255, 255, 255, 0.12);
     border-radius: 20px;
-    width: 70%; 
+    width: 70%; /* Make the content area wider */
     text-align: center;
     color: #f1f1f1;
 }
