@@ -1,9 +1,10 @@
 from datetime import datetime
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, send_file, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import cross_origin
+import logging
 import os
 # import sqlite3 (unused)
 
@@ -24,6 +25,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
 bcrypt = Bcrypt(app)
+
+
+
+UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Console output
+        logging.FileHandler("app.log")  # Log to a file named app.log
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Creates the database with multiple tables
 class User(db.Model):
@@ -51,6 +68,7 @@ class Post(db.Model):
     image_url = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    open_at = db.Column(db.DateTime, nullable=False) 
 
 # Define the Follower model
 class Follower(db.Model):
@@ -77,6 +95,9 @@ class Message(db.Model):
 
 # Initialize the database
 with app.app_context():
+    posts = Post.query.all()
+    for post in posts:
+        print(post.open_at)
     db.create_all()
 
 # Returns all the users in the users table
@@ -97,6 +118,7 @@ def get_users():
         } for user in users
     ]
     return jsonify(users_list)
+
 
 # Login handling
 @app.route('/login', methods=['POST'])
@@ -247,26 +269,64 @@ def update_settings():
 
     return jsonify({"status": "success", "message": "Settings updated successfully!"}), 200
 
-# Create a post (time capsule)
+
 @app.route('/posts', methods=['POST'])
 def create_post():
-    data = request.json
-    user = User.query.get(data['user_id'])
+    data = request.form
+    logger.info("Received request to create post with data: %s", data)
 
-    if not user:
-        return jsonify({"message": "User not found"}), 404
+    # Retrieve the file and save it if provided
+    file = request.files.get('image_url')
+    file_path = None
+    if file:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+        logger.info("File saved to %s", file_path)
+    else:
+        logger.warning("No file received.")
 
-    # Create a new post
+    # Retrieve user information and open date from the form
+    user_id = data.get('user_id')
+    content = data.get('content')
+    open_at = data.get('open_at')
+    try:
+        if open_at:
+            open_at = datetime.strptime(open_at, '%Y-%m-%dT%H:%M')
+            logger.info("Parsed open_at: %s", open_at)
+        else:
+            logger.info("No open_at provided; using None.")
+    except ValueError as e:
+        logger.error("Failed to parse open_at date: %s with error %s", open_at, e)
+        return jsonify({"message": "Invalid open_at format, expected '%Y-%m-%dT%H:%M'"}), 400
+
+    # Save the post with the provided data
     new_post = Post(
-        user_id=user.user_id,
-        content=data['content'],
-        image_url=data.get('image_url')  # Optional image
+        user_id=user_id,
+        content=content,
+        image_url=f"/uploads/{file.filename}" if file else None, 
+        open_at=open_at
     )
-
     db.session.add(new_post)
-    db.session.commit()
+    try:
+        db.session.commit()
+        logger.info("Successfully created post with post_id: %s", new_post.post_id)
+        return jsonify({"message": "Post created!", "image_url": new_post.image_url}), 201
+    except Exception as e:
+        logger.error("Failed to commit new post to the database: %s", e)
+        db.session.rollback()
+        return jsonify({"message": "Failed to create post"}), 500
 
-    return jsonify({"message": "Post created!"}), 201
+
+from flask import send_from_directory
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        # Dynamically set the mimetype based on the file extension
+        return send_file(file_path, mimetype='image/jpeg')  
+    else:
+        return jsonify({"error": "File not found"}), 404
 
 # Searching for users
 @app.route('/search', methods=['GET'])
@@ -345,6 +405,25 @@ def get_messages(user1_id, user2_id):
     ]
 
     return jsonify(messages_list)
+
+@app.route('/available-posts', methods=['GET'])
+def get_available_posts():
+    current_time = datetime.utcnow()
+    available_posts = Post.query.filter(Post.open_at <= current_time).all()
+
+    posts_list = [
+        {
+            "post_id": post.post_id,
+            "user_id": post.user_id,
+            "content": post.content,
+            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,  
+            "created_at": post.created_at,
+            "updated_at": post.updated_at,
+            "open_at": post.open_at
+        } for post in available_posts
+    ]
+    return jsonify(posts_list)
+
 
 # Route to mark messages as read
 @app.route('/read-message/<int:message_id>', methods=['POST'])

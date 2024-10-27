@@ -4,18 +4,18 @@
     flex-direction: column;
     align-items: center;
     padding: 50px 20px;
-    background: rgba(10, 10, 10, 0.8); /* Darker background */
+    background: rgba(10, 10, 10, 0.8); 
     color: white;
-    height: calc(100vh - 70px); /* Adjust to fit below the navbar */
-    justify-content: center; /* Center the content */
-    margin-top: 70px; /* Account for navbar height */
+    height: calc(100vh - 70px); 
+    justify-content: center; 
+    margin-top: 70px; 
 }
 
 /* Avatar Styling */
 .profile-avatar {
     font-size: 140px;
     margin-bottom: 20px;
-    color: #f1f1f1; /* Slightly lighter color for the avatar */
+    color: #f1f1f1; 
 }
 
 /* Profile Information */
@@ -30,6 +30,7 @@
     font-size: 32px;
     margin-bottom: 15px;
     font-weight: bold;
+    color: white;
 }
 
 .profile-stats {
@@ -53,7 +54,7 @@
     width: 300px;
     margin-top: 30px;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.08); /* Subtle background for the tab section */
+    background-color: rgba(255, 255, 255, 0.08); 
     border-radius: 30px;
 }
 
@@ -63,7 +64,7 @@
     cursor: pointer;
     background: none;
     color: white;
-    transition: color 0.3s ease, background 0.3s ease; /* Smooth transition on hover */
+    transition: color 0.3s ease, background 0.3s ease; 
 }
 
 .profile-tab-navbar button.active-profile-tab {
@@ -73,7 +74,7 @@
 }
 
 .profile-tab-navbar button:hover {
-    background-color: #3d4f73; /* Slight hover effect for buttons */
+    background-color: #3d4f73; 
     color: #e0e0e0;
 }
 
