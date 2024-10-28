@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HomeHeader.css';
 import { NavLink } from 'react-router-dom';
 import { FaHouseChimney } from "react-icons/fa6";
@@ -8,6 +8,29 @@ import { FaGear } from "react-icons/fa6";
 import Search from '../Search/Search';
 
 const HomeHeader = () => {
+    const [username, setUsername] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // Fetch username from Flask session
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include',  // Include session cookies
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);  // Set the username from session data
+                } else {
+                    setErrorMessage('Failed to load user info');
+                }
+            } catch (error) {
+                console.error("Failed to fetch session user:", error);
+                setErrorMessage('An error occurred while fetching user data.');
+            }
+        };
+        fetchSessionUser();
+    }, []);
 
     return (
         <nav className="navbar">
@@ -25,7 +48,7 @@ const HomeHeader = () => {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="/profile" activeClassName="active-link">
+                    <NavLink to={`/${username}`} activeClassName="active-link">
                         <FaUserCircle className= 'icons'/>
                         <span className='text'>Profile</span>
                     </NavLink>

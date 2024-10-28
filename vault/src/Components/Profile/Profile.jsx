@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './Profile.css';
 import Navbar from '../HomeHeader/HomeHeader';
 import { FaUserCircle } from "react-icons/fa";
@@ -6,7 +7,9 @@ import { BsGrid3X3 } from "react-icons/bs";
 import { IoIosStarOutline } from "react-icons/io";
 
 const Profile = () => {
-    const [username, setUsername] = useState('');
+    const { profileUsername } = useParams();
+    const [currentUser, setCurrentUser] = useState('');
+    const [isFollowing, setIsFollowing] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [selectedTab, setSelectedTab] = useState('capsules');
 
@@ -19,7 +22,7 @@ const Profile = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setUsername(data.username);  // Set the username from session data
+                    setCurrentUser(data.username);  // Set the username from session data
                 } else {
                     setErrorMessage('Failed to load user info');
                 }
@@ -31,9 +34,42 @@ const Profile = () => {
         fetchSessionUser();
     }, []);
 
-    const handleTabClick = (tab) => {
-        setSelectedTab(tab);
+    useEffect(() => {
+        const checkFollowStatus = async () => {
+            if (currentUser !== profileUsername) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:5000/follow-status/${profileUsername}`, {
+                        credentials: 'include',
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setIsFollowing(data.isFollowing);
+                    }
+                } catch (error) {
+                    console.error("Error fetching follow status:", error);
+                }
+            }
+        };
+        checkFollowStatus();
+    }, [currentUser, profileUsername]);
+        
+    const toggleFollow = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/follow/${profileUsername}`, {
+                method: isFollowing ? 'DELETE' : 'POST',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                setIsFollowing(!isFollowing);
+            } else {
+                console.error("Failed to update follow status");
+            }
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
     };
+
+    const handleTabClick = (tab) => setSelectedTab(tab);
 
     return (
         <div>
@@ -43,13 +79,22 @@ const Profile = () => {
                     <FaUserCircle />
                 </div>
                 <div className="profile-info">
-                    <h2>{username || errorMessage}</h2> {/* Display username or error message */}
+                    <h2>{profileUsername || errorMessage}</h2> {/* Display username or error message */}
                     <div className="profile-stats">
                         <span># posts</span>
                         <span># followers</span>
                         <span># following</span>
                     </div>
                     <p>bio</p>
+
+                    {/* Conditional rendering for follow/edit profile button*/}
+                    {currentUser === profileUsername ? (
+                        <button className="edit-profile-button">Edit Profile</button>
+                    ) : (
+                        <button className="follow-button" onClick={toggleFollow} >
+                            {isFollowing ? 'Unfollow' : 'Follow'}
+                        </button>
+                    )}
                 </div>
 
                 <div className="profile-tab-navbar">

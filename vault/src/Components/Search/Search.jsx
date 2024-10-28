@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import { ImCross } from 'react-icons/im';
 
@@ -50,13 +51,14 @@ export const Search = () => {
             <div className='search-result'>
                 {searchData.map((data, index) => {
                     return (
-                        <a 
-                            href={data.username} 
+                        <Link
+                            to={`/${data.username}`}
                             key={index} 
-                            target='_blank' 
-                            className='search-suggestion-line'>
+                            className='search-suggestion-line'
+                            onClick={handleClose}
+                        >
                             {data.username}
-                        </a>
+                        </Link>
                     );
                 })}
             </div>
