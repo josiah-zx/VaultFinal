@@ -435,6 +435,73 @@ def mark_message_as_read(message_id):
         return jsonify({"status": "success", "message": "Message marked as read."}), 200
     else:
         return jsonify({"status": "failure", "message": "Message not found."}), 404
+    
+# Route to follow a user
+@app.route('/follow/<username>', methods=['POST'])
+def follow_user(username):
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 403
+    
+    current_user_id = session['user_id']
+    user_to_follow = User.query.filter_by(username=username).first()
+
+    if not user_to_follow:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Check if already following
+    follow_relationship = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_follow.user_id
+    ).first()
+
+    if follow_relationship:
+        return jsonify({'message': 'Already following'}), 200
+    
+    new_follow = Follower(follower_id=current_user_id, followed_id=user_to_follow.user_id)
+    db.session.add(new_follow)
+    db.session.commit()
+    return jsonify({'message': 'Followed successfully'}), 201
+
+# Unfollow a user
+@app.route('/follow/<username>', methods=['DELETE'])
+def unfollow_user(username):
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 403
+
+    current_user_id = session['user_id']
+    user_to_unfollow = User.query.filter_by(username=username).first()
+
+    if not user_to_unfollow:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Find the follow relationship
+    follow_relationship = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_unfollow.user_id
+    ).first()
+
+    if follow_relationship:
+        db.session.delete(follow_relationship)
+        db.session.commit()
+        return jsonify({'message': 'Unfollowed successfully'}), 200
+    else:
+        return jsonify({'message': 'Not following this user'}), 400
+
+# Route to check following status
+@app.route('/follow-status/<username>', methods=['GET'])
+def check_follow_status(username):
+    current_user_id = session.get('user_id')
+    user_to_check = User.query.filter_by(username=username).first()
+
+    if not user_to_check:
+        return jsonify({'error': 'User not found'}), 404
+    
+    is_following = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_check.user_id
+    ).first() is not None
+
+    return jsonify({'isFollowing': is_following})
 
 # Route to log out user session
 @app.route('/logout', methods=['POST'])

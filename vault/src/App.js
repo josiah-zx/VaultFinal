@@ -20,7 +20,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/home" element={<Home />} />
           <Route path="/messages" element={<Messages/>} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/:profileUsername" element={<Profile />} />
           <Route path="/settings" element={<Settings/>} />
       </Routes>
   );
