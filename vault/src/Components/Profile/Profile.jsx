@@ -9,6 +9,10 @@ import { IoIosStarOutline } from "react-icons/io";
 const Profile = () => {
     const { profileUsername } = useParams();
     const [currentUser, setCurrentUser] = useState('');
+    const [postCount, setPostCount] = useState(0);
+    const [followerCount, setFollowerCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
+    const [bio, setBio] = useState('');
     const [isFollowing, setIsFollowing] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [selectedTab, setSelectedTab] = useState('capsules');
@@ -35,23 +39,25 @@ const Profile = () => {
     }, []);
 
     useEffect(() => {
-        const checkFollowStatus = async () => {
-            if (currentUser !== profileUsername) {
-                try {
-                    const response = await fetch(`http://127.0.0.1:5000/follow-status/${profileUsername}`, {
-                        credentials: 'include',
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setIsFollowing(data.isFollowing);
-                    }
-                } catch (error) {
-                    console.error("Error fetching follow status:", error);
+        const fetchProfileData = async () => {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/users/${profileUsername}`, {
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setPostCount(data.post_count);
+                    setFollowerCount(data.follower_count);
+                    setFollowingCount(data.following_count);
+                    setBio(data.bio);
+                    setIsFollowing(data.is_following);
                 }
+            } catch (error) {
+                console.error("Error fetching follow status:", error);
             }
         };
-        checkFollowStatus();
-    }, [currentUser, profileUsername]);
+        fetchProfileData();
+    }, [profileUsername]);
         
     const toggleFollow = async () => {
         try {
@@ -81,11 +87,11 @@ const Profile = () => {
                 <div className="profile-info">
                     <h2>{profileUsername || errorMessage}</h2> {/* Display username or error message */}
                     <div className="profile-stats">
-                        <span># posts</span>
-                        <span># followers</span>
-                        <span># following</span>
+                        <span>{postCount} posts</span>
+                        <span>{followerCount} followers</span>
+                        <span>{followingCount} following</span>
                     </div>
-                    <p>bio</p>
+                    <p>{bio}</p>
 
                     {/* Conditional rendering for follow/edit profile button*/}
                     {currentUser === profileUsername ? (

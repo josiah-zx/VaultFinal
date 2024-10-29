@@ -206,26 +206,35 @@ def get_session_user():
     return jsonify({"error": "User not logged in"}), 401
 
 
-# Retrieve single user by ID
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    user = User.query.get(user_id)
+# Retrieve single user by username
+@app.route('/users/<username>', methods=['GET'])
+def get_user(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Get the post, follower, and following counts
+    post_count = Post.query.filter_by(user_id=username).count() # usernames are currently in user_id for Post, FIX
+    follower_count = Follower.query.filter_by(followed_id=user.user_id).count()
+    following_count = Follower.query.filter_by(follower_id=user.user_id).count()
 
-    if user:
-        user_data = {
-            "user_id": user.user_id,
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "profile_pic": user.profile_pic,
-            "bio": user.bio,
-            "created_at": user.created_at,
-            "updated_at": user.updated_at
-        }
-        return jsonify(user_data), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
+    # Check if the current session user follows this profile user
+    current_user_id = session.get('user_id')
+    is_following = False
+    if current_user_id:
+        is_following = Follower.query.filter_by(
+            follower_id=current_user_id,
+            followed_id=user.user_id
+        ).first() is not None
+        
+    return jsonify({
+        'post_count': post_count,
+        'follower_count': follower_count,
+        'following_count': following_count,
+        'bio': user.bio,
+        'is_following': is_following
+    })
+
 
 # Update user profile information
 @app.route('/users/<int:user_id>', methods=['PUT'])
