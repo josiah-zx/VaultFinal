@@ -8,7 +8,7 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [imageUrl, setImageUrl] = useState('');  // Add state for image URL
+    const [imageUrl, setImageUrl] = useState('');  
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -45,7 +45,6 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
         }
     
         const formData = new FormData();
-        formData.append('user_id', username);
         formData.append('content', description);
         formData.append('open_at', selectedDate);
         if (file) {
@@ -61,12 +60,12 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
     
             if (response.ok) {
                 const data = await response.json();
-                setImageUrl(data.image_url);  // Set the image URL upon successful response
+                setImageUrl(data.image_url); 
                 setSuccessMessage("Time capsule saved successfully!");
                 setErrorMessage('');
                 
-                // Pass image URL to the parent component
-                onImageUpload(data.image_url);  // Add this line
+               
+                onImageUpload(data.image_url);
             } else {
                 setErrorMessage("Failed to save time capsule.");
             }
