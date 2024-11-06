@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import './Messages.css';
 import { FaUserCircle } from "react-icons/fa";
 import { FaSearch } from 'react-icons/fa';
 import { ImCross } from 'react-icons/im';
 import { IoArrowUndo } from "react-icons/io5";
+import { PiPaperPlaneTilt } from "react-icons/pi";
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../HomeHeader/HomeHeader';  
 
@@ -14,22 +14,8 @@ const Messages = () => {
     const [selectedUsername, setSelectedUsername] = useState("");
     const [search, setSearch] = useState('');
     const [searchData, setSearchData] = useState([]);
+    const [message, setMessage] = useState("");
     const navigate = useNavigate();
-
-    const handleClose = () => {
-        setSearch('');
-        setSearchData([]);
-    }
-    
-    useEffect(() => {
-        if(search !== '') {
-            fetch(`http://127.0.0.1:5000/search?q=${search}`)
-            .then((res) => res.json())
-            .then((data) => setSearchData(data));
-        } else {
-            setSearchData([]);
-        }
-    }, [search])
     
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -50,6 +36,52 @@ const Messages = () => {
         };
         fetchSessionUser();
     }, [navigate]);
+
+    useEffect(() => {
+        if(search !== '') {
+            fetch(`http://127.0.0.1:5000/search?q=${search}`)
+            .then((res) => res.json())
+            .then((data) => setSearchData(data));
+        } else {
+            setSearchData([]);
+        }
+    }, [search])
+
+
+    const handleClose = () => {
+        setSearch('');
+        setSearchData([]);
+    }
+
+    const sendMessage = async (e) => {
+        e.preventDefault();
+        if (message.trim() === "") return;
+        try {
+            // Send a POST request to backend
+            const response = await fetch('http://127.0.0.1:5000/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    receiver_username: selectedUsername, 
+                    content: message 
+                }), 
+                credentials: 'include',  // Include credentials (session cookies)
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Message sent:', message);
+                setMessage("");
+            } else {
+                console.log("An error occurred");
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+        }
+    };
 
     const handleDeleteCapsules = async () => {
         try {
@@ -93,7 +125,7 @@ const Messages = () => {
                                 <IoArrowUndo /></button>
                             <h2>New Message</h2>
                             <div className= "message-search-input">
-                                <div className='search-icon' > 
+                                <div className='message-search-icon' > 
                                     {search === '' ? (
                                         <FaSearch />
                                     ) : (
@@ -119,7 +151,6 @@ const Messages = () => {
                                                 setSelectedUsername(data.username);
                                                 setIsSearchOpen(false);
                                                 handleClose();
-                                                console.log(data.username);
                                             }}
                                         >
                                             {data.username}
@@ -127,6 +158,32 @@ const Messages = () => {
                                     );
                                 })}
                             </div>
+                        </div>
+                    ) : selectedUsername ? (
+                        <div className="user-message">
+                            <div className="other-user-header">
+                                <FaUserCircle 
+                                    className="other-user-icon" 
+                                    onClick={() => navigate(`/${selectedUsername}`)}/>
+                                <h3 onClick={() => navigate(`/${selectedUsername}`)}> {selectedUsername}</h3>
+                            </div>
+                            <div className="chat-content">
+                            </div>
+                            <form onSubmit={sendMessage}>
+                                <div className="message-bar">
+                                    <input
+                                        type="text"
+                                        className="message-content"
+                                        placeholder="Message..."
+                                        autoComplete='off'
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                    />
+                                    <button type="submit" className="send-button">
+                                        <PiPaperPlaneTilt />
+                                        </button>
+                                </div>
+                            </form>
                         </div>
                     ) : (
                         <div className="empty-message">

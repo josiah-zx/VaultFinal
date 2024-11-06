@@ -10,10 +10,6 @@ export const Search = () => {
     const [search, setSearch] = useState('');
     const [searchData, setSearchData] = useState([]);
 
-    const handleChange = e => {
-        setSearch(e.target.value)
-    };
-
     const handleClose = () => {
         setSearch('');
         setSearchData([]);
@@ -44,7 +40,7 @@ export const Search = () => {
                     className='search'
                     placeholder='Search...'
                     autoComplete='off'
-                    onChange={handleChange}
+                    onChange={(e) => setSearch(e.target.value)}
                     value={search}
                 />
             </div>
