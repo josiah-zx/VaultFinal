@@ -1,13 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './Messages.css';
 import { FaUserCircle } from "react-icons/fa";
+import { FaSearch } from 'react-icons/fa';
+import { ImCross } from 'react-icons/im';
+import { IoArrowUndo } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../HomeHeader/HomeHeader';  
 
 const Messages = () => {
     const [username, setUsername] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [selectedUsername, setSelectedUsername] = useState("");
+    const [search, setSearch] = useState('');
+    const [searchData, setSearchData] = useState([]);
     const navigate = useNavigate();
 
+    const handleClose = () => {
+        setSearch('');
+        setSearchData([]);
+    }
+    
+    useEffect(() => {
+        if(search !== '') {
+            fetch(`http://127.0.0.1:5000/search?q=${search}`)
+            .then((res) => res.json())
+            .then((data) => setSearchData(data));
+        } else {
+            setSearchData([]);
+        }
+    }, [search])
+    
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
@@ -64,15 +87,59 @@ const Messages = () => {
                 </div>
 
                 <div className="chat-area">
-                    <div className="empty-message">
-                        <h2>Your messages</h2>
-                        <p>Send a message to start a chat.</p>
-                        <button className="send-message-btn">Send message</button>
-                        {/* Delete all capsules button */}
-                        <button className="delete-capsules-btn" onClick={handleDeleteCapsules}>
-                            Delete All Capsules
-                        </button>
-                    </div>
+                    {isSearchOpen ? ( 
+                        <div className="new-message">
+                            <button className="back-button" onClick={() => setIsSearchOpen(false)}>
+                                <IoArrowUndo /></button>
+                            <h2>New Message</h2>
+                            <div className= "message-search-input">
+                                <div className='search-icon' > 
+                                    {search === '' ? (
+                                        <FaSearch />
+                                    ) : (
+                                        <ImCross onClick={handleClose} />
+                                    )}
+                                </div>
+                                <input
+                                    type="text"
+                                    className="message-search"
+                                    placeholder="Search..."
+                                    autoComplete='off'
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    value={search}
+                                />
+                            </div>
+                            <div className="message-search-result">
+                                {searchData.map((data, index) => {
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="message-search-result-item"
+                                            onClick={() => {
+                                                setSelectedUsername(data.username);
+                                                setIsSearchOpen(false);
+                                                handleClose();
+                                                console.log(data.username);
+                                            }}
+                                        >
+                                            {data.username}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="empty-message">
+                            <h2>Your messages</h2>
+                            <p>Send a message to start a chat.</p>
+                            <button className="send-message-btn" onClick={() => setIsSearchOpen(true)}>
+                                Send message</button>
+                            {/* Delete all capsules button */}
+                            <button className="delete-capsules-btn" onClick={handleDeleteCapsules}>
+                                Delete All Capsules
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
