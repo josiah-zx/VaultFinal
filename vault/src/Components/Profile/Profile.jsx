@@ -114,6 +114,11 @@ const Profile = () => {
             });
             if (response.ok) {
                 setIsFollowing(!isFollowing);
+                if (!isFollowing) {
+                    setFollowerCount(followerCount + 1);
+                } else {
+                    setFollowerCount(followerCount - 1);
+                }
             } else {
                 console.error("Failed to update follow status");
             }
