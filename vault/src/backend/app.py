@@ -422,10 +422,13 @@ def reset_password():
 @app.route('/send-message', methods=['POST'])
 def send_message():
     data = request.json
-    sender_id = data['sender_id']
-    receiver_id = data['receiver_id']
+    receiver_username = data['receiver_username']
     content = data['content']
     attachment_url = data.get('attachment_url')
+
+    sender_id = session.get('user_id')
+    receiver_user = User.query.filter_by(username=receiver_username).first()
+    receiver_id = receiver_user.user_id
 
     message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
 

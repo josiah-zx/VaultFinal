@@ -16,21 +16,6 @@ const Messages = () => {
     const [searchData, setSearchData] = useState([]);
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
-
-    const handleClose = () => {
-        setSearch('');
-        setSearchData([]);
-    }
-    
-    useEffect(() => {
-        if(search !== '') {
-            fetch(`http://127.0.0.1:5000/search?q=${search}`)
-            .then((res) => res.json())
-            .then((data) => setSearchData(data));
-        } else {
-            setSearchData([]);
-        }
-    }, [search])
     
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -52,12 +37,50 @@ const Messages = () => {
         fetchSessionUser();
     }, [navigate]);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if(search !== '') {
+            fetch(`http://127.0.0.1:5000/search?q=${search}`)
+            .then((res) => res.json())
+            .then((data) => setSearchData(data));
+        } else {
+            setSearchData([]);
+        }
+    }, [search])
+
+
+    const handleClose = () => {
+        setSearch('');
+        setSearchData([]);
+    }
+
+    const sendMessage = async (e) => {
         e.preventDefault();
         if (message.trim() === "") return;
-
-        console.log('Message sent:', message);
-        setMessage("");
+        try {
+            // Send a POST request to backend
+            const response = await fetch('http://127.0.0.1:5000/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    receiver_username: selectedUsername, 
+                    content: message 
+                }), 
+                credentials: 'include',  // Include credentials (session cookies)
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Message sent:', message);
+                setMessage("");
+            } else {
+                console.log("An error occurred");
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+        }
     };
 
     const handleDeleteCapsules = async () => {
@@ -146,7 +169,7 @@ const Messages = () => {
                             </div>
                             <div className="chat-content">
                             </div>
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={sendMessage}>
                                 <div className="message-bar">
                                     <input
                                         type="text"
