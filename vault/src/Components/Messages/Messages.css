@@ -1,15 +1,17 @@
 /* General container styling */
 .messages-container {
-    display: flex;
-    height: 75vh;
     color: #fff;
     font-family: 'Arial', sans-serif;
+    width: 100vh;
+    height: 75vh;
+    overflow: hidden;
     padding: 20px;
+    display: flex;
 }
 
 /* Sidebar (Friends section) styling */
 .sidebar {
-    width: 220px; 
+    width: 250px; 
     background-color: rgba(22, 22, 24, 0.95);
     display: flex;
     flex-direction: column;
@@ -107,4 +109,173 @@
 
 .send-message-btn:hover {
     background-color: #0077cc;
+}
+
+.new-message {
+    margin-top: -300px;
+    align-items: flex-start;
+    padding: 55px;
+    position: relative;
+}
+
+.new-message h2 {
+    font-size: 25px;
+    margin-bottom: 15px;
+    color: #f1f1f1;
+}
+
+.back-button {
+    background-color: transparent;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 30px;
+    position: absolute;
+    top: 30px;
+    left: -40px;
+}
+
+.back-button:hover {
+    background-color: transparent;
+}
+
+.message-search-input {
+    background-color: white;
+    width: calc(100% + 170px);
+    margin-left: -85px;
+    border-radius: 10px;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.message-search-icon {
+    margin-left: 15px;
+    color: black;
+    cursor: pointer;
+}
+
+.message-search {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+    padding: 0 20px;
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+}
+
+.message-search:focus {
+    outline: none;
+}
+
+.message-search-result {
+    position: absolute;
+    display: flex;
+    width: calc(100% + 60px);
+    margin-left: -85px;
+    max-height: 300px;
+    overflow-y: scroll;
+    margin-top: 25px;
+    color: white;
+    flex-direction: column;
+}
+
+.message-search-result::-webkit-scrollbar {
+    display: none;
+}
+
+.message-search-result-item {
+    text-decoration: none;
+    color: white;
+    flex-direction: column;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.message-search-result-item:hover {
+    background-color: rgb(78, 78, 78);
+}
+
+.user-message {
+    position: relative;
+    display: flex;
+}
+
+.other-user-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: -410px;
+    margin-left: -190px;
+}
+
+.other-user-header h3 {
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.other-user-icon {
+    font-size: 45px;
+    margin-right: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.message-bar {
+    background-color: transparent;
+    width: calc(100% + 370px);
+    margin-left: -135px;
+    margin-top: 185px;
+    border-radius: 10px;
+    min-height: 2.5rem;
+    height: auto;
+    max-height: 7.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    position: absolute;
+    box-shadow: 0 0 0 0.5px rgb(109, 109, 109);
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.message-bar button {
+    background-color: transparent;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 30px;
+}
+
+.message-content {
+    color: white;
+    border: none;
+    background-color: transparent;
+    border-radius: 2px;
+    flex: 1;
+    padding: 0 15px;
+    padding-right: 30px;
+    font-size: 12px;
+}
+
+.message-content:focus {
+    outline: none;
+}
+
+.send-button {
+    cursor: pointer;
+    position: relative;
+    left: -15px;
+    font-size: 20px;
 }

@@ -59,9 +59,39 @@
     border-radius: 50%;
     margin-right: 10px;
 }
+.post-card {
+    background-color: rgba(22, 22, 24, 0.95);
+    margin-top: 10px;
+    border: 1px solid #dbdbdb;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    color: white;
+    position: relative; /* Allow absolute positioning inside */
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    position: absolute; /* Place in top-left of the post */
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Optional: semi-transparent background for better readability */
+    border-radius: 8px;
+    padding: 5px 10px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
 
 .username {
     font-weight: bold;
+    color: white;
 }
 
 .post-content {
@@ -88,6 +118,7 @@
     justify-content: space-between;
     margin: 5px 40px;
 }
+
 
 .icon{
     cursor: pointer;
