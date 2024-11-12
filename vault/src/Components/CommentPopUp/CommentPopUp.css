@@ -4,7 +4,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(22, 22, 24, 0.95); /* Full-screen background color */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,19 +13,30 @@
     box-sizing: border-box;
 }
 
+.popup-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(22, 22, 24, 0.95); /* Full dark overlay */
+    z-index: -1; /* Place it behind other popup content */
+}
+
 .popup-wrapper {
     width: 90%;
     max-width: 900px;
     height: 90%;
-    background-color: rgba(22, 22, 24, 0.95); /* Background for entire popup */
-    border-radius: 50px;
+    background-color: transparent; /* Keep it transparent to show the full black background */
+    border-radius: 15px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 0;
     box-sizing: border-box;
     position: relative;
     color: #ccc;
+    z-index: 1; /* Ensure it’s above the popup-background */
 }
 
 .popup-content {
@@ -45,13 +55,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: transparent; /* Transparent background */
+    background-color: transparent;
 }
 
 .popup-post img {
     width: 100%;
-    border-radius: 15px;
-    border: none; /* Remove the border around the image */
+    border-radius: 8px;
+    border: none;
 }
 
 .popup-comments {
