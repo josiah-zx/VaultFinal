@@ -134,7 +134,7 @@ const Profile = () => {
     return (
         <div>
             <Navbar />
-            <div className="profile">
+            <div className={selectedTab === "capsules" ? "capsule-profile" : "post-profile"}>
                 <div className="profile-avatar">
                     <FaUserCircle />
                 </div>
@@ -197,16 +197,15 @@ const Profile = () => {
 
                     {selectedTab === "posts" && (
                          <div className="posts-tab post-content">
-                            <h3>Posts Content</h3>
+                            <h3 className="posts-heading">Posts Content</h3>
                             {regularPosts.length > 0 ? (
-                                <div className="regular-posts">
-                                    {regularPosts.map((post) => (
-                                        <div key={post.post_id} className="post">
-                                            <img src={post.image_url} alt="Post content" className="post-image" />
-                                            <p>{post.content}</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                regularPosts.map((post) => (
+                                    <div key={post.post_id} className="post">
+                                        <img src={post.image_url} alt="Post content" className="post-image" />
+                                        <p>{post.content}</p>
+                                    </div>
+                                ))
+                            
                             ) : (
                                 <p>No posts available.</p>
                             )}

@@ -428,14 +428,50 @@ def send_message():
 
     sender_id = session.get('user_id')
     receiver_user = User.query.filter_by(username=receiver_username).first()
+
+    if not receiver_user:
+        return jsonify({"status": "failure", "message": "Receiver not found"}), 404
+
     receiver_id = receiver_user.user_id
-
     message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
-
+    
     db.session.add(message)
     db.session.commit()
 
     return jsonify({"status": "success", "message": "Message sent!"}), 201
+
+# Endpoint to retrieve list of conversations for the logged-in user
+@app.route('/conversations/<username>', methods=['GET'])
+def get_conversations(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"status": "failure", "message": "User not found"}), 404
+
+    user_id = user.user_id
+    # Query unique conversation users
+    conversation_user_ids = db.session.query(
+        Message.receiver_id
+    ).filter(Message.sender_id == user_id).union(
+        db.session.query(Message.sender_id).filter(Message.receiver_id == user_id)
+    ).distinct()
+
+    conversations = []
+    for convo_user_id in conversation_user_ids:
+        convo_user = User.query.get(convo_user_id[0])
+        if convo_user:
+            last_message = Message.query.filter(
+                ((Message.sender_id == user_id) & (Message.receiver_id == convo_user.user_id)) |
+                ((Message.sender_id == convo_user.user_id) & (Message.receiver_id == user_id))
+            ).order_by(Message.timestamp.desc()).first()
+
+            conversations.append({
+                "username": convo_user.username,
+                "last_message": last_message.content if last_message else "",
+                "timestamp": last_message.timestamp if last_message else ""
+            })
+
+    return jsonify(conversations)
+
 
 # Route to get a conversation (list of all msgs ) between user1 and user2 by ID
 @app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
