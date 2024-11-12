@@ -76,38 +76,45 @@ const PostFeed = () => {
 
     return (
         <div className="feed-container">
+            <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
             <div className="feed">
                 {availablePosts.length > 0 ? (
                     availablePosts.map((post) => {
-                        const postStatus = likeStatus[post.post_id] || { isLiked: false, likes: 0 };
+                        const postStatus = likeStatus[post.post_id] || {isLiked: false, likes: 0};
                         return (
                             <div key={post.post_id} className="post-card">
                                 <div className="post-header">
-                                    <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic" />
+                                    <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
                                     <span className="username">{post.username || errorMessage}</span>
                                 </div>
-                                <img src={post.image_url} alt="Post content" className="post-content" />
+                                <img src={post.image_url} alt="Post content" className="post-content"/>
                                 <div className="post-info">
-                                    <p className="caption"><strong>{post.username || errorMessage}</strong> {post.content}</p>
+                                    <p className="caption">
+                                        <strong>{post.username || errorMessage}</strong> {post.content}</p>
                                     <div className="post-stats">
                                         <span>{postStatus.likes} likes</span>
                                         <span>{comments.length} comments</span>
                                     </div>
                                     <div className="post-actions">
                                         <span className="like-icon" onClick={() => handleLike(post.post_id)}>
-                                            {postStatus.isLiked ? <FaHeart className="icon filled" style={{ color: "red" }} /> : <FaRegHeart className="icon" />}
+                                            {postStatus.isLiked ?
+                                                <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                <FaRegHeart className="icon"/>}
                                         </span>
-                                        <span className="comment-icon" onClick={() => handleCommentClick(post.image_url)}>
-                                            <FaRegComment className="icon" />
+                                        <span className="comment-icon"
+                                              onClick={() => handleCommentClick(post.image_url)}>
+                                            <FaRegComment className="icon"/>
                                         </span>
                                         <span className="bookmark-icon" onClick={handleBookmark}>
-                                            {isBookmarked ? <FaBookmark className="icon" style={{ color: "black" }} /> : <FaRegBookmark className="icon" />}
+                                            {isBookmarked ? <FaBookmark className="icon" style={{color: "black"}}/> :
+                                                <FaRegBookmark className="icon"/>}
                                         </span>
                                         <span className="share-icon">
-                                            <FaRegPaperPlane className="icon" />
+                                            <FaRegPaperPlane className="icon"/>
                                         </span>
                                     </div>
                                 </div>
+                                <div className="separator-line"></div>
                             </div>
                         );
                     })
@@ -130,10 +137,9 @@ const PostFeed = () => {
                 )}
             </div>
 
-            <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
 
             {showTimeCapsulePopup && (
-                <TimeCapsulePopup onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload} />
+                <TimeCapsulePopup onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
             )}
         </div>
     );
