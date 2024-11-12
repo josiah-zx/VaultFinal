@@ -5,6 +5,8 @@ import { FaTimes } from 'react-icons/fa';
 const CommentPopup = ({ postContent, comments, onClose }) => {
     return (
         <div className="comment-popup">
+            <div className="popup-background" /> {/* New background overlay */}
+            
             <div className="popup-wrapper">
                 <button className="close-btn" onClick={onClose}>
                     <FaTimes />
