@@ -2,14 +2,13 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background-image: linear-gradient(135deg, #e0dafd 0%, #6a87d6 33%, #3a4f92 66%, #112358 100%);
     min-width: 100vw;
-    min-height: 100vh;
+    min-height: auto;
 }
 
 .homepage-profile {
     position: absolute;
-    margin-top: 100px;
+    margin-top: 75px;
     left: 0;
     padding-left: 90px;
 }

@@ -193,39 +193,138 @@ def register():
     }), 201
 
 @app.route('/session-user', methods=['GET'])
-@cross_origin(origin='http://localhost:3000', supports_credentials=True)
+@cross_origin(origins="http://localhost:3000", supports_credentials=True)
 def get_session_user():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
         if user:
+            logger.info(f"Session user: {user.user_id}")
             return jsonify({
                 "user_id": user.user_id,
                 "username": user.username,
                 "email": user.email  
             }), 200
+    logger.warning("User not logged in")
     return jsonify({"error": "User not logged in"}), 401
 
 
-# Retrieve single user by ID
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    user = User.query.get(user_id)
+@app.route('/posts', methods=['GET', 'POST'])
+def posts():
+    if request.method == 'GET':
+        # Handle GET request to fetch posts by username
+        username = request.args.get('username')
+        if not username:
+            return jsonify({"error": "Username is required"}), 400
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        user_posts = Post.query.filter_by(user_id=user.user_id).all()
+        posts_list = [
+            {
+                "post_id": post.post_id,
+                "user_id": post.user_id,
+                "content": post.content,
+                "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
+                "created_at": post.created_at,
+                "updated_at": post.updated_at,
+                "open_at": post.open_at
+            }
+            for post in user_posts
+        ]
+        return jsonify(posts_list), 200
 
-    if user:
-        user_data = {
-            "user_id": user.user_id,
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "profile_pic": user.profile_pic,
-            "bio": user.bio,
-            "created_at": user.created_at,
-            "updated_at": user.updated_at
+    elif request.method == 'POST':
+        # Handle POST request to create a new post
+        if 'user_id' not in session:
+            logger.warning("User not logged in.")
+            return jsonify({"error": "User not logged in"}), 401
+        
+        # Retrieve the user ID from the session
+        user_id = session['user_id']
+        logger.info(f"Creating post for user_id: {user_id}")
+        
+        # Retrieve form data
+        data = request.form
+        content = data.get("content")
+        open_at_str = data.get("open_at")
+
+        # Parse the open_at date
+        try:
+            open_at = datetime.strptime(open_at_str, "%Y-%m-%dT%H:%M") if open_at_str else None
+        except ValueError:
+            logger.error("Invalid date format for open_at: %s", open_at_str)
+            return jsonify({"message": "Invalid date format"}), 400
+
+        # Handle file upload
+        file = request.files.get("image_url")
+        image_url = None
+        if file:
+            filename = file.filename
+            image_url = f"/uploads/{filename}"
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            logger.info("Image file saved as %s", image_url)
+        
+        # Create new post with session-based user_id
+        new_post = Post(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
+        db.session.add(new_post)
+        db.session.commit()
+
+        return jsonify({"message": "Post created!", "post_id": new_post.post_id, "image_url": new_post.image_url}), 201
+
+
+@app.route('/user-capsules', methods=['GET'])
+def get_user_capsules():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+    current_user_id = session['user_id']
+    current_time = datetime.utcnow()
+    capsules = Post.query.filter(Post.user_id == current_user_id, Post.open_at <= current_time).all()
+    capsules_list = [
+        {
+            "post_id": post.post_id,
+            "user_id": post.user_id,
+            "content": post.content,
+            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
+            "created_at": post.created_at,
+            "updated_at": post.updated_at,
+            "open_at": post.open_at
         }
-        return jsonify(user_data), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
+        for post in capsules
+    ]
+    return jsonify(capsules_list), 200
+
+
+# Retrieve single user by username
+@app.route('/users/<username>', methods=['GET'])
+def get_user(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Get the post, follower, and following counts
+    post_count = Post.query.filter_by(user_id=username).count() # usernames are currently in user_id for Post, FIX
+    follower_count = Follower.query.filter_by(followed_id=user.user_id).count()
+    following_count = Follower.query.filter_by(follower_id=user.user_id).count()
+
+    # Check if the current session user follows this profile user
+    current_user_id = session.get('user_id')
+    is_following = False
+    if current_user_id:
+        is_following = Follower.query.filter_by(
+            follower_id=current_user_id,
+            followed_id=user.user_id
+        ).first() is not None
+        
+    return jsonify({
+        'post_count': post_count,
+        'follower_count': follower_count,
+        'following_count': following_count,
+        'bio': user.bio,
+        'is_following': is_following
+    })
+
 
 # Update user profile information
 @app.route('/users/<int:user_id>', methods=['PUT'])
@@ -249,72 +348,23 @@ def update_user(user_id):
 
 @app.route('/settings', methods=['POST'])
 def update_settings():
-    data = request.json  # Get the JSON data from the request
-    username = data.get('username')  # Username from the form
-    email = data.get('email')  # Email from the form
-    notifications_enabled = data.get('notificationsEnabled')  # Notifications preference from the form
+    data = request.json  
+    username = data.get('username')  
+    email = data.get('email')  
+    notifications_enabled = data.get('notificationsEnabled')  
 
-    # Retrieve the user from the database using the username (assuming username is unique)
     user = User.query.filter_by(username=username).first()
 
     if not user:
         return jsonify({"status": "failure", "message": "User not found"}), 404
 
-    # Update the user's email and notification preferences
+   
     user.email = email
-    # Assuming you want to store notificationsEnabled in the User model
-    # user.notifications_enabled = notifications_enabled
+   
 
-    db.session.commit()  # Commit the changes to the database
+    db.session.commit()  
 
     return jsonify({"status": "success", "message": "Settings updated successfully!"}), 200
-
-
-@app.route('/posts', methods=['POST'])
-def create_post():
-    data = request.form
-    logger.info("Received request to create post with data: %s", data)
-
-    # Retrieve the file and save it if provided
-    file = request.files.get('image_url')
-    file_path = None
-    if file:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(file_path)
-        logger.info("File saved to %s", file_path)
-    else:
-        logger.warning("No file received.")
-
-    # Retrieve user information and open date from the form
-    user_id = data.get('user_id')
-    content = data.get('content')
-    open_at = data.get('open_at')
-    try:
-        if open_at:
-            open_at = datetime.strptime(open_at, '%Y-%m-%dT%H:%M')
-            logger.info("Parsed open_at: %s", open_at)
-        else:
-            logger.info("No open_at provided; using None.")
-    except ValueError as e:
-        logger.error("Failed to parse open_at date: %s with error %s", open_at, e)
-        return jsonify({"message": "Invalid open_at format, expected '%Y-%m-%dT%H:%M'"}), 400
-
-    # Save the post with the provided data
-    new_post = Post(
-        user_id=user_id,
-        content=content,
-        image_url=f"/uploads/{file.filename}" if file else None, 
-        open_at=open_at
-    )
-    db.session.add(new_post)
-    try:
-        db.session.commit()
-        logger.info("Successfully created post with post_id: %s", new_post.post_id)
-        return jsonify({"message": "Post created!", "image_url": new_post.image_url}), 201
-    except Exception as e:
-        logger.error("Failed to commit new post to the database: %s", e)
-        db.session.rollback()
-        return jsonify({"message": "Failed to create post"}), 500
 
 
 from flask import send_from_directory
@@ -372,17 +422,56 @@ def reset_password():
 @app.route('/send-message', methods=['POST'])
 def send_message():
     data = request.json
-    sender_id = data['sender_id']
-    receiver_id = data['receiver_id']
+    receiver_username = data['receiver_username']
     content = data['content']
     attachment_url = data.get('attachment_url')
 
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
+    sender_id = session.get('user_id')
+    receiver_user = User.query.filter_by(username=receiver_username).first()
 
+    if not receiver_user:
+        return jsonify({"status": "failure", "message": "Receiver not found"}), 404
+
+    receiver_id = receiver_user.user_id
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
+    
     db.session.add(message)
     db.session.commit()
 
     return jsonify({"status": "success", "message": "Message sent!"}), 201
+
+# Endpoint to retrieve list of conversations for the logged-in user
+@app.route('/conversations/<username>', methods=['GET'])
+def get_conversations(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"status": "failure", "message": "User not found"}), 404
+
+    user_id = user.user_id
+    # Query unique conversation users
+    conversation_user_ids = db.session.query(
+        Message.receiver_id
+    ).filter(Message.sender_id == user_id).union(
+        db.session.query(Message.sender_id).filter(Message.receiver_id == user_id)
+    ).distinct()
+
+    conversations = []
+    for convo_user_id in conversation_user_ids:
+        convo_user = User.query.get(convo_user_id[0])
+        if convo_user:
+            last_message = Message.query.filter(
+                ((Message.sender_id == user_id) & (Message.receiver_id == convo_user.user_id)) |
+                ((Message.sender_id == convo_user.user_id) & (Message.receiver_id == user_id))
+            ).order_by(Message.timestamp.desc()).first()
+
+            conversations.append({
+                "username": convo_user.username,
+                "last_message": last_message.content if last_message else "",
+                "timestamp": last_message.timestamp if last_message else ""
+            })
+
+    return jsonify(conversations)
+
 
 # Route to get a conversation (list of all msgs ) between user1 and user2 by ID
 @app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
@@ -409,20 +498,25 @@ def get_messages(user1_id, user2_id):
 @app.route('/available-posts', methods=['GET'])
 def get_available_posts():
     current_time = datetime.utcnow()
-    available_posts = Post.query.filter(Post.open_at <= current_time).all()
+    # Fetch posts along with the associated usernames
+    available_posts = db.session.query(Post, User.username).join(User, Post.user_id == User.user_id).filter(Post.open_at <= current_time).all()
 
     posts_list = [
         {
             "post_id": post.post_id,
             "user_id": post.user_id,
+            "username": username,  
             "content": post.content,
-            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,  
+            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
             "created_at": post.created_at,
             "updated_at": post.updated_at,
             "open_at": post.open_at
-        } for post in available_posts
+        }
+        for post, username in available_posts
     ]
     return jsonify(posts_list)
+
+
 
 
 # Route to mark messages as read
@@ -435,6 +529,92 @@ def mark_message_as_read(message_id):
         return jsonify({"status": "success", "message": "Message marked as read."}), 200
     else:
         return jsonify({"status": "failure", "message": "Message not found."}), 404
+    
+# Route to follow a user
+@app.route('/follow/<username>', methods=['POST'])
+def follow_user(username):
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 403
+    
+    current_user_id = session['user_id']
+    user_to_follow = User.query.filter_by(username=username).first()
+
+    if not user_to_follow:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Check if already following
+    follow_relationship = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_follow.user_id
+    ).first()
+
+    if follow_relationship:
+        return jsonify({'message': 'Already following'}), 200
+    
+    new_follow = Follower(follower_id=current_user_id, followed_id=user_to_follow.user_id)
+    db.session.add(new_follow)
+    db.session.commit()
+    return jsonify({'message': 'Followed successfully'}), 201
+
+from datetime import datetime
+
+@app.route('/delete-all-capsules', methods=['POST'])
+def delete_all_capsules():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 403
+
+    current_time = datetime.utcnow()
+    try:
+        # Delete all posts where open_at is in the past
+        num_deleted = Post.query.filter(Post.open_at <= current_time).delete()
+        db.session.commit()
+        return jsonify({"message": f"Deleted {num_deleted} capsules successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete capsules", "details": str(e)}), 500
+
+
+
+# Unfollow a user
+@app.route('/follow/<username>', methods=['DELETE'])
+def unfollow_user(username):
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 403
+
+    current_user_id = session['user_id']
+    user_to_unfollow = User.query.filter_by(username=username).first()
+
+    if not user_to_unfollow:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Find the follow relationship
+    follow_relationship = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_unfollow.user_id
+    ).first()
+
+    if follow_relationship:
+        db.session.delete(follow_relationship)
+        db.session.commit()
+        return jsonify({'message': 'Unfollowed successfully'}), 200
+    else:
+        return jsonify({'message': 'Not following this user'}), 400
+
+# Route to check following status
+@app.route('/follow-status/<username>', methods=['GET'])
+def check_follow_status(username):
+    current_user_id = session.get('user_id')
+    user_to_check = User.query.filter_by(username=username).first()
+
+    if not user_to_check:
+        return jsonify({'error': 'User not found'}), 404
+    
+    is_following = Follower.query.filter_by(
+        follower_id=current_user_id,
+        followed_id=user_to_check.user_id
+    ).first() is not None
+
+    return jsonify({'isFollowing': is_following})
 
 # Route to log out user session
 @app.route('/logout', methods=['POST'])
