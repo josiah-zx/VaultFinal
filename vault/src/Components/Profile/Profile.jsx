@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './Profile.css';
 import Navbar from '../HomeHeader/HomeHeader';
 import { FaUserCircle } from "react-icons/fa";
@@ -18,6 +18,7 @@ const Profile = () => {
     const [selectedTab, setSelectedTab] = useState('capsules');
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
+    const navigate = useNavigate();
 
     // Fetch session user
     useEffect(() => {
@@ -31,6 +32,7 @@ const Profile = () => {
                     setCurrentUser(data.username);
                 } else {
                     setErrorMessage('Failed to load user info');
+                    navigate('/login');
                 }
             } catch (error) {
                 console.error("Failed to fetch session user:", error);

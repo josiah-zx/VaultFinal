@@ -17,22 +17,22 @@ const Settings = () => {
         const fetchSessionUser = async () => {
             try {
                 const response = await fetch('http://127.0.0.1:5000/session-user', {
-                    credentials: 'include',
+                    credentials: 'include'
                 });
                 if (response.ok) {
                     const data = await response.json();
                     setUsername(data.username);
                     setEmail(data.email);
                 } else {
-                    setErrorMessage('Failed to load user info.');
+                    console.error('Not logged in.');
+                    navigate('/login');
                 }
             } catch (error) {
-                console.error('Error fetching session user:', error);
-                setErrorMessage('An error occurred while fetching user data.');
+                console.error("Failed to fetch user data:", error);
             }
         };
         fetchSessionUser();
-    }, []);
+    }, [navigate]);
 
     // Handle form submission to update settings in the backend
     const handleSubmit = async (e) => {
