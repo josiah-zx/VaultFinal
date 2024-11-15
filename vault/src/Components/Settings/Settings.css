@@ -95,6 +95,14 @@ h1 {
     margin-top: 10px;
 }
 
+.logout-btn {
+    background-color: rgb(191, 9, 9);
+}
+
+.logout-btn:hover {
+    background-color: rgb(191, 9, 9);
+}
+
 /* Adjust for smaller screens */
 @media (max-width: 600px) {
     .settings-box {

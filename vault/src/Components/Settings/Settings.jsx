@@ -62,6 +62,32 @@ const Settings = () => {
         }
     };
 
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch('http://127.0.0.1:5000/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            const data = await response.json()
+
+            if (response.ok) {
+                console.log('Logged out successfully:', data.message);
+                setErrorMessage('');
+                navigate('/login');
+            } else {
+                setErrorMessage(data.message)
+            }
+        } catch (error) {
+            console.error('Error during logging out:', error)
+            setErrorMessage('Something went wrong. Please try again.');
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -95,6 +121,7 @@ const Settings = () => {
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
                     <button type="submit" className="save-btn" onClick={handleSubmit}>Save Settings</button>
                 </div>
+                <button type="submit" className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
         </>
     );

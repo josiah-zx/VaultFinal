@@ -17,7 +17,6 @@ const Messages = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [conversations, setConversations] = useState([]); // Holds list of conversations
-
     const navigate = useNavigate();
 
     useEffect(() => {
