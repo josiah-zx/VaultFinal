@@ -16,38 +16,38 @@ const PostFeed = () => {
     const [showTimeCapsulePopup, setShowTimeCapsulePopup] = useState(false);
     const [showAddPostPopup, setShowAddPostPopup] = useState(false);
     const [currentCapsule, setCurrentCapsule] = useState('');
-    const [availablePosts, setAvailablePosts] = useState([]);
+    const [availableCapsules, setAvailableCapsules] = useState([]);
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
     useEffect(() => {
-        const fetchAvailablePosts = async () => {
+        const fetchAvailableCapsules = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/available-posts');
+                const response = await fetch('http://127.0.0.1:5000/available-capsules');
                 if (response.ok) {
                     const data = await response.json();
-                    setAvailablePosts(data);
+                    setAvailableCapsules(data);
                 } else {
-                    setErrorMessage("Failed to load available posts.");
+                    setErrorMessage("Failed to load available capsules.");
                 }
             } catch (error) {
-                console.error("Error fetching available posts:", error);
+                console.error("Error fetching available capsules:", error);
             }
         };
 
-        fetchAvailablePosts();
-        const interval = setInterval(fetchAvailablePosts, 60000);
+        fetchAvailableCapsules();
+        const interval = setInterval(fetchAvailableCapsules, 60000);
 
         return () => clearInterval(interval);
     }, []);
 
-    const handleLike = (postId) => {
+    const handleLike = (capsuleId) => {
         setLikeStatus((prevStatus) => {
-            const currentStatus = prevStatus[postId] || { isLiked: false, likes: 0 };
+            const currentStatus = prevStatus[capsuleId] || { isLiked: false, likes: 0 };
             const newStatus = {
                 isLiked: !currentStatus.isLiked,
                 likes: currentStatus.isLiked ? currentStatus.likes - 1 : currentStatus.likes + 1,
             };
-            return { ...prevStatus, [postId]: newStatus };
+            return { ...prevStatus, [capsuleId]: newStatus };
         });
     };
 
@@ -72,9 +72,9 @@ const PostFeed = () => {
         setShowTimeCapsulePopup(false);
     };
 
-    const handleOpenAddPostPopup = (postId) => {
+    const handleOpenAddPostPopup = (capsuleId) => {
         setShowAddPostPopup(true);
-        setCurrentCapsule(postId);
+        setCurrentCapsule(capsuleId);
     };
 
     const handleCloseAddPostPopup = () => {
@@ -92,33 +92,33 @@ const PostFeed = () => {
         <div className="feed-container">
             <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
             <div className="feed">
-                {availablePosts.length > 0 ? (
-                    availablePosts.map((post) => {
-                        const postStatus = likeStatus[post.post_id] || {isLiked: false, likes: 0};
+                {availableCapsules.length > 0 ? (
+                    availableCapsules.map((capsule) => {
+                        const capsuleStatus = likeStatus[capsule.capsule_id] || {isLiked: false, likes: 0};
                         return (
-                            <div key={post.post_id} className="post-card">
-                                {post.is_open ? (
-                                    <div className="open-post">
-                                        <div className="post-header">
+                            <div key={capsule.capsule_id} className="capsule-card">
+                                {capsule.is_open ? (
+                                    <div className="open-capsule">
+                                        <div className="capsule-header">
                                             <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
-                                            <span className="username">{post.username || errorMessage}</span>
+                                            <span className="username">{capsule.username || errorMessage}</span>
                                         </div>
-                                        <img src={post.image_url} alt="Post content" className="post-content"/>
-                                        <div className="post-info">
+                                        <img src={capsule.image_url} alt="Capsule content" className="capsule-content"/>
+                                        <div className="capsule-info">
                                             <p className="caption">
-                                                <strong>{post.username || errorMessage}</strong> {post.content}</p>
-                                            <div className="post-stats">
-                                                <span>{postStatus.likes} likes</span>
+                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                            <div className="capsule-stats">
+                                                <span>{capsuleStatus.likes} likes</span>
                                                 <span>{comments.length} comments</span>
                                             </div>
-                                            <div className="post-actions">
-                                                <span className="like-icon" onClick={() => handleLike(post.post_id)}>
-                                                    {postStatus.isLiked ?
+                                            <div className="capsule-actions">
+                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                    {capsuleStatus.isLiked ?
                                                         <FaHeart className="icon filled" style={{color: "red"}}/> :
                                                         <FaRegHeart className="icon"/>}
                                                 </span>
                                                 <span className="comment-icon"
-                                                    onClick={() => handleOpenCommentPopup(post.image_url)}>
+                                                    onClick={() => handleOpenCommentPopup(capsule.image_url)}>
                                                     <FaRegComment className="icon"/>
                                                 </span>
                                                 <span className="bookmark-icon" onClick={handleBookmark}>
@@ -132,11 +132,11 @@ const PostFeed = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="closed-post">
-                                        <div className="post-header">
+                                    <div className="closed-capsule">
+                                        <div className="capsule-header">
                                             <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
-                                            <span className="username">{post.username || errorMessage}</span>
-                                            <span className="open-time">Opens: {post.open_at}</span>
+                                            <span className="username">{capsule.username || errorMessage}</span>
+                                            <span className="open-time">Opens: {capsule.open_at}</span>
                                         </div>
                                         <div className="vault">
                                             <div className="vault-lock"></div>
@@ -147,20 +147,20 @@ const PostFeed = () => {
                                                 <span></span>
                                             </div>
                                         </div>
-                                        <div className="post-info">
+                                        <div className="capsule-info">
                                             <p className="caption">
-                                                <strong>{post.username || errorMessage}</strong> {post.content}</p>
-                                            <div className="post-stats">
-                                                <span>{postStatus.likes} likes</span>
+                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                            <div className="capsule-stats">
+                                                <span>{capsuleStatus.likes} likes</span>
                                                 <span>0 contributors</span>
                                             </div>
-                                            <div className="post-actions">
-                                                <span className="like-icon" onClick={() => handleLike(post.post_id)}>
-                                                    {postStatus.isLiked ?
+                                            <div className="capsule-actions">
+                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                    {capsuleStatus.isLiked ?
                                                         <FaHeart className="icon filled" style={{color: "red"}}/> :
                                                         <FaRegHeart className="icon"/>}
                                                 </span>
-                                                <span className="add-post-icon" onClick={() => handleOpenAddPostPopup(post.post_id)}>
+                                                <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
                                                     <FaRegSquarePlus className="icon"/>
                                                 </span>
                                                 <span className="bookmark-icon" onClick={handleBookmark}>
@@ -179,13 +179,13 @@ const PostFeed = () => {
                         );
                     })
                 ) : (
-                    <div className="no-posts">
+                    <div className="no-capsules">
                         <p>No time capsules available to open yet. Check back later or create a new one!</p>
                     </div>
                 )}
                 {showCommentPopup && (
                     <CommentPopup
-                        postContent={{
+                        capsuleContent={{
                             username: username || errorMessage,
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
@@ -196,7 +196,7 @@ const PostFeed = () => {
                 )}
                 {showAddPostPopup && (
                     <AddPostPopup 
-                        postId={currentCapsule} 
+                        capsuleId={currentCapsule} 
                         onClose={handleCloseAddPostPopup} 
                         onImageUpload={handleImageUpload}
                     />

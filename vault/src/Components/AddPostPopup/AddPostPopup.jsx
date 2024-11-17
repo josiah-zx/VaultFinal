@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AddPostPopup.css';
 
-const AddPostPopup = ({ postId, onClose, onImageUpload }) => {
+const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
     const [file, setFile] = useState(null);
     const [description, setDescription] = useState('');
     const [username, setUsername] = useState('');
@@ -46,7 +46,7 @@ const AddPostPopup = ({ postId, onClose, onImageUpload }) => {
         }
     
         try {
-            const response = await fetch('http://127.0.0.1:5000/posts', {
+            const response = await fetch('http://127.0.0.1:5000/capsules', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -55,17 +55,17 @@ const AddPostPopup = ({ postId, onClose, onImageUpload }) => {
             if (response.ok) {
                 const data = await response.json();
                 setImageUrl(data.image_url); 
-                setSuccessMessage("Time capsule saved successfully!");
+                setSuccessMessage("Post saved successfully!");
                 setErrorMessage('');
                 
                
                 onImageUpload(data.image_url);
             } else {
-                setErrorMessage("Failed to save time capsule.");
+                setErrorMessage("Failed to save post.");
             }
         } catch (error) {
-            setErrorMessage("An error occurred while saving the time capsule.");
-            console.error("Error saving time capsule:", error);
+            setErrorMessage("An error occurred while saving the post.");
+            console.error("Error saving post:", error);
         }
     };
 

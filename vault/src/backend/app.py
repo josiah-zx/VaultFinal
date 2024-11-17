@@ -56,13 +56,13 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Define relationship to posts
-    posts = db.relationship('Post', backref='author', lazy=True)
+    # Define relationship to capsules
+    capsules = db.relationship('Capsule', backref='author', lazy=True)
 
-# Define the Post model
-class Post(db.Model):
-    __tablename__ = 'posts'
-    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+# Define the Capsule model
+class Capsule(db.Model):
+    __tablename__ = 'capsules'
+    capsule_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
@@ -95,9 +95,9 @@ class Message(db.Model):
 
 # Initialize the database
 with app.app_context():
-    posts = Post.query.all()
-    for post in posts:
-        print(post.open_at)
+    all_capsules = Capsule.query.all()
+    for capsule in all_capsules:
+        print(capsule.open_at)
     db.create_all()
 
 # Returns all the users in the users table
@@ -208,10 +208,10 @@ def get_session_user():
     return jsonify({"error": "User not logged in"}), 401
 
 
-@app.route('/posts', methods=['GET', 'POST'])
-def posts():
+@app.route('/capsules', methods=['GET', 'POST'])
+def capsules():
     if request.method == 'GET':
-        # Handle GET request to fetch posts by username
+        # Handle GET request to fetch capsules by username
         username = request.args.get('username')
         if not username:
             return jsonify({"error": "Username is required"}), 400
@@ -220,30 +220,30 @@ def posts():
         if not user:
             return jsonify({"error": "User not found"}), 404
         
-        user_posts = Post.query.filter_by(user_id=user.user_id).all()
-        posts_list = [
+        user_capsules = Capsule.query.filter_by(user_id=user.user_id).all()
+        capsules_list = [
             {
-                "post_id": post.post_id,
-                "user_id": post.user_id,
-                "content": post.content,
-                "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
-                "created_at": post.created_at,
-                "updated_at": post.updated_at,
-                "open_at": post.open_at
+                "capsule_id": capsule.capsule_id,
+                "user_id": capsule.user_id,
+                "content": capsule.content,
+                "image_url": f"http://127.0.0.1:5000{capsule.image_url}" if capsule.image_url else None,
+                "created_at": capsule.created_at,
+                "updated_at": capsule.updated_at,
+                "open_at": capsule.open_at
             }
-            for post in user_posts
+            for capsule in user_capsules
         ]
-        return jsonify(posts_list), 200
+        return jsonify(capsules_list), 200
 
     elif request.method == 'POST':
-        # Handle POST request to create a new post
+        # Handle POST request to create a new capsule
         if 'user_id' not in session:
             logger.warning("User not logged in.")
             return jsonify({"error": "User not logged in"}), 401
         
         # Retrieve the user ID from the session
         user_id = session['user_id']
-        logger.info(f"Creating post for user_id: {user_id}")
+        logger.info(f"Creating capsule for user_id: {user_id}")
         
         # Retrieve form data
         data = request.form
@@ -266,12 +266,12 @@ def posts():
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             logger.info("Image file saved as %s", image_url)
         
-        # Create new post with session-based user_id
-        new_post = Post(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
-        db.session.add(new_post)
+        # Create new capsule with session-based user_id
+        new_capsule = Capsule(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
+        db.session.add(new_capsule)
         db.session.commit()
 
-        return jsonify({"message": "Post created!", "post_id": new_post.post_id, "image_url": new_post.image_url}), 201
+        return jsonify({"message": "Capsule created!", "capsule_id": new_capsule.capsule_id, "image_url": new_capsule.image_url}), 201
 
 
 @app.route('/user-capsules', methods=['GET'])
@@ -280,18 +280,18 @@ def get_user_capsules():
         return jsonify({"error": "User not logged in"}), 401
     current_user_id = session['user_id']
     current_time = datetime.utcnow()
-    capsules = Post.query.filter(Post.user_id == current_user_id, Post.open_at <= current_time).all()
+    capsules = Capsule.query.filter(Capsule.user_id == current_user_id, Capsule.open_at <= current_time).all()
     capsules_list = [
         {
-            "post_id": post.post_id,
-            "user_id": post.user_id,
-            "content": post.content,
-            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
-            "created_at": post.created_at,
-            "updated_at": post.updated_at,
-            "open_at": post.open_at
+            "capsule_id": capsule.capsule_id,
+            "user_id": capsule.user_id,
+            "content": capsule.content,
+            "image_url": f"http://127.0.0.1:5000{capsule.image_url}" if capsule.image_url else None,
+            "created_at": capsule.created_at,
+            "updated_at": capsule.updated_at,
+            "open_at": capsule.open_at
         }
-        for post in capsules
+        for capsule in capsules
     ]
     return jsonify(capsules_list), 200
 
@@ -303,8 +303,8 @@ def get_user(username):
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # Get the post, follower, and following counts
-    post_count = Post.query.filter_by(user_id=username).count() # usernames are currently in user_id for Post, FIX
+    # Get the capsule, follower, and following counts
+    capsule_count = Capsule.query.filter_by(user_id=username).count()
     follower_count = Follower.query.filter_by(followed_id=user.user_id).count()
     following_count = Follower.query.filter_by(follower_id=user.user_id).count()
 
@@ -318,7 +318,7 @@ def get_user(username):
         ).first() is not None
         
     return jsonify({
-        'post_count': post_count,
+        'capsule_count': capsule_count,
         'follower_count': follower_count,
         'following_count': following_count,
         'bio': user.bio,
@@ -495,27 +495,27 @@ def get_messages(user1_id, user2_id):
 
     return jsonify(messages_list)
 
-@app.route('/available-posts', methods=['GET'])
-def get_available_posts():
+@app.route('/available-capsules', methods=['GET'])
+def get_available_capsules():
     current_time = datetime.utcnow()
-    # Fetch posts along with the associated usernames
-    available_posts = db.session.query(Post, User.username).join(User, Post.user_id == User.user_id).all()
+    # Fetch capsules along with the associated usernames
+    available_capsules = db.session.query(Capsule, User.username).join(User, Capsule.user_id == User.user_id).all()
 
-    posts_list = [
+    capsules_list = [
         {
-            "post_id": post.post_id,
-            "user_id": post.user_id,
+            "capsule_id": capsule.capsule_id,
+            "user_id": capsule.user_id,
             "username": username,  
-            "content": post.content,
-            "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
-            "created_at": post.created_at,
-            "updated_at": post.updated_at,
-            "open_at": post.open_at,
-            "is_open": post.open_at <= current_time
+            "content": capsule.content,
+            "image_url": f"http://127.0.0.1:5000{capsule.image_url}" if capsule.image_url else None,
+            "created_at": capsule.created_at,
+            "updated_at": capsule.updated_at,
+            "open_at": capsule.open_at,
+            "is_open": capsule.open_at <= current_time
         }
-        for post, username in available_posts
+        for capsule, username in available_capsules
     ]
-    return jsonify(posts_list)
+    return jsonify(capsules_list)
 
 
 
@@ -566,8 +566,8 @@ def delete_all_capsules():
 
     current_time = datetime.utcnow()
     try:
-        # Delete all posts where open_at is in the past
-        num_deleted = Post.query.filter(Post.open_at <= current_time).delete()
+        # Delete all capsules where open_at is in the past
+        num_deleted = Capsule.query.filter(Capsule.open_at <= current_time).delete()
         db.session.commit()
         return jsonify({"message": f"Deleted {num_deleted} capsules successfully"}), 200
     except Exception as e:

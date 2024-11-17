@@ -68,7 +68,7 @@ const Profile = () => {
         fetchProfileData();
     }, [profileUsername]);
 
-    // Fetch time capsule posts for session user
+    // Fetch time capsules for session user
     useEffect(() => {
         const fetchUserCapsules = async () => {
             try {
@@ -79,20 +79,20 @@ const Profile = () => {
                     const data = await response.json();
                     setCapsulePosts(data);
                 } else {
-                    console.error("Failed to load capsule posts");
+                    console.error("Failed to load capsules");
                 }
             } catch (error) {
-                console.error("Error fetching capsule posts:", error);
+                console.error("Error fetching capsules:", error);
             }
         };
         fetchUserCapsules();
     }, []);
 
-    // Fetch regular posts for profile user
+    // Fetch posts for profile user
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/posts?username=${profileUsername}`, {
+                const response = await fetch(`http://127.0.0.1:5000/capsules?username=${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
