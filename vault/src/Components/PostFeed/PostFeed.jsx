@@ -103,7 +103,7 @@ const PostFeed = () => {
                                             <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
                                             <span className="username">{capsule.username || errorMessage}</span>
                                         </div>
-                                        <img src={capsule.image_url} alt="Capsule content" className="capsule-content"/>
+                                        <img src={capsule.image_url} alt="Capsule content" className="image-content"/>
                                         <div className="capsule-info">
                                             <p className="caption">
                                                 <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
