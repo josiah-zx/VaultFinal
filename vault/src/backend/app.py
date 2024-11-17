@@ -499,7 +499,7 @@ def get_messages(user1_id, user2_id):
 def get_available_posts():
     current_time = datetime.utcnow()
     # Fetch posts along with the associated usernames
-    available_posts = db.session.query(Post, User.username).join(User, Post.user_id == User.user_id).filter(Post.open_at <= current_time).all()
+    available_posts = db.session.query(Post, User.username).join(User, Post.user_id == User.user_id).all()
 
     posts_list = [
         {
@@ -510,7 +510,8 @@ def get_available_posts():
             "image_url": f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
             "created_at": post.created_at,
             "updated_at": post.updated_at,
-            "open_at": post.open_at
+            "open_at": post.open_at,
+            "is_open": post.open_at <= current_time
         }
         for post, username in available_posts
     ]

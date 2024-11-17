@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './PostFeed.css';
 import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPaperPlane } from 'react-icons/fa';
+import { FaRegSquarePlus } from "react-icons/fa6";
+import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
 
@@ -10,8 +12,10 @@ const PostFeed = () => {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [showPopup, setShowPopup] = useState(false);
+    const [showCommentPopup, setShowCommentPopup] = useState(false);
     const [showTimeCapsulePopup, setShowTimeCapsulePopup] = useState(false);
+    const [showAddPostPopup, setShowAddPostPopup] = useState(false);
+    const [currentCapsule, setCurrentCapsule] = useState('');
     const [availablePosts, setAvailablePosts] = useState([]);
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
@@ -51,13 +55,13 @@ const PostFeed = () => {
         setIsBookmarked(!isBookmarked);
     };
 
-    const handleCommentClick = (image) => {
+    const handleOpenCommentPopup = (image) => {
         setUploadedImageUrl(image);
-        setShowPopup(true);
+        setShowCommentPopup(true);
     };
 
-    const handleClosePopup = () => {
-        setShowPopup(false);
+    const handleCloseCommentPopup = () => {
+        setShowCommentPopup(false);
     };
 
     const handleOpenTimeCapsulePopup = () => {
@@ -68,10 +72,20 @@ const PostFeed = () => {
         setShowTimeCapsulePopup(false);
     };
 
+    const handleOpenAddPostPopup = (postId) => {
+        setShowAddPostPopup(true);
+        setCurrentCapsule(postId);
+    };
+
+    const handleCloseAddPostPopup = () => {
+        setShowAddPostPopup(false);
+        setCurrentCapsule('');
+    };
+
     const handleImageUpload = (imageUrl) => {
         setUploadedImageUrl(imageUrl);
         setShowTimeCapsulePopup(false);
-        setShowPopup(true);
+        setShowCommentPopup(true);
     };
 
     return (
@@ -83,37 +97,83 @@ const PostFeed = () => {
                         const postStatus = likeStatus[post.post_id] || {isLiked: false, likes: 0};
                         return (
                             <div key={post.post_id} className="post-card">
-                                <div className="post-header">
-                                    <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
-                                    <span className="username">{post.username || errorMessage}</span>
-                                </div>
-                                <img src={post.image_url} alt="Post content" className="post-content"/>
-                                <div className="post-info">
-                                    <p className="caption">
-                                        <strong>{post.username || errorMessage}</strong> {post.content}</p>
-                                    <div className="post-stats">
-                                        <span>{postStatus.likes} likes</span>
-                                        <span>{comments.length} comments</span>
+                                {post.is_open ? (
+                                    <div className="open-post">
+                                        <div className="post-header">
+                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                            <span className="username">{post.username || errorMessage}</span>
+                                        </div>
+                                        <img src={post.image_url} alt="Post content" className="post-content"/>
+                                        <div className="post-info">
+                                            <p className="caption">
+                                                <strong>{post.username || errorMessage}</strong> {post.content}</p>
+                                            <div className="post-stats">
+                                                <span>{postStatus.likes} likes</span>
+                                                <span>{comments.length} comments</span>
+                                            </div>
+                                            <div className="post-actions">
+                                                <span className="like-icon" onClick={() => handleLike(post.post_id)}>
+                                                    {postStatus.isLiked ?
+                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                        <FaRegHeart className="icon"/>}
+                                                </span>
+                                                <span className="comment-icon"
+                                                    onClick={() => handleOpenCommentPopup(post.image_url)}>
+                                                    <FaRegComment className="icon"/>
+                                                </span>
+                                                <span className="bookmark-icon" onClick={handleBookmark}>
+                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
+                                                        <FaRegBookmark className="icon"/>}
+                                                </span>
+                                                <span className="share-icon">
+                                                    <FaRegPaperPlane className="icon"/>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="post-actions">
-                                        <span className="like-icon" onClick={() => handleLike(post.post_id)}>
-                                            {postStatus.isLiked ?
-                                                <FaHeart className="icon filled" style={{color: "red"}}/> :
-                                                <FaRegHeart className="icon"/>}
-                                        </span>
-                                        <span className="comment-icon"
-                                              onClick={() => handleCommentClick(post.image_url)}>
-                                            <FaRegComment className="icon"/>
-                                        </span>
-                                        <span className="bookmark-icon" onClick={handleBookmark}>
-                                            {isBookmarked ? <FaBookmark className="icon" style={{color: "black"}}/> :
-                                                <FaRegBookmark className="icon"/>}
-                                        </span>
-                                        <span className="share-icon">
-                                            <FaRegPaperPlane className="icon"/>
-                                        </span>
+                                ) : (
+                                    <div className="closed-post">
+                                        <div className="post-header">
+                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                            <span className="username">{post.username || errorMessage}</span>
+                                            <span className="open-time">Opens: {post.open_at}</span>
+                                        </div>
+                                        <div className="vault">
+                                            <div className="vault-lock"></div>
+                                            <div class="vault-bolts">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                        <div className="post-info">
+                                            <p className="caption">
+                                                <strong>{post.username || errorMessage}</strong> {post.content}</p>
+                                            <div className="post-stats">
+                                                <span>{postStatus.likes} likes</span>
+                                                <span>0 contributors</span>
+                                            </div>
+                                            <div className="post-actions">
+                                                <span className="like-icon" onClick={() => handleLike(post.post_id)}>
+                                                    {postStatus.isLiked ?
+                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                        <FaRegHeart className="icon"/>}
+                                                </span>
+                                                <span className="add-post-icon" onClick={() => handleOpenAddPostPopup(post.post_id)}>
+                                                    <FaRegSquarePlus className="icon"/>
+                                                </span>
+                                                <span className="bookmark-icon" onClick={handleBookmark}>
+                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
+                                                        <FaRegBookmark className="icon"/>}
+                                                </span>
+                                                <span className="share-icon">
+                                                    <FaRegPaperPlane className="icon"/>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                                 <div className="separator-line"></div>
                             </div>
                         );
@@ -123,8 +183,7 @@ const PostFeed = () => {
                         <p>No time capsules available to open yet. Check back later or create a new one!</p>
                     </div>
                 )}
-
-                {showPopup && (
+                {showCommentPopup && (
                     <CommentPopup
                         postContent={{
                             username: username || errorMessage,
@@ -132,7 +191,14 @@ const PostFeed = () => {
                             caption: 'Caption goes here.'
                         }}
                         comments={comments}
-                        onClose={handleClosePopup}
+                        onClose={handleCloseCommentPopup}
+                    />
+                )}
+                {showAddPostPopup && (
+                    <AddPostPopup 
+                        postId={currentCapsule} 
+                        onClose={handleCloseAddPostPopup} 
+                        onImageUpload={handleImageUpload}
                     />
                 )}
             </div>
