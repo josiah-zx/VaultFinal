@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './TimeCapsulePopup.css';
+import './AddPostPopup.css';
 
-const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
-    const [selectedDate, setSelectedDate] = useState('');
+const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
     const [file, setFile] = useState(null);
     const [description, setDescription] = useState('');
     const [username, setUsername] = useState('');
@@ -34,10 +33,6 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
         setFile(e.target.files[0]);
     };
 
-    const handleDateChange = (e) => {
-        setSelectedDate(e.target.value);
-    };
-
     const handleSubmit = async () => {
         if (!username) {
             setErrorMessage("Username not available. Please try again.");
@@ -45,14 +40,14 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
         }
     
         const formData = new FormData();
+        formData.append('capsule_id', capsuleId);
         formData.append('content', description);
-        formData.append('open_at', selectedDate);
         if (file) {
             formData.append('image_url', file);
         }
     
         try {
-            const response = await fetch('http://127.0.0.1:5000/capsules', {
+            const response = await fetch('http://127.0.0.1:5000/posts', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -61,29 +56,29 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
             if (response.ok) {
                 const data = await response.json();
                 setImageUrl(data.image_url); 
-                setSuccessMessage("Time capsule saved successfully!");
+                setSuccessMessage("Post saved successfully!");
                 setErrorMessage('');
                 
                
                 onImageUpload(data.image_url);
             } else {
-                setErrorMessage("Failed to save time capsule.");
+                setErrorMessage("Failed to save post.");
             }
         } catch (error) {
-            setErrorMessage("An error occurred while saving the time capsule.");
-            console.error("Error saving time capsule:", error);
+            setErrorMessage("An error occurred while saving the post.");
+            console.error("Error saving post:", error);
         }
     };
 
     return (
-        <div className="time-capsule-popup">
-            <div className="popup-content">
-                <button className="close-btn" onClick={onClose}>X</button>
+        <div className="add-post-popup">
+            <div className="add-post-popup-content">
+                <button className="add-post-close-btn" onClick={onClose}>X</button>
                 
-                <h2>Create Time Capsule</h2>
+                <h2>Add To Capsule</h2>
                 
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-                {successMessage && <p className="success-message">{successMessage}</p>}
+                {errorMessage && <p className="add-post-error-message">{errorMessage}</p>}
+                {successMessage && <p className="add-post-success-message">{successMessage}</p>}
                 
                 <input 
                     type="file" 
@@ -97,20 +92,13 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
                     onChange={(e) => setDescription(e.target.value)} 
                 />
 
-                <label>Open Date and Time:</label>
-                <input 
-                    type="datetime-local" 
-                    value={selectedDate} 
-                    onChange={handleDateChange} 
-                />
-
-                <button onClick={handleSubmit}>Save Capsule</button>
+                <button onClick={handleSubmit}>Post</button>
 
                 {/* Display uploaded image */}
-                {imageUrl && <img src={imageUrl} alt="Uploaded Capsule" className="uploaded-image" />}
+                {imageUrl && <img src={imageUrl} alt="Uploaded Post" className="uploaded-image" />}
             </div>
         </div>
     );
 };
 
-export default TimeCapsulePopup;
+export default AddPostPopup;

@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import './CommentPopUp.css';
 import { FaTimes, FaPaperPlane } from 'react-icons/fa';
 
-const CommentPopup = ({ postContent, comments, onClose, onSendComment }) => {
+const CommentPopup = ({ capsuleContent, comments, onClose, onSendComment }) => {
     const [newComment, setNewComment] = useState('');
 
     
@@ -30,7 +30,7 @@ const CommentPopup = ({ postContent, comments, onClose, onSendComment }) => {
             <FaTimes />
         </button>
         <div className="popup-post">
-            <img src={postContent.image} alt="Post content" />
+            <img src={capsuleContent.image} alt="Capsule content" />
         </div>
         <div className="popup-comments">
             <div className="comments-list">
