@@ -151,7 +151,11 @@
     font-size: 30px;
     position: absolute;
     top: -220px;
-    left: 150px;
+    left: 165px;
+}
+
+.back-button-chat:hover {
+    background-color: transparent;
 }
 
 .message-search-input {
@@ -225,6 +229,10 @@
     align-items: center;
     margin-top: -410px;
     margin-left: -190px;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .other-user-header h3 {
@@ -243,7 +251,7 @@
 .message-bar {
     background-color: transparent;
     width: calc(100% + 370px);
-    margin-left: -135px;
+    margin-left: -195px;
     margin-top: 185px;
     border-radius: 10px;
     min-height: 2.5rem;
