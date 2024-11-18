@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './PostFeed.css';
 import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPaperPlane } from 'react-icons/fa';
+import { FaRegSquarePlus } from "react-icons/fa6";
+import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
 
@@ -10,40 +12,42 @@ const PostFeed = () => {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [showPopup, setShowPopup] = useState(false);
+    const [showCommentPopup, setShowCommentPopup] = useState(false);
     const [showTimeCapsulePopup, setShowTimeCapsulePopup] = useState(false);
-    const [availablePosts, setAvailablePosts] = useState([]);
+    const [showAddPostPopup, setShowAddPostPopup] = useState(false);
+    const [currentCapsule, setCurrentCapsule] = useState('');
+    const [availableCapsules, setAvailableCapsules] = useState([]);
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
     useEffect(() => {
-        const fetchAvailablePosts = async () => {
+        const fetchAvailableCapsules = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/available-posts');
+                const response = await fetch('http://127.0.0.1:5000/available-capsules');
                 if (response.ok) {
                     const data = await response.json();
-                    setAvailablePosts(data);
+                    setAvailableCapsules(data);
                 } else {
-                    setErrorMessage("Failed to load available posts.");
+                    setErrorMessage("Failed to load available capsules.");
                 }
             } catch (error) {
-                console.error("Error fetching available posts:", error);
+                console.error("Error fetching available capsules:", error);
             }
         };
 
-        fetchAvailablePosts();
-        const interval = setInterval(fetchAvailablePosts, 60000);
+        fetchAvailableCapsules();
+        const interval = setInterval(fetchAvailableCapsules, 60000);
 
         return () => clearInterval(interval);
     }, []);
 
-    const handleLike = (postId) => {
+    const handleLike = (capsuleId) => {
         setLikeStatus((prevStatus) => {
-            const currentStatus = prevStatus[postId] || { isLiked: false, likes: 0 };
+            const currentStatus = prevStatus[capsuleId] || { isLiked: false, likes: 0 };
             const newStatus = {
                 isLiked: !currentStatus.isLiked,
                 likes: currentStatus.isLiked ? currentStatus.likes - 1 : currentStatus.likes + 1,
             };
-            return { ...prevStatus, [postId]: newStatus };
+            return { ...prevStatus, [capsuleId]: newStatus };
         });
     };
 
@@ -51,13 +55,13 @@ const PostFeed = () => {
         setIsBookmarked(!isBookmarked);
     };
 
-    const handleCommentClick = (image) => {
+    const handleOpenCommentPopup = (image) => {
         setUploadedImageUrl(image);
-        setShowPopup(true);
+        setShowCommentPopup(true);
     };
 
-    const handleClosePopup = () => {
-        setShowPopup(false);
+    const handleCloseCommentPopup = () => {
+        setShowCommentPopup(false);
     };
 
     const handleOpenTimeCapsulePopup = () => {
@@ -68,71 +72,134 @@ const PostFeed = () => {
         setShowTimeCapsulePopup(false);
     };
 
+    const handleOpenAddPostPopup = (capsuleId) => {
+        setShowAddPostPopup(true);
+        setCurrentCapsule(capsuleId);
+    };
+
+    const handleCloseAddPostPopup = () => {
+        setShowAddPostPopup(false);
+        setCurrentCapsule('');
+    };
+
     const handleImageUpload = (imageUrl) => {
         setUploadedImageUrl(imageUrl);
         setShowTimeCapsulePopup(false);
-        setShowPopup(true);
+        setShowAddPostPopup(false);
+        setShowCommentPopup(true);
     };
 
     return (
         <div className="feed-container">
             <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
             <div className="feed">
-                {availablePosts.length > 0 ? (
-                    availablePosts.map((post) => {
-                        const postStatus = likeStatus[post.post_id] || {isLiked: false, likes: 0};
+                {availableCapsules.length > 0 ? (
+                    availableCapsules.map((capsule) => {
+                        const capsuleStatus = likeStatus[capsule.capsule_id] || {isLiked: false, likes: 0};
                         return (
-                            <div key={post.post_id} className="post-card">
-                                <div className="post-header">
-                                    <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
-                                    <span className="username">{post.username || errorMessage}</span>
-                                </div>
-                                <img src={post.image_url} alt="Post content" className="post-content"/>
-                                <div className="post-info">
-                                    <p className="caption">
-                                        <strong>{post.username || errorMessage}</strong> {post.content}</p>
-                                    <div className="post-stats">
-                                        <span>{postStatus.likes} likes</span>
-                                        <span>{comments.length} comments</span>
+                            <div key={capsule.capsule_id} className="capsule-card">
+                                {capsule.is_open ? (
+                                    <div className="open-capsule">
+                                        <div className="capsule-header">
+                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                            <span className="username">{capsule.username || errorMessage}</span>
+                                        </div>
+                                        <img src={capsule.image_url} alt="Capsule content" className="image-content"/>
+                                        <div className="capsule-info">
+                                            <p className="caption">
+                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                            <div className="capsule-stats">
+                                                <span>{capsuleStatus.likes} likes</span>
+                                                <span>{comments.length} comments</span>
+                                            </div>
+                                            <div className="capsule-actions">
+                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                    {capsuleStatus.isLiked ?
+                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                        <FaRegHeart className="icon"/>}
+                                                </span>
+                                                <span className="comment-icon"
+                                                    onClick={() => handleOpenCommentPopup(capsule.image_url)}>
+                                                    <FaRegComment className="icon"/>
+                                                </span>
+                                                <span className="bookmark-icon" onClick={handleBookmark}>
+                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
+                                                        <FaRegBookmark className="icon"/>}
+                                                </span>
+                                                <span className="share-icon">
+                                                    <FaRegPaperPlane className="icon"/>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="post-actions">
-                                        <span className="like-icon" onClick={() => handleLike(post.post_id)}>
-                                            {postStatus.isLiked ?
-                                                <FaHeart className="icon filled" style={{color: "red"}}/> :
-                                                <FaRegHeart className="icon"/>}
-                                        </span>
-                                        <span className="comment-icon"
-                                              onClick={() => handleCommentClick(post.image_url)}>
-                                            <FaRegComment className="icon"/>
-                                        </span>
-                                        <span className="bookmark-icon" onClick={handleBookmark}>
-                                            {isBookmarked ? <FaBookmark className="icon" style={{color: "black"}}/> :
-                                                <FaRegBookmark className="icon"/>}
-                                        </span>
-                                        <span className="share-icon">
-                                            <FaRegPaperPlane className="icon"/>
-                                        </span>
+                                ) : (
+                                    <div className="closed-capsule">
+                                        <div className="capsule-header">
+                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                            <span className="username">{capsule.username || errorMessage}</span>
+                                            <span className="open-time">Opens: {capsule.open_at}</span>
+                                        </div>
+                                        <div className="vault">
+                                            <div className="vault-lock"></div>
+                                            <div class="vault-bolts">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                        <div className="capsule-info">
+                                            <p className="caption">
+                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                            <div className="capsule-stats">
+                                                <span>{capsuleStatus.likes} likes</span>
+                                                <span>0 contributors</span>
+                                            </div>
+                                            <div className="capsule-actions">
+                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                    {capsuleStatus.isLiked ?
+                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                        <FaRegHeart className="icon"/>}
+                                                </span>
+                                                <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
+                                                    <FaRegSquarePlus className="icon"/>
+                                                </span>
+                                                <span className="bookmark-icon" onClick={handleBookmark}>
+                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
+                                                        <FaRegBookmark className="icon"/>}
+                                                </span>
+                                                <span className="share-icon">
+                                                    <FaRegPaperPlane className="icon"/>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                                 <div className="separator-line"></div>
                             </div>
                         );
                     })
                 ) : (
-                    <div className="no-posts">
+                    <div className="no-capsules">
                         <p>No time capsules available to open yet. Check back later or create a new one!</p>
                     </div>
                 )}
-
-                {showPopup && (
+                {showCommentPopup && (
                     <CommentPopup
-                        postContent={{
+                        capsuleContent={{
                             username: username || errorMessage,
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
                         }}
                         comments={comments}
-                        onClose={handleClosePopup}
+                        onClose={handleCloseCommentPopup}
+                    />
+                )}
+                {showAddPostPopup && (
+                    <AddPostPopup 
+                        capsuleId={currentCapsule} 
+                        onClose={handleCloseAddPostPopup} 
+                        onImageUpload={handleImageUpload}
                     />
                 )}
             </div>

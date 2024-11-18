@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
@@ -10,6 +10,22 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    navigate('/home')
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+        fetchSessionUser();
+    }, [navigate]);
 
     // Function to handle form submission
     const handleSubmit = async (e) => {

@@ -222,14 +222,14 @@
 }
 
 .posts-heading {
-    grid-column: 1 / -1; /* Span across the grid columns */
+    grid-column: 1 / -1; 
     font-size: 24px;
     color: white;
-    margin-top: 20px; /* Adjust as needed */
+    margin-top: 20px; 
 }
 
 .post:hover .overlay {
-    opacity: 1; /* Show overlay on hover */
+    opacity: 1; 
 }
 
 .edit-profile-button:hover,
@@ -241,10 +241,10 @@
 
 @media (min-width: 600px) {
     .posts-tab {
-        grid-template-columns: repeat(3, 1fr); /* 3-column grid for posts */
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 .post p {
-    display: none; /* Hide post text */
+    display: none; 
 }

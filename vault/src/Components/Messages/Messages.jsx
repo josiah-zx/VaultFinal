@@ -17,7 +17,6 @@ const Messages = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [conversations, setConversations] = useState([]); // Holds list of conversations
-
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -139,7 +138,7 @@ const Messages = () => {
 
     const handleDeleteCapsules = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/delete-all-capsules', {
+            const response = await fetch('http://127.0.0.1:5000/delete-all', {
                 method: 'POST',
                 credentials: 'include'
             });
