@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './Profile.css';
 import Navbar from '../HomeHeader/HomeHeader';
 import { FaUserCircle } from "react-icons/fa";
@@ -18,6 +18,7 @@ const Profile = () => {
     const [selectedTab, setSelectedTab] = useState('capsules');
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
+    const navigate = useNavigate();
 
     // Fetch session user
     useEffect(() => {
@@ -31,6 +32,7 @@ const Profile = () => {
                     setCurrentUser(data.username);
                 } else {
                     setErrorMessage('Failed to load user info');
+                    navigate('/login');
                 }
             } catch (error) {
                 console.error("Failed to fetch session user:", error);
@@ -66,7 +68,7 @@ const Profile = () => {
         fetchProfileData();
     }, [profileUsername]);
 
-    // Fetch time capsule posts for session user
+    // Fetch time capsules for session user
     useEffect(() => {
         const fetchUserCapsules = async () => {
             try {
@@ -77,20 +79,20 @@ const Profile = () => {
                     const data = await response.json();
                     setCapsulePosts(data);
                 } else {
-                    console.error("Failed to load capsule posts");
+                    console.error("Failed to load capsules");
                 }
             } catch (error) {
-                console.error("Error fetching capsule posts:", error);
+                console.error("Error fetching capsules:", error);
             }
         };
         fetchUserCapsules();
     }, []);
 
-    // Fetch regular posts for profile user
+    // Fetch posts for profile user
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/posts?username=${profileUsername}`, {
+                const response = await fetch(`http://127.0.0.1:5000/capsules?username=${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -147,7 +149,9 @@ const Profile = () => {
                     </div>
                     <p>{bio}</p>
                     {currentUser === profileUsername ? (
-                        <button className="edit-profile-button">Edit Profile</button>
+                        <button className="edit-profile-button" onClick={() => navigate('/edit-profile')}>
+                            Edit Profile
+                        </button>
                     ) : (
                         <button className="follow-button" onClick={toggleFollow}>
                             {isFollowing ? 'Unfollow' : 'Follow'}

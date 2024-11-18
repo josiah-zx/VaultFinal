@@ -3,11 +3,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 80px 25px; /* Adjusted padding for capsules */
     background: rgba(10, 10, 10, 0.9); /* Darker background for capsule section */
     color: white;
-    height: calc(250vh); /* Adjusted height for capsules */
-    justify-content: center;
+    min-height: 100vh; /* Make it at least full screen */
+    overflow: hidden; /* Prevent overall scrolling */
+    justify-content: flex-start;
+    width: 50vw; /* Make the container wider */
+    max-width: 900px; /* Limit the maximum width */
+    margin: 0 auto;
+    padding: 20px;
 }
 
 /* Post Profile Styling */
@@ -15,27 +19,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 60px 20px; /* Standard padding for posts */
-    background: rgba(20, 20, 20, 0.85); /* Slightly lighter background for posts section */
+    background: rgba(10, 10, 10, 0.9); /* Darker background for capsule section */
     color: white;
-    height: calc(200vh); /* Adjusted height for posts */
-    justify-content: center;
-}
-
-
-
-.profile-content{
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
+    min-height: 100vh; /* Make it at least full screen */
+    overflow: hidden; /* Prevent overall scrolling */
+    justify-content: flex-start;
+    width: 50vw; /* Make the container wider */
+    max-width: 900px; /* Limit the maximum width */
+    margin: 0 auto;
+    padding: 20px;
 }
 
 /* Avatar Styling */
 .profile-avatar {
-    margin-top: 10px;
+    margin-top: 60px;
     font-size: 140px;
     margin-bottom: 10px;
-    color: #f1f1f1; 
+    color: #f1f1f1;
 }
 
 .capsule-content {
@@ -51,15 +51,6 @@
     max-height: 500px; 
 }
 
-
-/* Capsule Posts */
-.capsule-posts {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding-top: 10px;
-    padding-bottom: 300px;
-}
 
 /* Individual Capsule Post Styling */
 .capsule-post {
@@ -147,7 +138,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 300px;
+    width: 80%;
     margin-top: 30px;
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.08); 
@@ -174,13 +165,16 @@
     color: #e0e0e0;
 }
 
-/* Content Styling */
 .profile-content {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    flex-grow: 1;
+    max-height: calc(100vh - 250px);
     margin-top: 30px;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.12);
     border-radius: 20px;
-    width: 70%; 
+    width: 70%;
     text-align: center;
     color: #f1f1f1;
 }
@@ -228,14 +222,14 @@
 }
 
 .posts-heading {
-    grid-column: 1 / -1; /* Span across the grid columns */
+    grid-column: 1 / -1; 
     font-size: 24px;
     color: white;
-    margin-top: 20px; /* Adjust as needed */
+    margin-top: 20px; 
 }
 
 .post:hover .overlay {
-    opacity: 1; /* Show overlay on hover */
+    opacity: 1; 
 }
 
 .edit-profile-button:hover,
@@ -244,12 +238,13 @@
     cursor: pointer;
 }
 
+
 @media (min-width: 600px) {
     .posts-tab {
-        grid-template-columns: repeat(3, 1fr); /* 3-column grid for posts */
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 .post p {
-    display: none; /* Hide post text */
+    display: none; 
 }
