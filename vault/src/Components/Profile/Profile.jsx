@@ -149,7 +149,9 @@ const Profile = () => {
                     </div>
                     <p>{bio}</p>
                     {currentUser === profileUsername ? (
-                        <button className="edit-profile-button">Edit Profile</button>
+                        <button className="edit-profile-button" onClick={() => navigate('/edit-profile')}>
+                            Edit Profile
+                        </button>
                     ) : (
                         <button className="follow-button" onClick={toggleFollow}>
                             {isFollowing ? 'Unfollow' : 'Follow'}
