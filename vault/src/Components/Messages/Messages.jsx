@@ -138,7 +138,7 @@ const Messages = () => {
 
     const handleDeleteCapsules = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/delete-all-capsules', {
+            const response = await fetch('http://127.0.0.1:5000/delete-all', {
                 method: 'POST',
                 credentials: 'include'
             });

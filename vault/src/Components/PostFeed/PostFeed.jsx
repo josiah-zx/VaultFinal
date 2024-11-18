@@ -85,6 +85,7 @@ const PostFeed = () => {
     const handleImageUpload = (imageUrl) => {
         setUploadedImageUrl(imageUrl);
         setShowTimeCapsulePopup(false);
+        setShowAddPostPopup(false);
         setShowCommentPopup(true);
     };
 

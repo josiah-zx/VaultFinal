@@ -40,13 +40,14 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
         }
     
         const formData = new FormData();
+        formData.append('capsule_id', capsuleId);
         formData.append('content', description);
         if (file) {
             formData.append('image_url', file);
         }
     
         try {
-            const response = await fetch('http://127.0.0.1:5000/capsules', {
+            const response = await fetch('http://127.0.0.1:5000/posts', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -91,7 +92,7 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
                     onChange={(e) => setDescription(e.target.value)} 
                 />
 
-                <button onClick={handleSubmit}>Share</button>
+                <button onClick={handleSubmit}>Post</button>
 
                 {/* Display uploaded image */}
                 {imageUrl && <img src={imageUrl} alt="Uploaded Post" className="uploaded-image" />}
