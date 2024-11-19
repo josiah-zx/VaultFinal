@@ -10,10 +10,11 @@ const EditProfile = () => {
     const [currentUser, setCurrentUser] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const { profileUsername } = useParams();
+    const [file, setFile] = useState(null);
 
 
-    const handleFileChange = (event) => {
-        // Add functionality to add profile picture
+    const handleFileChange = (e) => {
+       // Add functionality to upload file / pfp
     };
 
     const handleSave = (event) => {
