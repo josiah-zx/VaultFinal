@@ -35,37 +35,39 @@ const HomeHeader = () => {
     return (
         <nav className="navbar">
             <div className="navbar-logo">
-                <NavLink to="/home">
+                <a href="/home" className="logo-link">
                     <img src="/nav_vault_logo.png" alt="Vault Logo" className="logo"/>
-                </NavLink>
+                </a>
             </div>
-            <Search />
             <ul className="navbar-links">
                 <li>
                     <NavLink to="/home" activeClassName="active-link">
-                        <FaHouseChimney className= 'icons'/>
+                        <FaHouseChimney className='icons'/>
                         <span className='text'>Home</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to={`/${username}`} activeClassName="active-link">
-                        <FaUserCircle className= 'icons'/>
+                        <FaUserCircle className='icons'/>
                         <span className='text'>Profile</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to="/messages" activeClassName="active-link">
-                        <BiSolidMessageDots className= 'icons'/>
+                        <BiSolidMessageDots className='icons'/>
                         <span className='text'>Messages</span>
                     </NavLink>
                 </li>
                 <li>
                     <NavLink to="/settings" activeClassName="active-link">
-                        <FaGear className= 'icons'/>
+                        <FaGear className='icons'/>
                         <span className='text'>Settings</span>
                     </NavLink>
                 </li>
             </ul>
+            <div className="navbar-search">
+                <Search/>
+            </div>
         </nav>
     );
 

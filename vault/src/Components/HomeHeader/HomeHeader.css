@@ -1,58 +1,95 @@
 .navbar {
     display: flex;
+    flex-direction: column;
     background-color: #222a45;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start; /* Align items from top to bottom */
     position: fixed;
-    height: 60px;
-    width: 100%;
+    height: 100vh; /* Full height of the viewport */
+    width: 270px;
     top: 0;
     left: 0;
     z-index: 1000;
+    padding-top: 8px;
+    gap: 30px;
 }
 
-.navbar-logo img.logo {
-    height: 110px;
-    width: auto;
+.navbar-search{
+    transform: scale(0.8);
+    margin-right: 8px;
+}
+
+.navbar-logo {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+}
+
+.logo-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    text-decoration: none;
+}
+
+.logo {
+    height: 160px; /* Keep the logo size unchanged */
+    width: auto; /* Maintain aspect ratio */
 }
 
 .navbar-links {
     list-style: none;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column; /* Stack links vertically */
+    justify-content: flex-start; /* Align links to the top */
     align-items: center;
-    flex: 1;
-
+    width: 100%;
+    padding: 0;
+    margin-top: 20px;
+    gap: 25px;
 }
 
 .navbar-links li {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%; /* Make sure the list items fill the navbar height */
+    height: 60px; /* Adjust link height as needed */
+    width: 100%; /* Make links span the full width of the navbar */
 }
 
 .navbar-links a {
     color: white;
     text-decoration: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Keep icon and text in a row */
     align-items: center;
+    justify-content: flex-start; /* Align items to the left within each link */
+    width: 100%; /* Stretch links to fill navbar width */
+    padding-left: 20px; /* Add padding for spacing */
+    height: 100%;
 }
 
 .navbar-links a:hover {
-    text-decoration: underline;
+    background-color: #1a2038; /* Optional: Highlight background on hover */
 }
 
 .active-link {
     text-decoration: underline;
+    background-color: #1a2038; /* Optional: Highlight active link */
 }
 
 .icons {
     font-size: 24px;
-    margin-bottom: 4px;
+    margin-right: 10px; /* Add spacing between icon and text */
 }
 
-.text{
-    padding-right: 7px;
+.text {
+    font-size: 20px; /* Adjust to your desired size */
+    padding: 0; /* Ensure no unnecessary padding */
+    color: white; /* Optional: Reaffirm text color */
 }
