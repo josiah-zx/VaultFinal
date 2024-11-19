@@ -47,7 +47,7 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
         }
     
         try {
-            const response = await fetch('http://127.0.0.1:5000/posts', {
+            const response = await fetch('http://127.0.0.1:5000/create-post', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'

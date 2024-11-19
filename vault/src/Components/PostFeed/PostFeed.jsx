@@ -8,8 +8,8 @@ import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
 
 const PostFeed = () => {
     const [likeStatus, setLikeStatus] = useState({});
-    const [comments, setComments] = useState([]);
-    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [commentsMap, setCommentsMap] = useState({});
+    const [bookmarkedPosts, setBookmarkedPosts] = useState({});
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
@@ -38,7 +38,24 @@ const PostFeed = () => {
         const interval = setInterval(fetchAvailableCapsules, 60000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [])
+
+    const fetchComments = async (capsuleId) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setCommentsMap((prev) => ({
+                    ...prev,
+                    [capsuleId]: data, // Map comments to the capsule ID
+                }));
+            } else {
+                console.error("Failed to fetch comments:", await response.json());
+            }
+        } catch (error) {
+            console.error("Error fetching comments:", error);
+        }
+    };
 
     const handleLike = (capsuleId) => {
         setLikeStatus((prevStatus) => {
@@ -51,19 +68,51 @@ const PostFeed = () => {
         });
     };
 
-    const handleBookmark = () => {
-        setIsBookmarked(!isBookmarked);
-    };
+    const handleBookmark = (capsuleId) => {
+    setBookmarkedPosts((prevBookmarks) => ({
+        ...prevBookmarks,
+        [capsuleId]: !prevBookmarks[capsuleId],
+    }));
+};
 
-    const handleOpenCommentPopup = (image) => {
-        setUploadedImageUrl(image);
-        setShowCommentPopup(true);
+     const handleOpenCommentPopup = (capsuleId, image) => {
+        setCurrentCapsule(capsuleId); // Set capsule ID
+        setUploadedImageUrl(image); // Set image for the popup
+        setShowCommentPopup(true); // Show popup
+        fetchComments(capsuleId); // Fetch comments for the capsule
     };
 
     const handleCloseCommentPopup = () => {
         setShowCommentPopup(false);
     };
 
+     const handleSendComment = async (newComment) => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/comments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // Send session cookie
+                body: JSON.stringify({
+                    capsule_id: currentCapsule,
+                    text: newComment,
+                }),
+            });
+
+            if (response.ok) {
+                const savedComment = await response.json();
+                setCommentsMap((prev) => ({
+                    ...prev,
+                    [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], // Append comment to capsule's comments
+                }));
+            } else {
+                console.error("Failed to send comment:", await response.json());
+            }
+        } catch (error) {
+            console.error("Error sending comment:", error);
+        }
+    };
     const handleOpenTimeCapsulePopup = () => {
         setShowTimeCapsulePopup(true);
     };
@@ -110,7 +159,7 @@ const PostFeed = () => {
                                                 <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
                                             <div className="capsule-stats">
                                                 <span>{capsuleStatus.likes} likes</span>
-                                                <span>{comments.length} comments</span>
+                                                <span>{(commentsMap[capsule.capsule_id]?.length || 0)} comments</span>
                                             </div>
                                             <div className="capsule-actions">
                                                 <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
@@ -119,12 +168,14 @@ const PostFeed = () => {
                                                         <FaRegHeart className="icon"/>}
                                                 </span>
                                                 <span className="comment-icon"
-                                                    onClick={() => handleOpenCommentPopup(capsule.image_url)}>
+                                                    onClick={() => handleOpenCommentPopup(capsule.capsule_id, capsule.image_url)}>
                                                     <FaRegComment className="icon"/>
                                                 </span>
-                                                <span className="bookmark-icon" onClick={handleBookmark}>
-                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
-                                                        <FaRegBookmark className="icon"/>}
+                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                    {/* trying new bookmark tracking - jd */}
+                                                    {bookmarkedPosts[capsule.capsule_id] ?
+                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                        <FaRegBookmark className="icon" />}
                                                 </span>
                                                 <span className="share-icon">
                                                     <FaRegPaperPlane className="icon"/>
@@ -164,9 +215,10 @@ const PostFeed = () => {
                                                 <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
                                                     <FaRegSquarePlus className="icon"/>
                                                 </span>
-                                                <span className="bookmark-icon" onClick={handleBookmark}>
-                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
-                                                        <FaRegBookmark className="icon"/>}
+                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                    {bookmarkedPosts[capsule.capsule_id] ?
+                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                        <FaRegBookmark className="icon" />}
                                                 </span>
                                                 <span className="share-icon">
                                                     <FaRegPaperPlane className="icon"/>
@@ -191,8 +243,9 @@ const PostFeed = () => {
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
                         }}
-                        comments={comments}
+                        comments={commentsMap[currentCapsule] || []} // pass comments for current capsule
                         onClose={handleCloseCommentPopup}
+                        onSendComment={handleSendComment}
                     />
                 )}
                 {showAddPostPopup && (
