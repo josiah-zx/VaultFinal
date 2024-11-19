@@ -103,6 +103,21 @@ class Message(db.Model):
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
+# Define the Comment model
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    comment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships for querying
+    user = db.relationship('User', backref='comments', lazy=True)
+    capsule = db.relationship('Capsule', backref='comments', lazy=True)
+
+
+
 # Initialize the database
 with app.app_context():
     all_capsules = Capsule.query.all()
@@ -693,6 +708,52 @@ def check_follow_status(username):
 def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
+
+# Route to add new comment
+@app.route('/comments', methods=['POST'])
+def add_comment():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+    text = data.get('text')
+
+    if not capsule_id or not text:
+        return jsonify({"error": "Invalid data"}), 400
+
+    new_comment = Comment(
+        user_id=session['user_id'],
+        capsule_id=capsule_id,
+        text=text,
+    )
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({
+        "comment_id": new_comment.comment_id,
+        "capsule_id": new_comment.capsule_id,
+        "user_id": new_comment.user_id,
+        "text": new_comment.text,
+        "created_at": new_comment.created_at
+    }), 201
+
+# Route to get all comments on a capsule
+@app.route('/comments/<int:capsule_id>', methods=['GET'])
+def get_comments(capsule_id):
+    comments = Comment.query.filter_by(capsule_id=capsule_id).order_by(Comment.created_at).all()
+    comments_list = [
+        {
+            "comment_id": comment.comment_id,
+            "capsule_id": comment.capsule_id,
+            "user_id": comment.user_id,
+            "username": comment.user.username,  # Use the relationship to fetch username
+            "text": comment.text,
+            "created_at": comment.created_at
+        }
+        for comment in comments
+    ]
+    return jsonify(comments_list), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

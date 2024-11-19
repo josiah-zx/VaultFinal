@@ -67,6 +67,31 @@ const PostFeed = () => {
         setShowCommentPopup(false);
     };
 
+    const handleSendComment = async (newComment) => {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/comments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            credentials: "include", // Send session cookie
+            body: JSON.stringify({
+                capsule_id: currentCapsule, // Pass the current capsule ID
+                text: newComment, // The comment text
+            }),
+        });
+
+        if (response.ok) {
+            const savedComment = await response.json();
+            setComments((prevComments) => [...prevComments, savedComment]);
+        } else {
+            console.error("Failed to send comment:", await response.json());
+        }
+    } catch (error) {
+        console.error("Error sending comment:", error);
+    }
+};
     const handleOpenTimeCapsulePopup = () => {
         setShowTimeCapsulePopup(true);
     };
@@ -199,6 +224,7 @@ const PostFeed = () => {
                         }}
                         comments={comments}
                         onClose={handleCloseCommentPopup}
+                        onSendComment={handleSendComment}
                     />
                 )}
                 {showAddPostPopup && (
