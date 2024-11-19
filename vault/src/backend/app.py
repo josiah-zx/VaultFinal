@@ -709,50 +709,65 @@ def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
 
-# Route to add new comment
+# Route to add new comment - debug logs as well
 @app.route('/comments', methods=['POST'])
 def add_comment():
     if 'user_id' not in session:
+        app.logger.error("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.json
+    app.logger.info("Received comment data: %s", data)
+
     capsule_id = data.get('capsule_id')
     text = data.get('text')
 
     if not capsule_id or not text:
+        app.logger.error("Invalid data: capsule_id=%s, text=%s", capsule_id, text)
         return jsonify({"error": "Invalid data"}), 400
 
-    new_comment = Comment(
-        user_id=session['user_id'],
-        capsule_id=capsule_id,
-        text=text,
-    )
-    db.session.add(new_comment)
-    db.session.commit()
-
-    return jsonify({
-        "comment_id": new_comment.comment_id,
-        "capsule_id": new_comment.capsule_id,
-        "user_id": new_comment.user_id,
-        "text": new_comment.text,
-        "created_at": new_comment.created_at
-    }), 201
+    try:
+        new_comment = Comment(
+            user_id=session['user_id'],
+            capsule_id=capsule_id,
+            text=text,
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+        app.logger.info("Comment added: %s", new_comment)
+        return jsonify({
+            "comment_id": new_comment.comment_id,
+            "capsule_id": new_comment.capsule_id,
+            "user_id": new_comment.user_id,
+            "username": session['username'],
+            "text": new_comment.text,
+            "created_at": new_comment.created_at
+        }), 201
+    except Exception as e:
+        app.logger.error("Error adding comment: %s", e)
+        return jsonify({"error": "Failed to add comment"}), 500
 
 # Route to get all comments on a capsule
-@app.route('/comments/<int:capsule_id>', methods=['GET'])
-def get_comments(capsule_id):
-    comments = Comment.query.filter_by(capsule_id=capsule_id).order_by(Comment.created_at).all()
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    capsule_id = request.args.get('capsule_id')
+    if not capsule_id:
+        return jsonify({"error": "Capsule ID is required"}), 400
+
+    # Fetch comments for the given capsule ID
+    comments = Comment.query.filter_by(capsule_id=capsule_id).all()
     comments_list = [
         {
             "comment_id": comment.comment_id,
             "capsule_id": comment.capsule_id,
             "user_id": comment.user_id,
-            "username": comment.user.username,  # Use the relationship to fetch username
             "text": comment.text,
-            "created_at": comment.created_at
+            "timestamp": comment.timestamp,
         }
         for comment in comments
     ]
+
     return jsonify(comments_list), 200
 
 if __name__ == "__main__":
