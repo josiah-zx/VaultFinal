@@ -168,7 +168,7 @@ const PostFeed = () => {
                                                         <FaRegHeart className="icon"/>}
                                                 </span>
                                                 <span className="comment-icon"
-                                                    onClick={() => handleOpenCommentPopup(capsule.image_url)}>
+                                                    onClick={() => handleOpenCommentPopup(capsule.capsule_id, capsule.image_url)}>
                                                     <FaRegComment className="icon"/>
                                                 </span>
                                                  <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
