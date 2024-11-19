@@ -26,7 +26,6 @@
 .profile-card .profile-stats {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
     font-size: 0.9rem;
     color: #ddd; 
 }
