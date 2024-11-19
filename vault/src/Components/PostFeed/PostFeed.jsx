@@ -9,7 +9,7 @@ import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
 const PostFeed = () => {
     const [likeStatus, setLikeStatus] = useState({});
     const [comments, setComments] = useState([]);
-    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [bookmarkedPosts, setBookmarkedPosts] = useState({});
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
@@ -51,9 +51,12 @@ const PostFeed = () => {
         });
     };
 
-    const handleBookmark = () => {
-        setIsBookmarked(!isBookmarked);
-    };
+    const handleBookmark = (capsuleId) => {
+    setBookmarkedPosts((prevBookmarks) => ({
+        ...prevBookmarks,
+        [capsuleId]: !prevBookmarks[capsuleId],
+    }));
+};
 
     const handleOpenCommentPopup = (image) => {
         setUploadedImageUrl(image);
@@ -122,9 +125,11 @@ const PostFeed = () => {
                                                     onClick={() => handleOpenCommentPopup(capsule.image_url)}>
                                                     <FaRegComment className="icon"/>
                                                 </span>
-                                                <span className="bookmark-icon" onClick={handleBookmark}>
-                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
-                                                        <FaRegBookmark className="icon"/>}
+                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                    {/* trying new bookmark tracking - jd */}
+                                                    {bookmarkedPosts[capsule.capsule_id] ?
+                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                        <FaRegBookmark className="icon" />}
                                                 </span>
                                                 <span className="share-icon">
                                                     <FaRegPaperPlane className="icon"/>
@@ -164,9 +169,10 @@ const PostFeed = () => {
                                                 <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
                                                     <FaRegSquarePlus className="icon"/>
                                                 </span>
-                                                <span className="bookmark-icon" onClick={handleBookmark}>
-                                                    {isBookmarked ? <FaBookmark className="icon" style={{color: "white"}}/> :
-                                                        <FaRegBookmark className="icon"/>}
+                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                    {bookmarkedPosts[capsule.capsule_id] ?
+                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                        <FaRegBookmark className="icon" />}
                                                 </span>
                                                 <span className="share-icon">
                                                     <FaRegPaperPlane className="icon"/>
