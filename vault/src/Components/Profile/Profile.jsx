@@ -9,6 +9,7 @@ import { IoIosStarOutline } from "react-icons/io";
 const Profile = () => {
     const { profileUsername } = useParams();
     const [currentUser, setCurrentUser] = useState('');
+    const [capsuleCount, setCapsuleCount] = useState(0);
     const [postCount, setPostCount] = useState(0);
     const [followerCount, setFollowerCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
@@ -52,6 +53,7 @@ const Profile = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
+                    setCapsuleCount(data.capsule_count);
                     setPostCount(data.post_count);
                     setFollowerCount(data.follower_count);
                     setFollowingCount(data.following_count);
@@ -72,7 +74,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserCapsules = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/user-capsules', {
+                const response = await fetch(`http://127.0.0.1:5000/capsules/${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -86,13 +88,13 @@ const Profile = () => {
             }
         };
         fetchUserCapsules();
-    }, []);
+    }, [profileUsername]);
 
     // Fetch posts for profile user
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/capsules?username=${profileUsername}`, {
+                const response = await fetch(`http://127.0.0.1:5000/posts/${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -143,6 +145,7 @@ const Profile = () => {
                 <div className="profile-info">
                     <h2>{profileUsername || errorMessage}</h2>
                     <div className="profile-stats">
+                        <span>{capsuleCount} capsules</span>
                         <span>{postCount} posts</span>
                         <span>{followerCount} followers</span>
                         <span>{followingCount} following</span>
@@ -172,12 +175,14 @@ const Profile = () => {
                     >
                         <BsGrid3X3 size={22}/>
                     </button>
-                    <button
-                        className={selectedTab === "favorites" ? "active-profile-tab" : ""}
-                        onClick={() => handleTabClick("favorites")}
-                    >
-                        <IoIosStarOutline size={30}/>
-                    </button>
+                    {currentUser === profileUsername && (
+                        <button
+                            className={selectedTab === "favorites" ? "active-profile-tab" : ""}
+                            onClick={() => handleTabClick("favorites")}
+                        >
+                            <IoIosStarOutline size={30}/>
+                        </button>
+                    )}
                 </div>
 
                 <div className="profile-content">
