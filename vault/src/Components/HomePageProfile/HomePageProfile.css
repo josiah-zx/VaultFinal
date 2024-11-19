@@ -6,7 +6,7 @@
     height: 240px;
     border: 1px solid #333; 
     color: white; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .profile-card .profile-avatar {
@@ -26,7 +26,6 @@
 .profile-card .profile-stats {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
     font-size: 0.9rem;
     color: #ddd; 
 }
