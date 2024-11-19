@@ -27,7 +27,7 @@
   .App-link {
     color: #61dafb;
   }
-  
+
   @keyframes App-logo-spin {
     from {
       transform: rotate(0deg);
@@ -36,4 +36,10 @@
       transform: rotate(360deg);
     }
   }
-  
+
+  /* prevent horizontal overflow causing scroll bar at bottom of screen */
+  body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
