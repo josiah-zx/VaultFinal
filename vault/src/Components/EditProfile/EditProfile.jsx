@@ -68,48 +68,57 @@ const EditProfile = () => {
         <div>
             <Navbar/>
             <div className="edit-settings-container">
-                <h1>Account Settings</h1>
                 <div className="edit-profile-main">
-                    <h2>Edit profile</h2>
-                    <form onSubmit={handleSave} className="edit-profile-form">
-                        <div className="form-group profile-section">
-                            <h3>{profileUsername || errorMessage}</h3>
-                            <div className="profile-picture">
-                                <img
-                                    src={profilePicture || 'https://via.placeholder.com/150'
-                                    }
-                                    alt="Profile"
-                                />
-                            </div>
-                            <div>
-                                <button type="button" className="change-photo-button">
-                                    Change photo
-                                </button>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    style={{display: 'none'}}
-                                    id="upload-photo"
-                                />
-                            </div>
+                    <h1 className="edit-settings-title">Edit Profile</h1>
+                    <div className="edit-profile-header">
+                        <div className="edit-profile-picture">
+                            <img
+                                src={profilePicture || 'https://via.placeholder.com/150'}
+                                alt="Profile"
+                            />
                         </div>
-
-                        <div className="form-group">
-                            <label htmlFor="bio">Bio</label>
+                        <div className="edit-profile-info">
+                            <div className="username-section">
+                                <h2 className="edit-profile-username">{currentUser || "Your Username"}</h2>
+                            </div>
+                            <button
+                                type="button"
+                                className="change-photo-button"
+                                onClick={() =>
+                                    document.getElementById("upload-photo").click()
+                                }
+                            >
+                                Change photo
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                style={{display: "none"}}
+                                id="upload-photo"
+                            />
+                        </div>
+                    </div>
+                    <form onSubmit={handleSave} className="edit-profile-form">
+                        <div className="edit-bio-section">
+                            <label htmlFor="bio" className="bio-label">
+                                Bio
+                            </label>
                             <textarea
                                 id="bio"
                                 value={bio}
                                 onChange={(e) => setBio(e.target.value)}
                                 placeholder="Write something about yourself"
                                 maxLength="150"
+                                className="bio-textarea"
                             />
-                            <span>{bio.length} / 150</span>
+                            <span className="bio-counter">{bio.length} / 150</span>
                         </div>
-
-                        <button type="submit" className="save-button">
-                            Save Changes
-                        </button>
+                        <div className="save-button-container">
+                            <button type="submit" className="save-button">
+                                Save Changes
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
