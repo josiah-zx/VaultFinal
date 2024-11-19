@@ -4,10 +4,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 75vh;
-    padding: 20px;
-    border-radius: 20px;
-    background-color: rgba(22, 22, 24, 0.95);
+    padding: 10px;
+    font-family: 'Arial', sans-serif;
+    background: #0d1322;
+    width: 500px;
+    min-height: 100vh;
 }
 
 h1 {
@@ -17,7 +18,7 @@ h1 {
 
 /* Settings box with the rgba color */
 .settings-box {
-    background-color: rgba(22, 22, 24, 0.95); 
+    background: #1a1e30;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
@@ -77,7 +78,8 @@ h1 {
 
 /* Button styling */
 .save-btn {
-    background-color: #007bff;
+    
+    background-color: #1f78ff;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -96,7 +98,10 @@ h1 {
 }
 
 .logout-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
     background-color: rgb(191, 9, 9);
+    width: 400px;
 }
 
 .logout-btn:hover {

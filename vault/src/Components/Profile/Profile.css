@@ -3,13 +3,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(10, 10, 10, 0.9); /* Darker background for capsule section */
+    background: #0d1322; 
     color: white;
-    min-height: 100vh; /* Make it at least full screen */
-    overflow: hidden; /* Prevent overall scrolling */
+    min-height: 100vh; 
+    overflow: hidden; 
     justify-content: flex-start;
-    width: 50vw; /* Make the container wider */
-    max-width: 900px; /* Limit the maximum width */
+    width: 50vw; 
+    max-width: 900px; 
     margin: 0 auto;
     padding: 20px;
 }
@@ -19,13 +19,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(10, 10, 10, 0.9); /* Darker background for capsule section */
+    background: rgba(10, 10, 10, 0.9); 
     color: white;
-    min-height: 100vh; /* Make it at least full screen */
-    overflow: hidden; /* Prevent overall scrolling */
+    min-height: 100vh;
+    overflow: hidden; 
     justify-content: flex-start;
-    width: 50vw; /* Make the container wider */
-    max-width: 900px; /* Limit the maximum width */
+    width: 50vw; 
+    max-width: 900px; 
     margin: 0 auto;
     padding: 20px;
 }
@@ -69,10 +69,10 @@
 /* Regular Post Content Styling (Smaller) */
 .post-content {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    gap: 10px; /* Space between grid items */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; 
     width: 100%;
-    max-width: 900px; /* Adjust width to align items */
+    max-width: 900px; 
     margin: 20px auto;
     text-align: center;
 }
@@ -88,7 +88,7 @@
 /* Individual Regular Post Styling */
 .post {
     width: 100%;
-    aspect-ratio: 1 / 1; /* Square shape */
+    aspect-ratio: 1 / 1;
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     overflow: hidden;
@@ -102,7 +102,7 @@
 .post-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire post area */
+    object-fit: cover; 
 }
 
 /* Profile Information */
@@ -111,6 +111,8 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    margin-top: -30px;
+    margin-bottom: 100px;
 }
 
 .profile-info h2 {
@@ -122,8 +124,9 @@
 
 .profile-stats {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     margin-bottom: 20px;
+    align-items: center;
     font-size: 18px;
 }
 
