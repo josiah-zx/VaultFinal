@@ -67,7 +67,7 @@ const EditProfile = () => {
     return (
         <div>
             <Navbar/>
-            <div className="settings-container">
+            <div className="edit-settings-container">
                 <h1>Account Settings</h1>
                 <div className="edit-profile-main">
                     <h2>Edit profile</h2>
