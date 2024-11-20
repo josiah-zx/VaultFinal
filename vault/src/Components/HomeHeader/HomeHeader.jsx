@@ -36,7 +36,7 @@ const HomeHeader = () => {
         <nav className="navbar">
             <div className="navbar-logo">
                 <a href="/home" className="logo-link">
-                    <img src="/nav_vault_logo.png" alt="Vault Logo" className="logo"/>
+                    <img src="/VaultTextLogo.png" alt="Vault Logo" className="logo"/>
                 </a>
             </div>
             <ul className="navbar-links">

@@ -20,7 +20,7 @@
 }
 
 .navbar-logo {
-    margin-top: 30px;
+    margin-top: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,7 +38,7 @@
 }
 
 .logo {
-    height: 160px; /* Keep the logo size unchanged */
+    height: 55px; /* Keep the logo size unchanged */
     width: auto; /* Maintain aspect ratio */
 }
 
