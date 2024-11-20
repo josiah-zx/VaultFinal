@@ -6,7 +6,7 @@
     justify-content: center;
     padding: 10px;
     font-family: 'Arial', sans-serif;
-    background-color: rgba(0, 2, 9, 0.6);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     min-width: 60vw;
     min-height: 90vh;
@@ -19,16 +19,35 @@ h1 {
     color: #fff;
 }
 
-/* Settings box with the rgba color */
 .settings-box {
-    background-color: rgba(221, 238, 253, 0.2);
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    border-radius: 16px; /* Rounded corners */
     padding: 20px;
     width: 400px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     color: #fff;
     text-align: center;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-box:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    padding: 2px; /* Border thickness */
+    background: linear-gradient(135deg, #6a87d6 20%, #7887e5 40%, #3a4f92 70%, #223370 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 /* Profile Avatar Styling */

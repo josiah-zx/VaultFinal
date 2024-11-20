@@ -22,7 +22,7 @@
 }
 
 .create-capsule-btn {
-    background: #0d1322;
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -46,7 +46,7 @@
     margin-right: 10px;
 }
 .capsule-card {
-    background: #0d1322;
+    background-color: rgb(27, 30, 55);
     width: 100%;
     overflow: hidden;
     color: white;

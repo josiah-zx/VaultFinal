@@ -20,19 +20,41 @@
     padding: 50px;
     max-width: 800px;
     width: 100%;
-    background-color: rgba(0, 2, 9, 0.6);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     align-items: center;
     border-radius: 20px;
 }
 
 .edit-profile-header {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
     border-radius: 8px;
     display: flex;
     align-items: center;
     margin-bottom: 40px;
-    background-color: rgba(221, 238, 253, 0.2);
     padding: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+}
+
+.edit-profile-header:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px; /* Matches the border-radius of the header */
+    padding: 2px; /* Gradient border thickness */
+    background: linear-gradient(135deg, #6a87d6 20%, #7887e5 40%, #3a4f92 70%, #223370 100%); /* Gradient colors */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none; /* Prevents interaction with the pseudo-element */
 }
 
 .edit-profile-picture img {
