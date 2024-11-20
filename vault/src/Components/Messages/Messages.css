@@ -2,11 +2,12 @@
 .messages-container {
     color: #fff;
     font-family: 'Arial', sans-serif;
-    width: 100vh;
-    height: 75vh;
+    min-width: 60vw;
+    min-height: 90vh;
     overflow: hidden;
     padding: 20px;
     display: flex;
+    margin-left: 15vw;
 }
 .delete-capsules-btn{
     margin-top: 50px;
@@ -14,13 +15,13 @@
 
 /* Sidebar (Friends section) styling */
 .sidebar {
-    width: 250px; 
-    background-color: rgba(22, 22, 24, 0.95);
+    width: 250px;
+    background: rgba(10, 10, 10, 0.8);
     display: flex;
     flex-direction: column;
     padding: 20px;
     border-radius: 20px 0 0 20px;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     flex-shrink: 0;
 }
 
@@ -77,10 +78,10 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background: rgba(10, 10, 10, 0.8); 
+    background-color: rgba(0, 2, 9, 0.6);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     border-radius: 0 20px 20px 0;
     padding: 50px;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.6);
 }
 
 /* Empty message box styling */
@@ -104,16 +105,16 @@
 
 .send-message-btn {
     padding: 12px 25px;
-    background-color: #1f78ff;
-    color: white;
+    background-color: rgba(255, 255, 255, 0.91);
+    color: #000000;
+    border-radius: 20px;
     border: none;
-    border-radius: 30px;
     cursor: pointer;
     font-size: 16px;
 }
 
 .send-message-btn:hover {
-    background-color: #0077cc;
+    background-color: rgba(237, 233, 233, 0.64);
 }
 
 .new-message {
