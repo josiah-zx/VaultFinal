@@ -78,7 +78,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: rgba(0, 2, 9, 0.6);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     border-radius: 0 20px 20px 0;
     padding: 50px;

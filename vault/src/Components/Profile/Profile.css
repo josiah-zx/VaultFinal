@@ -10,8 +10,7 @@
     width: 50vw;
     max-width: 900px;
     padding: 20px;
-    background-color: rgba(0, 2, 9, 0.6);
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     margin-left: 15vw;
 }
 
@@ -20,16 +19,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgba(0, 2, 9, 0.6);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     color: white;
     min-height: 100vh;
     overflow: hidden; 
     justify-content: flex-start;
-    width: 50vw; 
+    width: 50vw;
     max-width: 900px;
     padding: 20px;
-    margin-left: 200px;
+    margin-left: 15vw;
 }
 
 /* Avatar Styling */
@@ -44,9 +43,9 @@
     border: none;
     padding: 20px;
     border-radius: 8px;
-    background-color: rgba(0, 2, 9, 0.6);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
-    width: 90%; 
+    width: 90%;
     max-width: 600px;
     text-align: center;
     overflow-y: auto;
@@ -139,16 +138,36 @@
     color: #d0d0d0;
 }
 
-/* Tabs Section */
 .profile-tab-navbar {
+    margin-top: -40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 80%;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.08); 
-    border-radius: 30px;
-    margin-top: -40px;
+    background-color: rgba(255, 255, 255, 0.08); /* Background color for the navbar */
+    border-radius: 30px; /* Rounded corners */
+    position: relative; /* Required for the pseudo-element */
+    overflow: hidden; /* Ensures gradient border stays within bounds */
+    z-index: 1; /* Keeps it above other elements */
+}
+
+.profile-tab-navbar:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 30px; /* Matches the border-radius of the navbar */
+    padding: 2px; /* Thickness of the gradient border */
+    background: linear-gradient(135deg, #6a87d6 20%, #7887e5 40%, #3a4f92 70%, #223370 100%); /* Gradient border */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none; /* Prevents interaction with the pseudo-element */
+    z-index: -1; /* Places the gradient border behind the content */
 }
 
 .profile-tab-navbar button {
@@ -157,7 +176,7 @@
     cursor: pointer;
     background: none;
     color: white;
-    transition: color 0.3s ease, background 0.3s ease; 
+    transition: color 0.3s ease, background 0.3s ease;
 }
 
 .profile-tab-navbar button.active-profile-tab {

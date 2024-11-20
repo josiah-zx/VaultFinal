@@ -15,7 +15,9 @@ body {
   justify-content: center;
   align-items :center;
   min-height: 100vh;
-  background-image: linear-gradient(135deg, #e0dafd 0%, #6a87d6 33%, #3a4f92 66%, #112358 100%);
+  background-image:
+  linear-gradient(135deg, rgba(17, 20, 62, 0.8) 0%, rgba(46, 53, 109, 0.8) 35%, rgba(54, 51, 128, 0.8) 60%, rgba(18, 18, 47, 0.8) 100%),
+          url("/public/bgimage3.jpg"); /* Replace with your image path */
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;

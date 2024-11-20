@@ -1,6 +1,6 @@
 .profile-card {
     padding: 16px;
-    background: #0d1322;
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     border-radius: 6px;
     width: 240px;
     height: 240px;

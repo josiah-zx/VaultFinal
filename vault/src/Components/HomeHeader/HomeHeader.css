@@ -1,11 +1,11 @@
 .navbar {
     display: flex;
     flex-direction: column;
-    background-color: #222a45;
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     align-items: center;
     justify-content: flex-start; /* Align items from top to bottom */
     position: fixed;
-    height: 100vh; /* Full height of the viewport */
+    height: 100vh;
     width: 270px;
     top: 0;
     left: 0;
