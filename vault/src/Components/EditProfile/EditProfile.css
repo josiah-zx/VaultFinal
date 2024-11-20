@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: flex-start;
     min-height: calc(100vh - 60px);
-    margin-left: 200px;
+    margin-left: 15vw;
     width: 100vw;
 }
 
@@ -23,6 +23,7 @@
     background-color: rgba(0, 2, 9, 0.6);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     align-items: center;
+    border-radius: 20px;
 }
 
 .edit-profile-header {
@@ -73,7 +74,7 @@
 }
 
 .change-photo-button:hover {
-    background-color: #c7cdcc;
+    background-color: rgba(237, 233, 233, 0.64);
 }
 
 
@@ -130,5 +131,5 @@
 }
 
 .save-button:hover {
-    background-color: #c7cdcc;
+    background-color: rgba(237, 233, 233, 0.64);
 }

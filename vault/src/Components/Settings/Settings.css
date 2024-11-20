@@ -6,9 +6,12 @@
     justify-content: center;
     padding: 10px;
     font-family: 'Arial', sans-serif;
-    background: #0d1322;
-    width: 500px;
-    min-height: 100vh;
+    background-color: rgba(0, 2, 9, 0.6);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
+    min-width: 60vw;
+    min-height: 90vh;
+    margin-left: 15vw;
+    border-radius: 20px;
 }
 
 h1 {
@@ -18,7 +21,7 @@ h1 {
 
 /* Settings box with the rgba color */
 .settings-box {
-    background: #1a1e30;
+    background-color: rgba(221, 238, 253, 0.2);
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
@@ -42,7 +45,7 @@ h1 {
     justify-content: flex-start;
     margin-bottom: 15px;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
 }
@@ -54,7 +57,7 @@ h1 {
 
 .label {
     font-weight: bold;
-    color: #bbb; 
+    color: #ffffff;
     margin-right: 10px;
 }
 
@@ -78,18 +81,17 @@ h1 {
 
 /* Button styling */
 .save-btn {
-    
-    background-color: #1f78ff;
-    color: white;
+    background-color: rgba(255, 255, 255, 0.91);
+    color: #000000;
+    border-radius: 20px;
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
 }
 
 .save-btn:hover {
-    background-color: #0056b3;
+    background-color: rgba(237, 233, 233, 0.64);
 }
 
 .error-message {
@@ -99,13 +101,14 @@ h1 {
 
 .logout-btn {
     margin-top: 20px;
+    border-radius: 20px;
     padding: 10px 20px;
     background-color: rgb(191, 9, 9);
     width: 400px;
 }
 
 .logout-btn:hover {
-    background-color: rgb(191, 9, 9);
+    background-color: rgb(191, 9, 9, 0.7);
 }
 
 /* Adjust for smaller screens */
