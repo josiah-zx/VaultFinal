@@ -8,21 +8,16 @@ const EditProfile = () => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [bio, setBio] = useState('');
     const [currentUser, setCurrentUser] = useState('');
+    const [currentUserId, setCurrentUserId] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const { profileUsername } = useParams();
     const [file, setFile] = useState(null);
-
 
     const handleFileChange = (e) => {
        // Add functionality to upload file / pfp
     };
 
-    const handleSave = (event) => {
-        // Add functionality to save the updated profile information
-    };
-
-    // Fetch session user
     useEffect(() => {
+        // Fetch session user
         const fetchSessionUser = async () => {
             try {
                 const response = await fetch('http://127.0.0.1:5000/session-user', {
@@ -31,6 +26,7 @@ const EditProfile = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setCurrentUser(data.username);
+                    setCurrentUserId(data.user_id);
                 } else {
                     setErrorMessage('Failed to load user info');
                 }
@@ -39,20 +35,22 @@ const EditProfile = () => {
                 setErrorMessage('User not found.');
             }
         };
+
         fetchSessionUser();
     }, []);
 
-    // Fetch profile data
     useEffect(() => {
+        // Fetch user profile data
         const fetchProfileData = async () => {
-            if (!profileUsername) return;
+            if (!currentUser) return;
             try {
-                const response = await fetch(`http://127.0.0.1:5000/users/${profileUsername}`, {
+                const response = await fetch(`http://127.0.0.1:5000/users/${currentUser}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setBio(data.bio);
+                    setBio(data.bio || '');
+                    setProfilePicture(data.profile_pic);
                 } else {
                     setErrorMessage('Failed to load profile data');
                 }
@@ -62,8 +60,30 @@ const EditProfile = () => {
             }
         };
         fetchProfileData();
-    }, [profileUsername]);
+    }, [currentUser]);
 
+    const handleSave = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ bio: bio }),
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Bio updated successfully!');
+            } else {
+                console.error('Failed to update bio.');
+            }
+        } catch (error) {
+            console.error('Error saving bio:', error);
+            console.log('An error occurred while saving your bio.');
+        }
+    };
 
     return (
         <div>
@@ -100,7 +120,7 @@ const EditProfile = () => {
                             />
                         </div>
                     </div>
-                    <form onSubmit={handleSave} className="edit-profile-form">
+                    <form className="edit-profile-form">
                         <div className="edit-bio-section">
                             <label htmlFor="bio" className="bio-label">
                                 Bio
@@ -116,7 +136,7 @@ const EditProfile = () => {
                             <span className="bio-counter">{bio.length} / 150</span>
                         </div>
                         <div className="save-button-container">
-                            <button type="submit" className="save-button">
+                            <button type="submit" className="save-button" onClick={handleSave}>
                                 Save Changes
                             </button>
                         </div>
