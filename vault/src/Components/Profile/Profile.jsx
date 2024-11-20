@@ -167,7 +167,7 @@ const Profile = () => {
                         className={selectedTab === "capsules" ? "active-profile-tab" : ""}
                         onClick={() => handleTabClick("capsules")}
                     >
-                        <img src="/capsule.png" className="capsule-icon" alt="Capsules" width="24" height="24" />
+                        <img src="capsule.png" className="capsule-icon" alt="Capsules" width="24" height="24" />
                     </button>
                     <button
                         className={selectedTab === "posts" ? "active-profile-tab" : ""}
