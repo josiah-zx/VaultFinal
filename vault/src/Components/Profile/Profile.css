@@ -11,6 +11,7 @@
     max-width: 900px;
     padding: 20px;
     background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     margin-left: 15vw;
 }
 
