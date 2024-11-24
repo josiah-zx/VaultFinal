@@ -11,9 +11,30 @@
 
 .profile-card .profile-avatar {
     font-size: 4rem;
-    color: #bbb; 
+    color: #bbb;
     text-align: center;
     margin-bottom: 10px;
+}
+
+.profile-card .profile-avatar-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin: 0 auto;
+}
+
+.profile-card .profile-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #444;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .profile-card .profile-username {

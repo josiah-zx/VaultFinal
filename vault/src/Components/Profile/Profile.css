@@ -40,6 +40,20 @@
     color: #f1f1f1;
 }
 
+.profile-avatar-placeholder {
+    font-size: 100px;
+    color: #ddd;
+    margin: 0 auto;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .capsule-content {
     border: none;
     padding: 20px;
