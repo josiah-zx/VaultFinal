@@ -2,22 +2,27 @@
 .messages-container {
     color: #fff;
     font-family: 'Arial', sans-serif;
-    width: 100vh;
-    height: 75vh;
+    min-width: 60vw;
+    min-height: 90vh;
     overflow: hidden;
     padding: 20px;
     display: flex;
+    margin-left: 15vw;
+}
+
+.delete-capsules-btn {
+    margin-top: 50px;
 }
 
 /* Sidebar (Friends section) styling */
 .sidebar {
-    width: 250px; 
-    background-color: rgba(22, 22, 24, 0.95);
+    width: 250px;
+    background: rgba(10, 10, 10, 0.8);
     display: flex;
     flex-direction: column;
     padding: 20px;
     border-radius: 20px 0 0 20px;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     flex-shrink: 0;
 }
 
@@ -29,15 +34,27 @@
     padding-left: 10px;
 }
 
-.user-icon {
-    font-size: 50px;
+/* Profile picture styling */
+.user-profile img.user-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
     margin-right: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Default icon styling (FaUserCircle fallback) */
+.user-profile .user-icon {
+    font-size: 50px;
     color: #fff;
+    margin-right: 10px;
 }
 
 .user-profile h3 {
     font-size: 22px;
     font-weight: bold;
+    color: #fff;
 }
 
 /* Friends list styling */
@@ -69,23 +86,21 @@
 
 /* Main chat area (Messages section) */
 .chat-area {
-    flex: 6;  
+    flex: 6;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background: rgba(10, 10, 10, 0.8); 
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     border-radius: 0 20px 20px 0;
     padding: 50px;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.6);
 }
 
 /* Empty message box styling */
 .empty-message {
     text-align: center;
 }
-
-
 
 .empty-message h2 {
     font-size: 34px;
@@ -101,16 +116,16 @@
 
 .send-message-btn {
     padding: 12px 25px;
-    background-color: #00b8ff;
-    color: white;
+    background-color: rgba(255, 255, 255, 0.91);
+    color: #000000;
+    border-radius: 20px;
     border: none;
-    border-radius: 30px;
     cursor: pointer;
     font-size: 16px;
 }
 
 .send-message-btn:hover {
-    background-color: #0077cc;
+    background-color: rgba(237, 233, 233, 0.64);
 }
 
 .new-message {
@@ -140,7 +155,7 @@
     left: -40px;
 }
 
-.back-button-chat{
+.back-button-chat {
     background-color: transparent;
     width: 20px;
     height: 20px;
@@ -241,11 +256,28 @@
     cursor: pointer;
 }
 
+/* Updated placeholder for other-user-icon */
 .other-user-icon {
-    font-size: 45px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
     margin-right: 10px;
+    background-color: #333;
+}
+
+/* Placeholder using FaUserCircle for other-user-icon */
+.other-user-icon-placeholder {
+    font-size: 45px;
     color: #fff;
-    cursor: pointer;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #333;
 }
 
 .message-bar {
@@ -289,8 +321,100 @@
     font-size: 12px;
 }
 
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    font-size: 16px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    color: #bbb;
+    text-align: left;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.conversation-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.conversation-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left: 4px solid #6a87d6;
+}
+
+.conversation-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    background-color: #333;
+}
+
+/* Placeholder using FaUserCircle for conversation-icon */
+.conversation-icon-placeholder {
+    font-size: 40px;
+    color: #fff;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #333;
+}
+
 .message-content:focus {
     outline: none;
+}
+
+.conversation-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversation-username {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.conversation-last-message {
+    font-size: 14px;
+    color: #bbb;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversation-icon-placeholder,
+.search-result-icon-placeholder,
+.other-user-icon-placeholder {
+    font-size: 40px;
+    /* Adjust size as needed */
+    color: #fff;
+    background-color: #333;
+    width: 40px;
+    /* Adjust size */
+    height: 40px;
+    /* Adjust size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.conversation-timestamp {
+    font-size: 12px;
+    color: #777;
+    margin-left: auto;
+    text-align: right;
 }
 
 .send-button {

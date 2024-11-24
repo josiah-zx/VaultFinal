@@ -103,6 +103,21 @@ class Message(db.Model):
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
+# Define the Comment model
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    comment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships for querying
+    user = db.relationship('User', backref='comments', lazy=True)
+    capsule = db.relationship('Capsule', backref='comments', lazy=True)
+
+
+
 # Initialize the database
 with app.app_context():
     all_capsules = Capsule.query.all()
@@ -208,13 +223,12 @@ def get_session_user():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
         if user:
-            logger.info(f"Session user: {user.user_id}")
             return jsonify({
                 "user_id": user.user_id,
                 "username": user.username,
-                "email": user.email  
+                "email": user.email,
+                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
             }), 200
-    logger.warning("User not logged in")
     return jsonify({"error": "User not logged in"}), 401
 
 
@@ -244,12 +258,10 @@ def get_capsules(username):
 def create_capsule():
     # Handle POST request to create a new capsule
     if 'user_id' not in session:
-        logger.warning("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
     
     # Retrieve the user ID from the session
     user_id = session['user_id']
-    logger.info(f"Creating capsule for user_id: {user_id}")
     
     # Retrieve form data
     data = request.form
@@ -260,7 +272,6 @@ def create_capsule():
     try:
         open_at = datetime.strptime(open_at_str, "%Y-%m-%dT%H:%M") if open_at_str else None
     except ValueError:
-        logger.error("Invalid date format for open_at: %s", open_at_str)
         return jsonify({"message": "Invalid date format"}), 400
 
     # Handle file upload
@@ -270,8 +281,6 @@ def create_capsule():
         filename = file.filename
         image_url = f"/uploads/{filename}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        logger.info("Image file saved as %s", image_url)
-    
     # Create new capsule with session-based user_id
     new_capsule = Capsule(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
     db.session.add(new_capsule)
@@ -327,12 +336,10 @@ def get_posts(username):
 def create_post():
     # Handle POST request to create a new post
     if 'user_id' not in session:
-        logger.warning("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
     
     # Retrieve the user ID from the session
     user_id = session['user_id']
-    logger.info(f"Creating post for user_id: {user_id}")
     
     # Retrieve form data
     data = request.form
@@ -346,7 +353,6 @@ def create_post():
         filename = file.filename
         image_url = f"/uploads/{filename}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        logger.info("Image file saved as %s", image_url)
     
     # Create new capsule with session-based user_id
     new_post = Post(capsule_id=capsule_id, user_id=user_id, content=content, image_url=image_url)
@@ -383,6 +389,7 @@ def get_user(username):
         'follower_count': follower_count,
         'following_count': following_count,
         'bio': user.bio,
+        'profile_pic': user.profile_pic,
         'is_following': is_following
     })
 
@@ -430,13 +437,17 @@ def update_settings():
 
 from flask import send_from_directory
 
+from mimetypes import guess_type
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
-        # Dynamically set the mimetype based on the file extension
-        return send_file(file_path, mimetype='image/jpeg')  
+        mime_type, _ = guess_type(file_path)
+        app.logger.info(f"Serving file: {file_path}")
+        return send_file(file_path, mimetype=mime_type)
     else:
+        app.logger.error(f"File not found: {file_path}")
         return jsonify({"error": "File not found"}), 404
 
 # Searching for users
@@ -447,9 +458,43 @@ def search():
     # Search users by username using a LIKE query
     users = User.query.filter(User.username.like(f"%{query}%")).limit(7).all()
 
-    results = [{'username': user.username} for user in users]
+    results = [
+        {
+            'username': user.username,
+            'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
+        }
+        for user in users
+    ]
 
     return jsonify(results)
+
+
+@app.route('/users/<int:user_id>/upload-picture', methods=['POST'])
+def upload_profile_picture(user_id):
+    # Check if the user exists
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Check if a file is in the request
+    if 'profile_picture' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files['profile_picture']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Save the file
+    filename = f"user_{user_id}_{file.filename}"
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(file_path)
+
+    # Update user's profile picture path in the database
+    user.profile_pic = f"/uploads/{filename}"
+    db.session.commit()
+
+    return jsonify({"profile_pic": user.profile_pic, "message": "Profile picture updated successfully!"}), 200
+
 
 # Route for resetting password
 @app.route('/reset-password', methods=['POST'])
@@ -527,6 +572,7 @@ def get_conversations(username):
 
             conversations.append({
                 "username": convo_user.username,
+                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else "https://via.placeholder.com/150",
                 "last_message": last_message.content if last_message else "",
                 "timestamp": last_message.timestamp if last_message else ""
             })
@@ -560,22 +606,25 @@ def get_messages(user1_id, user2_id):
 @app.route('/available-capsules', methods=['GET'])
 def get_available_capsules():
     current_time = datetime.utcnow()
-    # Fetch capsules along with the associated usernames
-    available_capsules = db.session.query(Capsule, User.username).join(User, Capsule.user_id == User.user_id).all()
+    # Fetch capsules along with associated usernames and profile pictures
+    available_capsules = db.session.query(
+        Capsule, User.username, User.profile_pic
+    ).join(User, Capsule.user_id == User.user_id).all()
 
     capsules_list = [
         {
             "capsule_id": capsule.capsule_id,
             "user_id": capsule.user_id,
-            "username": username,  
+            "username": username,
             "content": capsule.content,
+            "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else None,
             "image_url": f"http://127.0.0.1:5000{capsule.image_url}" if capsule.image_url else None,
             "created_at": capsule.created_at,
             "updated_at": capsule.updated_at,
             "open_at": capsule.open_at,
             "is_open": capsule.open_at <= current_time
         }
-        for capsule, username in available_capsules
+        for capsule, username, profile_pic in available_capsules
     ]
     return jsonify(capsules_list)
 
@@ -687,6 +736,63 @@ def check_follow_status(username):
 def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
+
+# Route to add new comment - debug logs as well
+@app.route('/comments', methods=['POST'])
+def add_comment():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+
+
+    capsule_id = data.get('capsule_id')
+    text = data.get('text')
+
+    if not capsule_id or not text:
+        return jsonify({"error": "Invalid data"}), 400
+
+    try:
+        new_comment = Comment(
+            user_id=session['user_id'],
+            capsule_id=capsule_id,
+            text=text,
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+        return jsonify({
+            "comment_id": new_comment.comment_id,
+            "capsule_id": new_comment.capsule_id,
+            "user_id": new_comment.user_id,
+            "username": session['username'],
+            "text": new_comment.text,
+            "created_at": new_comment.created_at
+        }), 201
+    except Exception as e:
+        return jsonify({"error": "Failed to add comment"}), 500
+
+# Route to get all comments on a capsule
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    capsule_id = request.args.get('capsule_id')
+    if not capsule_id:
+        return jsonify({"error": "Capsule ID is required"}), 400
+
+    # Fetch comments for the given capsule ID
+    comments = Comment.query.filter_by(capsule_id=capsule_id).all()
+    comments_list = [
+        {
+            "comment_id": comment.comment_id,
+            "capsule_id": comment.capsule_id,
+            "user_id": comment.user_id,
+            "text": comment.text,
+            "timestamp": comment.timestamp,
+        }
+        for comment in comments
+    ]
+
+    return jsonify(comments_list), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

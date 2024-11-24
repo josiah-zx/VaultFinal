@@ -8,20 +8,25 @@ const EditProfile = () => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [bio, setBio] = useState('');
     const [currentUser, setCurrentUser] = useState('');
+    const [currentUserId, setCurrentUserId] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const { profileUsername } = useParams();
+    const [file, setFile] = useState(null);
 
-
-    const handleFileChange = (event) => {
-        // Add functionality to add profile picture
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile){
+            setFile(selectedFile);
+            const reader = new FileReader();
+            reader.onload = () =>{
+                setProfilePicture(reader.result);
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+       
     };
 
-    const handleSave = (event) => {
-        // Add functionality to save the updated profile information
-    };
-
-    // Fetch session user
     useEffect(() => {
+        // Fetch session user
         const fetchSessionUser = async () => {
             try {
                 const response = await fetch('http://127.0.0.1:5000/session-user', {
@@ -30,6 +35,7 @@ const EditProfile = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setCurrentUser(data.username);
+                    setCurrentUserId(data.user_id);
                 } else {
                     setErrorMessage('Failed to load user info');
                 }
@@ -38,22 +44,31 @@ const EditProfile = () => {
                 setErrorMessage('User not found.');
             }
         };
+
         fetchSessionUser();
     }, []);
 
-    // Fetch profile data
     useEffect(() => {
         const fetchProfileData = async () => {
-            if (!profileUsername) return;
+            if (!currentUser) return;
             try {
-                const response = await fetch(`http://127.0.0.1:5000/users/${profileUsername}`, {
+                const response = await fetch(`http://127.0.0.1:5000/users/${currentUser}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setBio(data.bio);
+                    console.log('Profile Data:', data); // Debugging
+                    setBio(data.bio || '');
+                    if (data.profile_pic) {
+                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        console.log('Image URL:', imageUrl); // Debugging
+                        setProfilePicture(imageUrl);
+                    } else {
+                        setProfilePicture('https://via.placeholder.com/150');
+                    }
                 } else {
                     setErrorMessage('Failed to load profile data');
+                    console.error('Profile data fetch failed:', response.statusText);
                 }
             } catch (error) {
                 console.error("Error fetching profile data:", error);
@@ -61,62 +76,116 @@ const EditProfile = () => {
             }
         };
         fetchProfileData();
-    }, [profileUsername]);
+    }, [currentUser]);
+    const handleSave = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ bio: bio }),
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Bio updated successfully!');
+            } else {
+                console.error('Failed to update bio.');
+            }
+        } catch (error) {
+            console.error('Error saving bio:', error);
+            console.log('An error occurred while saving your bio.');
+        }
+        if (file) {
+            const formData = new FormData();
+            formData.append("profile_picture", file);
 
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}/upload-picture`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProfilePicture(
+                        data.profile_pic
+                            ? `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`
+                            : 'https://via.placeholder.com/150'
+                    );
+                    console.log('Profile picture updated successfully!');
+                } else {
+                    console.error('Failed to upload profile picture.');
+                }
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+            }
+        }
+    };
 
     return (
         <div>
-            <Navbar/>
-            <div className="settings-container">
-                <h1>Account Settings</h1>
+            <Navbar />
+            <div className="edit-settings-container">
                 <div className="edit-profile-main">
-                    <h2>Edit profile</h2>
-                    <form onSubmit={handleSave} className="edit-profile-form">
-                        <div className="form-group profile-section">
-                            <h3>{profileUsername || errorMessage}</h3>
-                            <div className="profile-picture">
-                                <img
-                                    src={profilePicture || 'https://via.placeholder.com/150'
-                                    }
-                                    alt="Profile"
-                                />
-                            </div>
-                            <div>
-                                <button type="button" className="change-photo-button">
-                                    Change photo
-                                </button>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    style={{display: 'none'}}
-                                    id="upload-photo"
-                                />
-                            </div>
+                    <h1 className="edit-settings-title">Edit Profile</h1>
+                    <div className="edit-profile-header">
+                        <div className="edit-profile-picture">
+                            <img
+                                src={profilePicture || 'https://via.placeholder.com/150'}
+                                alt="Profile"
+                            />
                         </div>
-
-                        <div className="form-group">
-                            <label htmlFor="bio">Bio</label>
+                        <div className="edit-profile-info">
+                            <div className="username-section">
+                                <h2 className="edit-profile-username">{currentUser || "Your Username"}</h2>
+                            </div>
+                            <button
+                                type="button"
+                                className="change-photo-button"
+                                onClick={() =>
+                                    document.getElementById("upload-photo").click()
+                                }
+                            >
+                                Change photo
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                style={{ display: "none" }}
+                                id="upload-photo"
+                            />
+                        </div>
+                    </div>
+                    <form className="edit-profile-form">
+                        <div className="edit-bio-section">
+                            <label htmlFor="bio" className="bio-label">
+                                Bio
+                            </label>
                             <textarea
                                 id="bio"
                                 value={bio}
                                 onChange={(e) => setBio(e.target.value)}
                                 placeholder="Write something about yourself"
                                 maxLength="150"
+                                className="bio-textarea"
                             />
-                            <span>{bio.length} / 150</span>
+                            <span className="bio-counter">{bio.length} / 150</span>
                         </div>
-
-                        <button type="submit" className="save-button">
-                            Save Changes
-                        </button>
+                        <div className="save-button-container">
+                            <button type="submit" className="save-button" onClick={handleSave}>
+                                Save Changes
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     );
-
-
 };
 
 export default EditProfile;

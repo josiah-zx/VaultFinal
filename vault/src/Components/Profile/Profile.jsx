@@ -19,6 +19,7 @@ const Profile = () => {
     const [selectedTab, setSelectedTab] = useState('capsules');
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
+    const [profilePicture, setProfilePicture] = useState('');
     const navigate = useNavigate();
 
     // Fetch session user
@@ -59,6 +60,14 @@ const Profile = () => {
                     setFollowingCount(data.following_count);
                     setBio(data.bio);
                     setIsFollowing(data.is_following);
+    
+                    // Set the profile picture
+                    if (data.profile_pic) {
+                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        setProfilePicture(imageUrl);
+                    } else {
+                        setProfilePicture('https://via.placeholder.com/150');
+                    }
                 } else {
                     setErrorMessage('Failed to load profile data');
                 }
@@ -140,7 +149,11 @@ const Profile = () => {
             <Navbar />
             <div className={selectedTab === "capsules" ? "capsule-profile" : "post-profile"}>
                 <div className="profile-avatar">
-                    <FaUserCircle />
+                    {profilePicture ? (
+                        <img src={profilePicture} alt="Profile" className="profile-picture" />
+                    ) : (
+                        <FaUserCircle />
+                    )}
                 </div>
                 <div className="profile-info">
                     <h2>{profileUsername || errorMessage}</h2>
@@ -167,7 +180,7 @@ const Profile = () => {
                         className={selectedTab === "capsules" ? "active-profile-tab" : ""}
                         onClick={() => handleTabClick("capsules")}
                     >
-                        <img src="/capsule.png" className="capsule-icon" alt="Capsules" width="24" height="24" />
+                        <img src="capsule.png" className="capsule-icon" alt="Capsules" width="24" height="24" />
                     </button>
                     <button
                         className={selectedTab === "posts" ? "active-profile-tab" : ""}

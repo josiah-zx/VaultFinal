@@ -22,7 +22,7 @@
 }
 
 .create-capsule-btn {
-    background-color: rgba(22, 22, 24, 0.95);
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -46,13 +46,17 @@
     margin-right: 10px;
 }
 .capsule-card {
-    background-color: rgba(22, 22, 24, 0.95);
+    background-color: rgb(27, 30, 55);
     width: 100%;
     overflow: hidden;
     color: white;
     position: relative; /* Allow absolute positioning inside */
 }
 
+
+.open-time{
+    margin-left: 4px;
+}
 .capsule-header {
     display: flex;
     align-items: center;
@@ -69,6 +73,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    object-fit: cover;
     margin-right: 10px;
 }
 

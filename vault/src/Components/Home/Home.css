@@ -7,14 +7,13 @@
 }
 
 .homepage-profile {
+    margin-top: 14px;
     position: absolute;
-    margin-top: 75px;
-    left: 0;
-    padding-left: 90px;
+    right: 0;
+    margin-right: 8vw;
 }
 
 .home-container .post-feed {
-    margin-top: 60px;
     width: 60%;
     height: 100vh;
 }

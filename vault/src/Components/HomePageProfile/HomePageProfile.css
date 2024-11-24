@@ -1,19 +1,40 @@
 .profile-card {
     padding: 16px;
-    background-color: rgba(22, 22, 24, 0.95);
-    border-radius: 10px;
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
+    border-radius: 6px;
     width: 240px;
     height: 240px;
     border: 1px solid #333; 
     color: white; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .profile-card .profile-avatar {
     font-size: 4rem;
-    color: #bbb; 
+    color: #bbb;
     text-align: center;
     margin-bottom: 10px;
+}
+
+.profile-card .profile-avatar-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin: 0 auto;
+}
+
+.profile-card .profile-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #444;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .profile-card .profile-username {
@@ -26,7 +47,6 @@
 .profile-card .profile-stats {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
     font-size: 0.9rem;
     color: #ddd; 
 }
