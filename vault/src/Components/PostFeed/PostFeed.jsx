@@ -186,7 +186,11 @@ const PostFeed = () => {
                                 ) : (
                                     <div className="closed-capsule">
                                         <div className="capsule-header">
-                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                                <img
+                                                    src={capsule.profile_pic || '/profile-pic.png'} // Use the profile picture from data or fallback
+                                                    alt="Profile Picture"
+                                                    className="profile-pic"
+                                                />
                                             <span className="username">{capsule.username || errorMessage}</span>
                                             <span className="open-time">Opens: {capsule.open_at}</span>
                                         </div>

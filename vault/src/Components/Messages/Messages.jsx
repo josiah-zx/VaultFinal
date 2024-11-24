@@ -49,7 +49,7 @@ const Messages = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setConversations(data); // Assuming response is an array of conversations
+                    setConversations(data); // Data includes profile pictures now
                 } else {
                     console.error('Failed to fetch conversations.');
                 }
@@ -99,9 +99,9 @@ const Messages = () => {
         // Initial fetch
         fetchMessages();
 
-        const interval = setInterval(fetchMessages, 5000); 
+        const interval = setInterval(fetchMessages, 5000);
 
-        return () => clearInterval(interval); 
+        return () => clearInterval(interval);
     }, [selectedUsername, username]);
 
     const handleClose = () => {
@@ -159,10 +159,18 @@ const Messages = () => {
             <div className="messages-container">
                 <div className="sidebar">
                     <div className="user-profile">
-                        <FaUserCircle className="user-icon" />
+                        {conversations.length > 0 && conversations[0].profile_pic ? (
+                            <img
+                                src={conversations[0].profile_pic}
+                                alt="Profile"
+                                className="user-icon"
+                                onError={(e) => { e.target.style.display = "none"; e.target.parentNode.appendChild(document.createElement('span')).classList.add('user-icon-placeholder'); }}
+                            />
+                        ) : (
+                            <FaUserCircle className="user-icon" />
+                        )}
                         <h3>{username}</h3>
                     </div>
-
                     <div className="friends-list">
                         <h4>Messages</h4>
                         <button className="send-message-btn" onClick={() => setIsSearchOpen(true)}>
@@ -176,7 +184,16 @@ const Messages = () => {
                                         className={`conversation-item ${selectedUsername === conv.username ? 'active' : ''}`}
                                         onClick={() => setSelectedUsername(conv.username)}
                                     >
-                                        <FaUserCircle className="conversation-icon" />
+                                        {conv.profile_pic ? (
+                                            <img
+                                                src={conv.profile_pic}
+                                                alt="Profile"
+                                                className="conversation-icon"
+                                                onError={(e) => { e.target.style.display = "none"; e.target.parentNode.appendChild(document.createElement('span')).classList.add('conversation-icon-placeholder'); }}
+                                            />
+                                        ) : (
+                                            <FaUserCircle className="conversation-icon-placeholder" />
+                                        )}
                                         <div className="conversation-details">
                                             <span className="conversation-username">{conv.username}</span>
                                             <span className="conversation-last-message">{conv.last_message}</span>
@@ -228,6 +245,16 @@ const Messages = () => {
                                             handleClose();
                                         }}
                                     >
+                                        {data.profile_pic ? (
+                                            <img
+                                                src={data.profile_pic}
+                                                alt="Profile"
+                                                className="search-result-icon"
+                                                onError={(e) => { e.target.style.display = "none"; e.target.parentNode.appendChild(document.createElement('span')).classList.add('search-result-icon-placeholder'); }}
+                                            />
+                                        ) : (
+                                            <FaUserCircle className="search-result-icon-placeholder" />
+                                        )}
                                         {data.username}
                                     </div>
                                 ))}
@@ -242,7 +269,16 @@ const Messages = () => {
                                 <IoArrowUndo />
                             </button>
                             <div className="other-user-header">
-                                <FaUserCircle className="other-user-icon" />
+                                {conversations.find((conv) => conv.username === selectedUsername)?.profile_pic ? (
+                                    <img
+                                        src={conversations.find((conv) => conv.username === selectedUsername).profile_pic}
+                                        alt="Profile"
+                                        className="other-user-icon"
+                                        onError={(e) => { e.target.style.display = "none"; e.target.parentNode.appendChild(document.createElement('span')).classList.add('other-user-icon-placeholder'); }}
+                                    />
+                                ) : (
+                                    <FaUserCircle className="other-user-icon-placeholder" />
+                                )}
                                 <h3>{selectedUsername}</h3>
                             </div>
                             <div className="chat-content">
