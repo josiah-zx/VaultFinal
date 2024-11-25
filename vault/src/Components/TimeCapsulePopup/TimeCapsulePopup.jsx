@@ -35,7 +35,10 @@ const TimeCapsulePopup = ({ onClose, onImageUpload }) => {
     };
 
     const handleDateChange = (e) => {
-        setSelectedDate(e.target.value);
+        const date = e.target.value;
+        const newDate = new Date(date);
+        newDate.setHours(newDate.getHours() + 5);
+        setSelectedDate(newDate.toISOString().slice(0, 16));
     };
 
     const handleSubmit = async () => {
