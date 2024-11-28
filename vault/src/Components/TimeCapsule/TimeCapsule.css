@@ -1,0 +1,104 @@
+/* General container style */
+.time-capsule-container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 32px;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 20px;
+    margin: 0;
+    /* Ensure no unwanted margin */
+    box-sizing: border-box;
+    /* Prevent overflow */
+}
+
+/* Styled box for the capsule creation form */
+.time-capsule-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    /* Ensure responsiveness */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+    /* Add spacing from header */
+}
+
+.time-capsule-box:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(135deg, #6a87d6 20%, #7887e5 40%, #3a4f92 70%, #223370 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Form inputs */
+.time-capsule-box textarea,
+.time-capsule-box input[type="datetime-local"],
+.time-capsule-box input[type="file"],
+.time-capsule-box button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    /* Ensure text is readable */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Button hover effect */
+.time-capsule-box button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Submit button */
+.save-btn {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: rgba(237, 233, 233, 0.7);
+}
+
+/* Success and error messages */
+.success-message {
+    color: #5cb85c;
+    font-weight: 600;
+}
+
+.error-message {
+    color: #d9534f;
+    font-weight: 600;
+}

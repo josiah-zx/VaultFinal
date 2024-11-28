@@ -4,9 +4,12 @@ import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPape
 import { FaRegSquarePlus } from "react-icons/fa6";
 import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
-import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
+import TimeCapsule from '../TimeCapsule/TimeCapsule';
+import { useNavigate } from 'react-router-dom';
+
 
 const PostFeed = () => {
+    const navigate = useNavigate();
     const [likeStatus, setLikeStatus] = useState({});
     const [commentsMap, setCommentsMap] = useState({});
     const [bookmarkedPosts, setBookmarkedPosts] = useState({});
@@ -140,7 +143,10 @@ const PostFeed = () => {
 
     return (
         <div className="feed-container">
-            <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
+            <button onClick={() => navigate('/create-capsule')} className="create-capsule-btn">
+                Create Time Capsule
+            </button>
+
             <div className="feed">
                 {availableCapsules.length > 0 ? (
                     availableCapsules.map((capsule) => {
@@ -243,6 +249,7 @@ const PostFeed = () => {
                 {showCommentPopup && (
                     <CommentPopup
                         capsuleContent={{
+                            capsule_id: currentCapsule, // Include capsule_id
                             username: username || errorMessage,
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
@@ -263,7 +270,7 @@ const PostFeed = () => {
 
 
             {showTimeCapsulePopup && (
-                <TimeCapsulePopup onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
+                <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
             )}
         </div>
     );
