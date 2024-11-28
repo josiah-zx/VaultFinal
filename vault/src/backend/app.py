@@ -256,38 +256,37 @@ def get_capsules(username):
 
 @app.route('/create-capsule', methods=['POST'])
 def create_capsule():
-    # Handle POST request to create a new capsule
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
-    
-    # Retrieve the user ID from the session
+
     user_id = session['user_id']
-    
-    # Retrieve form data
     data = request.form
     content = data.get("content")
     open_at_str = data.get("open_at")
 
-    # Parse the open_at date
     try:
         open_at = datetime.strptime(open_at_str, "%Y-%m-%dT%H:%M") if open_at_str else None
     except ValueError:
         return jsonify({"message": "Invalid date format"}), 400
 
-    # Handle file upload
     file = request.files.get("image_url")
     image_url = None
     if file:
         filename = file.filename
         image_url = f"/uploads/{filename}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    # Create new capsule with session-based user_id
+
     new_capsule = Capsule(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
     db.session.add(new_capsule)
     db.session.commit()
 
-    return jsonify({"message": "Capsule created!", "capsule_id": new_capsule.capsule_id, "image_url": new_capsule.image_url}), 201
+    app.logger.info(f"Capsule created with ID: {new_capsule.capsule_id}")  # Debug log
 
+    return jsonify({
+        "message": "Capsule created!",
+        "capsule_id": new_capsule.capsule_id,
+        "image_url": new_capsule.image_url
+    }), 201
 
 @app.route('/user-capsules', methods=['GET']) 
 def get_user_capsules():
@@ -444,10 +443,8 @@ def uploaded_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
         mime_type, _ = guess_type(file_path)
-        app.logger.info(f"Serving file: {file_path}")
         return send_file(file_path, mimetype=mime_type)
     else:
-        app.logger.error(f"File not found: {file_path}")
         return jsonify({"error": "File not found"}), 404
 
 # Searching for users
@@ -675,18 +672,29 @@ def delete_all():
         return jsonify({"error": "Unauthorized access"}), 403
 
     try:
-        # Delete database entries
-        num_deleted_capsules = Capsule.query.delete()
-        num_deleted_posts = Post.query.delete()
+        user_id = session['user_id']
+
+        # Fetch all capsules created by the current user
+        user_capsules = Capsule.query.filter_by(user_id=user_id).all()
+
+        # Delete related comments, posts, and other associated data
+        for capsule in user_capsules:
+            Comment.query.filter_by(capsule_id=capsule.capsule_id).delete()
+            Post.query.filter_by(capsule_id=capsule.capsule_id).delete()
+
+        # Delete capsules themselves
+        num_deleted_capsules = Capsule.query.filter_by(user_id=user_id).delete()
+
+        # Commit the deletions
         db.session.commit()
 
         return jsonify({
-            "message": f"Deleted {num_deleted_capsules} capsules successfully. "
-                       f"Deleted {num_deleted_posts} posts successfully."
+            "message": f"Deleted {num_deleted_capsules} capsules and all related data successfully."
         }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to delete capsules and posts", "details": str(e)}), 500
+        return jsonify({"error": "Failed to delete capsules and related data", "details": str(e)}), 500
+
 
 
 
@@ -779,20 +787,28 @@ def get_comments():
     if not capsule_id:
         return jsonify({"error": "Capsule ID is required"}), 400
 
-    # Fetch comments for the given capsule ID
-    comments = Comment.query.filter_by(capsule_id=capsule_id).all()
+    # Fetch comments for the given capsule ID, joining with the users table
+    comments = db.session.query(
+        Comment,
+        User.username,
+        User.profile_pic
+    ).join(User, Comment.user_id == User.user_id).filter(Comment.capsule_id == capsule_id).all()
+
     comments_list = [
         {
             "comment_id": comment.comment_id,
             "capsule_id": comment.capsule_id,
             "user_id": comment.user_id,
+            "username": username,
+            "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else "/default-profile-pic.png",
             "text": comment.text,
-            "timestamp": comment.timestamp,
+            "created_at": comment.created_at
         }
-        for comment in comments
+        for comment, username, profile_pic in comments
     ]
 
     return jsonify(comments_list), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
