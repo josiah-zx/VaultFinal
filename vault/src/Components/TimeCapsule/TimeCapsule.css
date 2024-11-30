@@ -11,9 +11,7 @@
     color: #fff;
     padding: 20px;
     margin: 0;
-    /* Ensure no unwanted margin */
     box-sizing: border-box;
-    /* Prevent overflow */
 }
 
 /* Styled box for the capsule creation form */
@@ -31,7 +29,6 @@
     position: relative;
     overflow: hidden;
     margin-top: 20px;
-    /* Add spacing from header */
 }
 
 .time-capsule-box:before {

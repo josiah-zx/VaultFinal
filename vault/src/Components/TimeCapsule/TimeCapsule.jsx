@@ -38,8 +38,8 @@ const TimeCapsule = () => {
                 const data = await response.json();
                 setSuccessMessage('Time capsule created successfully!');
                 setTimeout(() => {
-                    navigate('/home'); // Navigate to the home page
-                }, 1500); // Add a slight delay to allow the user to see the success message
+                    navigate('/home');
+                }, 1500);
             } else {
                 setErrorMessage('Failed to create the time capsule.');
             }
