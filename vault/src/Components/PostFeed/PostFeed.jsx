@@ -249,12 +249,12 @@ const PostFeed = () => {
                 {showCommentPopup && (
                     <CommentPopup
                         capsuleContent={{
-                            capsule_id: currentCapsule, // Include capsule_id
+                            capsule_id: currentCapsule, 
                             username: username || errorMessage,
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
                         }}
-                        comments={commentsMap[currentCapsule] || []} // pass comments for current capsule
+                        comments={commentsMap[currentCapsule] || []} 
                         onClose={handleCloseCommentPopup}
                         onSendComment={handleSendComment}
                     />

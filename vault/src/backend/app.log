@@ -231,3 +231,54 @@
 2024-11-28 02:00:58,475 [INFO] 127.0.0.1 - - [28/Nov/2024 02:00:58] "GET /available-capsules HTTP/1.1" 200 -
 2024-11-28 02:01:09,685 [INFO]  * Detected change in 'C:\\Users\\Owner\\Desktop\\Vault\\vault\\src\\backend\\app.py', reloading
 2024-11-28 02:01:09,888 [INFO]  * Restarting with stat
+2024-11-28 02:11:00,951 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-11-28 02:11:00,951 [INFO] [33mPress CTRL+C to quit[0m
+2024-11-28 02:11:00,951 [INFO]  * Restarting with stat
+2024-11-28 02:11:01,570 [WARNING]  * Debugger is active!
+2024-11-28 02:11:01,576 [INFO]  * Debugger PIN: 112-052-109
+2024-11-28 02:11:06,720 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:06] "OPTIONS /login HTTP/1.1" 200 -
+2024-11-28 02:11:06,928 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:06] "POST /login HTTP/1.1" 200 -
+2024-11-28 02:11:07,014 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,017 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:11:07,020 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,020 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:11:07,028 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,044 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,059 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /users/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:11:07,059 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,066 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:11:07,077 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:07] "GET /users/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:11:09,650 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:09] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:11:09,663 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:09] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:11:09,672 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:09] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:11:16,756 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:16] "OPTIONS /comments HTTP/1.1" 200 -
+2024-11-28 02:11:16,763 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:16] "[35m[1mPOST /comments HTTP/1.1[0m" 201 -
+2024-11-28 02:11:20,081 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:20] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:11:20,089 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:20] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:11:20,098 [INFO] 127.0.0.1 - - [28/Nov/2024 02:11:20] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:12:06,992 [INFO] 127.0.0.1 - - [28/Nov/2024 02:12:06] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:13:06,992 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:06] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:13:33,736 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:33] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:13:33,744 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:33] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:13:33,751 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:33] "GET /comments?capsule_id=1 HTTP/1.1" 200 -
+2024-11-28 02:13:37,244 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:37] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:37,251 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:37] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:37,263 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:37] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:37,272 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:37] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:37,286 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:37] "GET /conversations/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:13:42,286 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:42] "GET /conversations/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:13:43,015 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:43] "GET /search?q=f HTTP/1.1" 200 -
+2024-11-28 02:13:47,279 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:47] "GET /conversations/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:13:48,369 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,376 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,380 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:13:48,389 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,389 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:13:48,399 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /users/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:13:48,399 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,405 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,414 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /session-user HTTP/1.1" 200 -
+2024-11-28 02:13:48,419 [INFO] 127.0.0.1 - - [28/Nov/2024 02:13:48] "GET /users/fabian2 HTTP/1.1" 200 -
+2024-11-28 02:14:48,478 [INFO] 127.0.0.1 - - [28/Nov/2024 02:14:48] "GET /available-capsules HTTP/1.1" 200 -
+2024-11-28 02:15:48,471 [INFO] 127.0.0.1 - - [28/Nov/2024 02:15:48] "GET /available-capsules HTTP/1.1" 200 -
