@@ -10,6 +10,7 @@ import Profile from "./Components/Profile/Profile";
 import Messages from './Components/Messages/Messages';
 import Settings from './Components/Settings/Settings';
 import EditProfile from './Components/EditProfile/EditProfile';
+import TimeCapsule from './Components/TimeCapsule/TimeCapsule';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/create-capsule" element={<TimeCapsule />} />
           <Route path="/messages" element={<Messages/>} />
           <Route path="/:profileUsername" element={<Profile />} />
           <Route path="/settings" element={<Settings/>} />

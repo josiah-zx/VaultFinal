@@ -4,9 +4,12 @@ import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPape
 import { FaRegSquarePlus } from "react-icons/fa6";
 import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
-import TimeCapsulePopup from '../TimeCapsulePopup/TimeCapsulePopup';
+import TimeCapsule from '../TimeCapsule/TimeCapsule';
+import { useNavigate } from 'react-router-dom';
+
 
 const PostFeed = () => {
+    const navigate = useNavigate();
     const [likeStatus, setLikeStatus] = useState({});
     const [commentsMap, setCommentsMap] = useState({});
     const [bookmarkedPosts, setBookmarkedPosts] = useState({});
@@ -40,6 +43,31 @@ const PostFeed = () => {
         return () => clearInterval(interval);
     }, [])
 
+    useEffect(() => {
+        const fetchBookmarkedCapsules = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/bookmarked-capsules', {
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const bookmarks = data.reduce((acc, capsule) => {
+                        acc[capsule.capsule_id] = true;
+                        return acc;
+                    }, {});
+                    setBookmarkedPosts(bookmarks);
+                } else {
+                    console.error("Failed to fetch bookmarked capsules:", await response.json());
+                }
+            } catch (error) {
+                console.error("Error fetching bookmarked capsules:", error);
+            }
+        };
+
+        fetchBookmarkedCapsules();
+    }, []);
+
     const fetchComments = async (capsuleId) => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleId}`);
@@ -68,18 +96,46 @@ const PostFeed = () => {
         });
     };
 
-    const handleBookmark = (capsuleId) => {
-    setBookmarkedPosts((prevBookmarks) => ({
-        ...prevBookmarks,
-        [capsuleId]: !prevBookmarks[capsuleId],
-    }));
-};
+    const handleBookmark = async (capsuleId) => {
+        // Optimistically toggle the bookmark state
+        setBookmarkedPosts((prevBookmarks) => ({
+            ...prevBookmarks,
+            [capsuleId]: !prevBookmarks[capsuleId],
+        }));
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/bookmark', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ capsule_id: capsuleId }), 
+            });
+
+            if (!response.ok) {
+                console.error("Failed to toggle bookmark:", await response.json());
+                // Revert state if API call fails
+                setBookmarkedPosts((prevBookmarks) => ({
+                    ...prevBookmarks,
+                    [capsuleId]: !prevBookmarks[capsuleId],
+                }));
+            }
+        } catch (error) {
+            console.error("Error toggling bookmark:", error);
+            // Revert state if an error occurs
+            setBookmarkedPosts((prevBookmarks) => ({
+                ...prevBookmarks,
+                [capsuleId]: !prevBookmarks[capsuleId], 
+            }));
+        }
+    };
 
      const handleOpenCommentPopup = (capsuleId, image) => {
-        setCurrentCapsule(capsuleId); // Set capsule ID
-        setUploadedImageUrl(image); // Set image for the popup
-        setShowCommentPopup(true); // Show popup
-        fetchComments(capsuleId); // Fetch comments for the capsule
+        setCurrentCapsule(capsuleId); 
+        setUploadedImageUrl(image); 
+        setShowCommentPopup(true); 
+        fetchComments(capsuleId); 
     };
 
     const handleCloseCommentPopup = () => {
@@ -93,7 +149,7 @@ const PostFeed = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                credentials: "include", // Send session cookie
+                credentials: "include", 
                 body: JSON.stringify({
                     capsule_id: currentCapsule,
                     text: newComment,
@@ -104,7 +160,7 @@ const PostFeed = () => {
                 const savedComment = await response.json();
                 setCommentsMap((prev) => ({
                     ...prev,
-                    [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], // Append comment to capsule's comments
+                    [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], 
                 }));
             } else {
                 console.error("Failed to send comment:", await response.json());
@@ -140,7 +196,10 @@ const PostFeed = () => {
 
     return (
         <div className="feed-container">
-            <button onClick={handleOpenTimeCapsulePopup} className="create-capsule-btn">Create Time Capsule</button>
+            <button onClick={() => navigate('/create-capsule')} className="create-capsule-btn">
+                Create Time Capsule
+            </button>
+
             <div className="feed">
                 {availableCapsules.length > 0 ? (
                     availableCapsules.map((capsule) => {
@@ -171,11 +230,12 @@ const PostFeed = () => {
                                                     onClick={() => handleOpenCommentPopup(capsule.capsule_id, capsule.image_url)}>
                                                     <FaRegComment className="icon"/>
                                                 </span>
-                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
-                                                    {/* trying new bookmark tracking - jd */}
-                                                    {bookmarkedPosts[capsule.capsule_id] ?
-                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
-                                                        <FaRegBookmark className="icon" />}
+                                                <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                    {bookmarkedPosts[capsule.capsule_id] ? (
+                                                        <FaBookmark className="icon" style={{ color: "gold" }} />
+                                                    ) : (
+                                                        <FaRegBookmark className="icon" />
+                                                    )}
                                                 </span>
                                                 <span className="share-icon">
                                                     <FaRegPaperPlane className="icon"/>
@@ -187,7 +247,7 @@ const PostFeed = () => {
                                     <div className="closed-capsule">
                                         <div className="capsule-header">
                                                 <img
-                                                    src={capsule.profile_pic || '/profile-pic.png'} // Use the profile picture from data or fallback
+                                                    src={capsule.profile_pic || '/profile-pic.png'} 
                                                     alt="Profile Picture"
                                                     className="profile-pic"
                                                 />
@@ -243,11 +303,12 @@ const PostFeed = () => {
                 {showCommentPopup && (
                     <CommentPopup
                         capsuleContent={{
+                            capsule_id: currentCapsule, 
                             username: username || errorMessage,
                             image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                             caption: 'Caption goes here.'
                         }}
-                        comments={commentsMap[currentCapsule] || []} // pass comments for current capsule
+                        comments={commentsMap[currentCapsule] || []} 
                         onClose={handleCloseCommentPopup}
                         onSendComment={handleSendComment}
                     />
@@ -263,7 +324,7 @@ const PostFeed = () => {
 
 
             {showTimeCapsulePopup && (
-                <TimeCapsulePopup onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
+                <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
             )}
         </div>
     );

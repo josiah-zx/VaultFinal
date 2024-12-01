@@ -1,6 +1,6 @@
 .feed-container {
     display: flex;
-    flex-direction: column; /* Stacks items vertically */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 20px;
@@ -50,7 +50,7 @@
     width: 100%;
     overflow: hidden;
     color: white;
-    position: relative; /* Allow absolute positioning inside */
+    position: relative; 
 }
 
 

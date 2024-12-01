@@ -119,6 +119,29 @@ const Profile = () => {
         fetchUserPosts();
     }, [profileUsername]);
 
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
+
+    useEffect(() => {
+        const fetchBookmarkedPosts = async () => {
+            if (selectedTab !== 'favorites') return;
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/bookmarked-capsules', {
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setBookmarkedPosts(data); 
+                } else {
+                    console.error("Failed to fetch bookmarked posts:", await response.json());
+                }
+            } catch (error) {
+                console.error("Error fetching bookmarked posts:", error);
+            }
+        };
+
+        fetchBookmarkedPosts();
+    }, [selectedTab]);
     const toggleFollow = async () => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/follow/${profileUsername}`, {
@@ -236,8 +259,23 @@ const Profile = () => {
 
                     {selectedTab === "favorites" && (
                         <div className="favorites-tab">
-                            <h3>Favorites Content</h3>
-                            <p>Show all favorites here.</p>
+                            <h3>Bookmarked Capsules</h3>
+                            {bookmarkedPosts.length > 0 ? (
+                                <div className="capsule-posts"> 
+                                    {bookmarkedPosts.map((bookmark) => (
+                                        <div key={bookmark.capsule_id} className="capsule-post"> 
+                                            <img
+                                                src={bookmark.image_url} 
+                                                alt="Capsule content"
+                                                className="capsule-image" 
+                                            />
+                                            <p>{bookmark.content}</p> 
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No bookmarked capsules available.</p>
+                            )}
                         </div>
                     )}
                 </div>
