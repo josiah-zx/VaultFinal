@@ -7,7 +7,6 @@ from flask_cors import cross_origin
 import logging
 import os
 
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -116,15 +115,20 @@ class Comment(db.Model):
     user = db.relationship('User', backref='comments', lazy=True)
     capsule = db.relationship('Capsule', backref='comments', lazy=True)
 
-
-
+class Bookmark(db.Model):
+    __tablename__ = 'bookmarks'
+    bookmark_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    capsule = db.relationship('Capsule', backref='bookmarks', lazy=True)
 # Initialize the database
 with app.app_context():
+    db.create_all()
     all_capsules = Capsule.query.all()
     for capsule in all_capsules:
         print(capsule.open_at)
-    db.create_all()
-
+        
 # Returns all the users in the users table
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -143,6 +147,57 @@ def get_users():
         } for user in users
     ]
     return jsonify(users_list)
+
+@app.route('/bookmark', methods=['POST'])
+def toggle_bookmark():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+
+    if not capsule_id:
+        return jsonify({"error": "Capsule ID is required"}), 400
+
+    user_id = session['user_id']
+
+    # Check if the bookmark exists
+    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id).first()
+
+    if bookmark:
+        # If it exists, remove it
+        db.session.delete(bookmark)
+        db.session.commit()
+        return jsonify({"message": "Bookmark removed"}), 200
+    else:
+        # Otherwise, create a new bookmark
+        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id)
+        db.session.add(new_bookmark)
+        db.session.commit()
+        return jsonify({"message": "Bookmark added"}), 201
+
+
+@app.route('/bookmarked-capsules', methods=['GET'])
+def get_bookmarked_capsules():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    # Query for bookmarked capsules and their related capsule details
+    bookmarks = Bookmark.query.filter_by(user_id=user_id).all()
+    bookmarked_capsules = [
+        {
+            "capsule_id": bookmark.capsule_id,
+            "content": bookmark.capsule.content,
+            "image_url": f"http://127.0.0.1:5000{bookmark.capsule.image_url}" if bookmark.capsule.image_url else None,
+            "created_at": bookmark.capsule.created_at,
+            "open_at": bookmark.capsule.open_at
+        }
+        for bookmark in bookmarks if bookmark.capsule
+    ]
+    print(bookmarked_capsules)
+    return jsonify(bookmarked_capsules), 200
 
 
 # Login handling
