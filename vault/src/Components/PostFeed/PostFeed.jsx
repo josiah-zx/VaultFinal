@@ -4,6 +4,7 @@ import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPape
 import { FaRegSquarePlus } from "react-icons/fa6";
 import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
+import PostModal from '../PostModal/PostModal';
 import TimeCapsule from '../TimeCapsule/TimeCapsule';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +21,10 @@ const PostFeed = () => {
     const [showAddPostPopup, setShowAddPostPopup] = useState(false);
     const [currentCapsule, setCurrentCapsule] = useState('');
     const [availableCapsules, setAvailableCapsules] = useState([]);
+    const [capsulePosts, setCapsulePosts] = useState({});
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPostData, setCurrentPostData] = useState([]);
 
     useEffect(() => {
         const fetchAvailableCapsules = async () => {
@@ -42,6 +46,14 @@ const PostFeed = () => {
 
         return () => clearInterval(interval);
     }, [])
+
+    useEffect(() => {
+        availableCapsules.forEach(capsule => {
+            if (capsule.is_open && !capsulePosts[capsule.capsule_id]) {
+                fetchPosts(capsule.capsule_id);
+            }
+        });
+    }, [availableCapsules, capsulePosts]);
 
     useEffect(() => {
         const fetchBookmarkedCapsules = async () => {
@@ -67,6 +79,26 @@ const PostFeed = () => {
 
         fetchBookmarkedCapsules();
     }, []);
+
+    const fetchPosts = async (capsuleId) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/capsules/${capsuleId}/posts`, {
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCapsulePosts(prevState => ({
+                    ...prevState,
+                    [capsuleId]: data,
+                }));
+            } else {
+                console.error('Failed to fetch posts:', await response.json());
+            }
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        }
+    };
 
     const fetchComments = async (capsuleId) => {
         try {
@@ -131,7 +163,7 @@ const PostFeed = () => {
         }
     };
 
-     const handleOpenCommentPopup = (capsuleId, image) => {
+    const handleOpenCommentPopup = (capsuleId, image) => {
         setCurrentCapsule(capsuleId); 
         setUploadedImageUrl(image); 
         setShowCommentPopup(true); 
@@ -142,7 +174,7 @@ const PostFeed = () => {
         setShowCommentPopup(false);
     };
 
-     const handleSendComment = async (newComment) => {
+    const handleSendComment = async (newComment) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/comments", {
                 method: "POST",
@@ -191,8 +223,17 @@ const PostFeed = () => {
         setUploadedImageUrl(imageUrl);
         setShowTimeCapsulePopup(false);
         setShowAddPostPopup(false);
-        setShowCommentPopup(true);
     };
+
+    const openModal = (data) => {
+        setIsModalOpen(true);
+        setCurrentPostData(data);
+    }
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setCurrentPostData([]);
+    }
 
     return (
         <div className="feed-container">
@@ -209,10 +250,47 @@ const PostFeed = () => {
                                 {capsule.is_open ? (
                                     <div className="open-capsule">
                                         <div className="capsule-header">
-                                            <img src="/profile-pic.png" alt="Profile Picture" className="profile-pic"/>
+                                            <img
+                                                src={capsule.profile_pic || '/profile-pic.png'} 
+                                                alt="Profile Picture"
+                                                className="profile-pic"
+                                            />
                                             <span className="username">{capsule.username || errorMessage}</span>
                                         </div>
-                                        <img src={capsule.image_url} alt="Capsule content" className="image-content"/>
+                                        <div className="capsule-contents">
+                                            <div className="capsule-image">
+                                                <img 
+                                                    src={capsule.image_url} 
+                                                    alt="Capsule photo" 
+                                                    className="capsule-photo"
+                                                    onClick={() => openModal(capsule)}
+                                                />
+                                            </div>
+                                            <div className="capsule-posts">
+                                                {capsulePosts[capsule.capsule_id]?.map((post, index) => {
+                                                    const totalPosts = capsulePosts[capsule.capsule_id]?.length || 1;
+                                                    const layer = Math.floor(index / 8); // Calculate which layer the post belongs to
+                                                    const angle = (360 / totalPosts) * index; // Evenly distribute posts around the circle
+
+                                                    return (
+                                                        <div
+                                                        key={post.id}
+                                                        className="post-bubble"
+                                                        style={{
+                                                            transform: `rotate(${angle}deg) translate(${150 + layer * 80}px) rotate(-${angle}deg)` // Increase radius for each layer
+                                                        }}
+                                                        >
+                                                        <img 
+                                                            src={post.image_url} 
+                                                            alt={`Post ${index}`} 
+                                                            className="photo-circle" 
+                                                            onClick={() => openModal(post)}
+                                                        />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                         <div className="capsule-info">
                                             <p className="caption">
                                                 <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
@@ -246,11 +324,11 @@ const PostFeed = () => {
                                 ) : (
                                     <div className="closed-capsule">
                                         <div className="capsule-header">
-                                                <img
-                                                    src={capsule.profile_pic || '/profile-pic.png'} 
-                                                    alt="Profile Picture"
-                                                    className="profile-pic"
-                                                />
+                                            <img
+                                                src={capsule.profile_pic || '/profile-pic.png'} 
+                                                alt="Profile Picture"
+                                                className="profile-pic"
+                                            />
                                             <span className="username">{capsule.username || errorMessage}</span>
                                             <span className="open-time">Opens: {capsule.open_at}</span>
                                         </div>
@@ -322,9 +400,16 @@ const PostFeed = () => {
                 )}
             </div>
 
-
             {showTimeCapsulePopup && (
                 <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
+            )}
+
+            {isModalOpen && (
+                <PostModal
+                    isOpen={isModalOpen}
+                    closeModal={closeModal}
+                    data={currentPostData}
+                />
             )}
         </div>
     );

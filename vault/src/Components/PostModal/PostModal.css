@@ -1,0 +1,29 @@
+.modal-overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other content */
+    overflow: hidden; /* Prevent scrolling within the modal */
+}
+
+.modal-photo {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+}
+  
+.modal-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}

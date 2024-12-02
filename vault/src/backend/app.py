@@ -79,6 +79,8 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    user = db.relationship('User')
+
 # Define the Follower model
 class Follower(db.Model):
     __tablename__ = 'followers'
@@ -680,6 +682,23 @@ def get_available_capsules():
     ]
     return jsonify(capsules_list)
 
+@app.route('/capsules/<int:capsule_id>/posts', methods=['GET'])
+def get_capsule_posts(capsule_id):
+    posts = Post.query.filter_by(capsule_id=capsule_id).all()
+    if not posts:
+        return jsonify([])
+    
+    posts_data = [{
+        'post_id': post.post_id,
+        'user_id': post.user_id,
+        'username': post.user.username,
+        'content': post.content,
+        'profile_pic': f"http://127.0.0.1:5000{post.user.profile_pic}" if post.user.profile_pic else None,
+        'image_url': f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
+        'created_at': post.created_at
+    } for post in posts]
+
+    return jsonify(posts_data)
 
 # Route to mark messages as read
 @app.route('/read-message/<int:message_id>', methods=['POST'])
