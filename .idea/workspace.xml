@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far." />
+    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/PostFeed/PostFeed.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/PostFeed/PostFeed.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/backend/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/backend/vault_database.db" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,6 +46,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "Christian",
+    "last_opened_file_path": "C:/Users/josiah/PycharmProjects/Vault",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -51,18 +57,19 @@
 }]]></component>
   <component name="RunManager">
     <configuration name="app" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Vault" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$PROJECT_DIR$/../CrystalFootball/venv/bin/python" />
-      <option name="SDK_NAME" value="Python 3.11 (CrystalFootball)" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/vault/src/backend" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.9 (Vault)" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\josiah\PycharmProjects\Vault" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vault/src/backend/app.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -132,5 +139,9 @@
     <MESSAGE value="Setup initial React app" />
     <MESSAGE value="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far." />
     <option name="LAST_COMMIT_MESSAGE" value="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far." />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Vault$Vault.coverage" NAME="app Coverage Results" MODIFIED="1733176129135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\josiah\PycharmProjects\Vault" />
+    <SUITE FILE_PATH="coverage/Vault$app.coverage" NAME="app Coverage Results" MODIFIED="1733176583435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\josiah\PycharmProjects\Vault" />
   </component>
 </project>
