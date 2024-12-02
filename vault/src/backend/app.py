@@ -109,13 +109,16 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     comment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # relationships for querying
     user = db.relationship('User', backref='comments', lazy=True)
     capsule = db.relationship('Capsule', backref='comments', lazy=True)
+    post = db.relationship('Post', backref='comments', lazy=True)
+
 
 class Bookmark(db.Model):
     __tablename__ = 'bookmarks'
