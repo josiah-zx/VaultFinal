@@ -25,6 +25,7 @@ const PostFeed = () => {
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPostData, setCurrentPostData] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
 
     useEffect(() => {
         const fetchAvailableCapsules = async () => {
@@ -225,192 +226,198 @@ const PostFeed = () => {
         setShowAddPostPopup(false);
     };
 
-    const openModal = (data) => {
+    const openModal = (data, type) => {
         setIsModalOpen(true);
         setCurrentPostData(data);
+        setSelectedType(type);
+        document.body.style.overflow = "hidden";
     }
 
     const closeModal = () => {
         setIsModalOpen(false);
         setCurrentPostData([]);
+        setSelectedType('');
+        document.body.style.overflow = "auto";
     }
 
     return (
-        <div className="feed-container">
-            <button onClick={() => navigate('/create-capsule')} className="create-capsule-btn">
-                Create Time Capsule
-            </button>
-
-            <div className="feed">
-                {availableCapsules.length > 0 ? (
-                    availableCapsules.map((capsule) => {
-                        const capsuleStatus = likeStatus[capsule.capsule_id] || {isLiked: false, likes: 0};
-                        return (
-                            <div key={capsule.capsule_id} className="capsule-card">
-                                {capsule.is_open ? (
-                                    <div className="open-capsule">
-                                        <div className="capsule-header">
-                                            <img
-                                                src={capsule.profile_pic || '/profile-pic.png'} 
-                                                alt="Profile Picture"
-                                                className="profile-pic"
-                                            />
-                                            <span className="username">{capsule.username || errorMessage}</span>
-                                        </div>
-                                        <div className="capsule-contents">
-                                            <div className="capsule-image">
-                                                <img 
-                                                    src={capsule.image_url} 
-                                                    alt="Capsule photo" 
-                                                    className="capsule-photo"
-                                                    onClick={() => openModal(capsule)}
+        <div>
+            <div className="feed-container">
+                <button onClick={() => navigate('/create-capsule')} className="create-capsule-btn">
+                    Create Time Capsule
+                </button>
+                <div className="feed">
+                    {availableCapsules.length > 0 ? (
+                        availableCapsules.map((capsule) => {
+                            const capsuleStatus = likeStatus[capsule.capsule_id] || {isLiked: false, likes: 0};
+                            return (
+                                <div key={capsule.capsule_id} className="capsule-card">
+                                    {capsule.is_open ? (
+                                        <div className="open-capsule">
+                                            <div className="capsule-header">
+                                                <img
+                                                    src={capsule.profile_pic || '/profile-pic.png'} 
+                                                    alt="Profile Picture"
+                                                    className="profile-pic"
                                                 />
+                                                <span className="username">{capsule.username || errorMessage}</span>
                                             </div>
-                                            <div className="capsule-posts">
-                                                {capsulePosts[capsule.capsule_id]?.map((post, index) => {
-                                                    const totalPosts = capsulePosts[capsule.capsule_id]?.length || 1;
-                                                    const layer = Math.floor(index / 8); // Calculate which layer the post belongs to
-                                                    const angle = (360 / totalPosts) * index; // Evenly distribute posts around the circle
+                                            <div className="capsule-contents">
+                                                <div className="capsule-image">
+                                                    <img 
+                                                        src={capsule.image_url} 
+                                                        alt="Capsule photo" 
+                                                        className="capsule-photo"
+                                                        onClick={() => openModal(capsule, 'capsule')}
+                                                    />
+                                                </div>
+                                                <div className="capsule-posts">
+                                                    {capsulePosts[capsule.capsule_id]?.map((post, index) => {
+                                                        const totalPosts = capsulePosts[capsule.capsule_id]?.length || 1;
+                                                        const layer = Math.floor(index / 8); // Calculate which layer the post belongs to
+                                                        const angle = (360 / totalPosts) * index; // Evenly distribute posts around the circle
 
-                                                    return (
-                                                        <div
-                                                        key={post.id}
-                                                        className="post-bubble"
-                                                        style={{
-                                                            transform: `rotate(${angle}deg) translate(${150 + layer * 80}px) rotate(-${angle}deg)` // Increase radius for each layer
-                                                        }}
-                                                        >
-                                                        <img 
-                                                            src={post.image_url} 
-                                                            alt={`Post ${index}`} 
-                                                            className="photo-circle" 
-                                                            onClick={() => openModal(post)}
-                                                        />
-                                                        </div>
-                                                    );
-                                                })}
+                                                        return (
+                                                            <div
+                                                            key={post.id}
+                                                            className="post-bubble"
+                                                            style={{
+                                                                transform: `rotate(${angle}deg) translate(${150 + layer * 80}px) rotate(-${angle}deg)` // Increase radius for each layer
+                                                            }}
+                                                            >
+                                                            <img 
+                                                                src={post.image_url} 
+                                                                alt={`Post ${index}`} 
+                                                                className="photo-circle" 
+                                                                onClick={() => openModal(post, 'post')}
+                                                            />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                            <div className="capsule-info">
+                                                <p className="caption">
+                                                    <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                                <div className="capsule-stats">
+                                                    <span>{capsuleStatus.likes} likes</span>
+                                                    <span>{(commentsMap[capsule.capsule_id]?.length || 0)} comments</span>
+                                                </div>
+                                                <div className="capsule-actions">
+                                                    <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                        {capsuleStatus.isLiked ?
+                                                            <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                            <FaRegHeart className="icon"/>}
+                                                    </span>
+                                                    <span className="comment-icon"
+                                                        onClick={() => handleOpenCommentPopup(capsule.capsule_id, capsule.image_url)}>
+                                                        <FaRegComment className="icon"/>
+                                                    </span>
+                                                    <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                        {bookmarkedPosts[capsule.capsule_id] ? (
+                                                            <FaBookmark className="icon" style={{ color: "gold" }} />
+                                                        ) : (
+                                                            <FaRegBookmark className="icon" />
+                                                        )}
+                                                    </span>
+                                                    <span className="share-icon">
+                                                        <FaRegPaperPlane className="icon"/>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="capsule-info">
-                                            <p className="caption">
-                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
-                                            <div className="capsule-stats">
-                                                <span>{capsuleStatus.likes} likes</span>
-                                                <span>{(commentsMap[capsule.capsule_id]?.length || 0)} comments</span>
+                                    ) : (
+                                        <div className="closed-capsule">
+                                            <div className="capsule-header">
+                                                <img
+                                                    src={capsule.profile_pic || '/profile-pic.png'} 
+                                                    alt="Profile Picture"
+                                                    className="profile-pic"
+                                                />
+                                                <span className="username">{capsule.username || errorMessage}</span>
+                                                <span className="open-time">Opens: {capsule.open_at}</span>
                                             </div>
-                                            <div className="capsule-actions">
-                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
-                                                    {capsuleStatus.isLiked ?
-                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
-                                                        <FaRegHeart className="icon"/>}
-                                                </span>
-                                                <span className="comment-icon"
-                                                    onClick={() => handleOpenCommentPopup(capsule.capsule_id, capsule.image_url)}>
-                                                    <FaRegComment className="icon"/>
-                                                </span>
-                                                <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
-                                                    {bookmarkedPosts[capsule.capsule_id] ? (
-                                                        <FaBookmark className="icon" style={{ color: "gold" }} />
-                                                    ) : (
-                                                        <FaRegBookmark className="icon" />
-                                                    )}
-                                                </span>
-                                                <span className="share-icon">
-                                                    <FaRegPaperPlane className="icon"/>
-                                                </span>
+                                            <div className="vault">
+                                                <div className="vault-lock"></div>
+                                                <div class="vault-bolts">
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="closed-capsule">
-                                        <div className="capsule-header">
-                                            <img
-                                                src={capsule.profile_pic || '/profile-pic.png'} 
-                                                alt="Profile Picture"
-                                                className="profile-pic"
-                                            />
-                                            <span className="username">{capsule.username || errorMessage}</span>
-                                            <span className="open-time">Opens: {capsule.open_at}</span>
-                                        </div>
-                                        <div className="vault">
-                                            <div className="vault-lock"></div>
-                                            <div class="vault-bolts">
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
+                                            <div className="capsule-info">
+                                                <p className="caption">
+                                                    <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                                <div className="capsule-stats">
+                                                    <span>{capsuleStatus.likes} likes</span>
+                                                    <span>0 contributors</span>
+                                                </div>
+                                                <div className="capsule-actions">
+                                                    <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
+                                                        {capsuleStatus.isLiked ?
+                                                            <FaHeart className="icon filled" style={{color: "red"}}/> :
+                                                            <FaRegHeart className="icon"/>}
+                                                    </span>
+                                                    <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
+                                                        <FaRegSquarePlus className="icon"/>
+                                                    </span>
+                                                    <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
+                                                        {bookmarkedPosts[capsule.capsule_id] ?
+                                                            <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                            <FaRegBookmark className="icon" />}
+                                                    </span>
+                                                    <span className="share-icon">
+                                                        <FaRegPaperPlane className="icon"/>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="capsule-info">
-                                            <p className="caption">
-                                                <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
-                                            <div className="capsule-stats">
-                                                <span>{capsuleStatus.likes} likes</span>
-                                                <span>0 contributors</span>
-                                            </div>
-                                            <div className="capsule-actions">
-                                                <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
-                                                    {capsuleStatus.isLiked ?
-                                                        <FaHeart className="icon filled" style={{color: "red"}}/> :
-                                                        <FaRegHeart className="icon"/>}
-                                                </span>
-                                                <span className="add-capsule-icon" onClick={() => handleOpenAddPostPopup(capsule.capsule_id)}>
-                                                    <FaRegSquarePlus className="icon"/>
-                                                </span>
-                                                 <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
-                                                    {bookmarkedPosts[capsule.capsule_id] ?
-                                                        <FaBookmark className="icon" style={{ color: "white" }} /> :
-                                                        <FaRegBookmark className="icon" />}
-                                                </span>
-                                                <span className="share-icon">
-                                                    <FaRegPaperPlane className="icon"/>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="separator-line"></div>
-                            </div>
-                        );
-                    })
-                ) : (
-                    <div className="no-capsules">
-                        <p>No time capsules available to open yet. Check back later or create a new one!</p>
-                    </div>
+                                    )}
+                                    <div className="separator-line"></div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="no-capsules">
+                            <p>No time capsules available to open yet. Check back later or create a new one!</p>
+                        </div>
+                    )}
+                    {showCommentPopup && (
+                        <CommentPopup
+                            capsuleContent={{
+                                capsule_id: currentCapsule, 
+                                username: username || errorMessage,
+                                image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
+                                caption: 'Caption goes here.'
+                            }}
+                            comments={commentsMap[currentCapsule] || []} 
+                            onClose={handleCloseCommentPopup}
+                            onSendComment={handleSendComment}
+                        />
+                    )}
+                    {showAddPostPopup && (
+                        <AddPostPopup 
+                            capsuleId={currentCapsule} 
+                            onClose={handleCloseAddPostPopup} 
+                            onImageUpload={handleImageUpload}
+                        />
+                    )}
+                </div>
+
+                {showTimeCapsulePopup && (
+                    <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
                 )}
-                {showCommentPopup && (
-                    <CommentPopup
-                        capsuleContent={{
-                            capsule_id: currentCapsule, 
-                            username: username || errorMessage,
-                            image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
-                            caption: 'Caption goes here.'
-                        }}
-                        comments={commentsMap[currentCapsule] || []} 
-                        onClose={handleCloseCommentPopup}
-                        onSendComment={handleSendComment}
-                    />
-                )}
-                {showAddPostPopup && (
-                    <AddPostPopup 
-                        capsuleId={currentCapsule} 
-                        onClose={handleCloseAddPostPopup} 
-                        onImageUpload={handleImageUpload}
+            </div>
+            <div className="modal">
+                {isModalOpen && (
+                    <PostModal
+                        closeModal={closeModal}
+                        post={currentPostData}
+                        type={selectedType}
                     />
                 )}
             </div>
-
-            {showTimeCapsulePopup && (
-                <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
-            )}
-
-            {isModalOpen && (
-                <PostModal
-                    isOpen={isModalOpen}
-                    closeModal={closeModal}
-                    data={currentPostData}
-                />
-            )}
         </div>
     );
 };

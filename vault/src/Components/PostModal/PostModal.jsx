@@ -4,9 +4,7 @@ import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPape
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 
 
-const PostModal = ({ isOpen, closeModal, data }) => {
-    if (!isOpen) return null;
-
+const PostModal = ({ closeModal, post, type }) => {
     return (
         <div className="modal-overlay" onClick={closeModal}>
             <div className="feed-container" onClick={(e) => e.stopPropagation()}>
@@ -14,18 +12,16 @@ const PostModal = ({ isOpen, closeModal, data }) => {
                     <div className="capsule-card">
                         <div className="capsule-header">
                             <img
-                                src={data.profile_pic || '/profile-pic.png'} 
+                                src={post.profile_pic || '/profile-pic.png'} 
                                 alt="Profile Picture"
                                 className="profile-pic"
                             />
-                            <span className="username">{data.username}</span>
+                            <span className="username">{post.username}</span>
                         </div>
-                        <div className="capsule-image">
-                            <img src={data.image_url} alt="Modal photo" className="modal-photo"/>
-                        </div>
+                        <img src={post.image_url} alt="Modal photo" className="modal-photo"/>
                         <div className="capsule-info">
                             <p className="caption">
-                                <strong>{data.username}</strong> {data.content}</p>
+                                <strong>{post.username}</strong> {post.content}</p>
                             <div className="capsule-stats">
                                 <span>0 likes</span>
                                 <span>0 comments</span>
