@@ -839,25 +839,25 @@ def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
 
-# Route to add new comment - debug logs as well
+# Add comment for a capsule or post
 @app.route('/comments', methods=['POST'])
 def add_comment():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.json
-
-
     capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
     text = data.get('text')
 
-    if not capsule_id or not text:
+    if not text or (not capsule_id and not post_id):
         return jsonify({"error": "Invalid data"}), 400
 
     try:
         new_comment = Comment(
             user_id=session['user_id'],
             capsule_id=capsule_id,
+            post_id=post_id,
             text=text,
             created_at=datetime.utcnow()
         )
@@ -866,6 +866,7 @@ def add_comment():
         return jsonify({
             "comment_id": new_comment.comment_id,
             "capsule_id": new_comment.capsule_id,
+            "post_id": new_comment.post_id,
             "user_id": new_comment.user_id,
             "username": session['username'],
             "text": new_comment.text,
@@ -874,24 +875,29 @@ def add_comment():
     except Exception as e:
         return jsonify({"error": "Failed to add comment"}), 500
 
-# Route to get all comments on a capsule
+# Get comments for a capsule or post
 @app.route('/comments', methods=['GET'])
 def get_comments():
     capsule_id = request.args.get('capsule_id')
-    if not capsule_id:
-        return jsonify({"error": "Capsule ID is required"}), 400
+    post_id = request.args.get('post_id')
 
-    # Fetch comments for the given capsule ID, joining with the users table
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    # Fetch comments for the specific capsule or post
     comments = db.session.query(
         Comment,
         User.username,
         User.profile_pic
-    ).join(User, Comment.user_id == User.user_id).filter(Comment.capsule_id == capsule_id).all()
+    ).join(User, Comment.user_id == User.user_id).filter(
+        (Comment.capsule_id == capsule_id) | (Comment.post_id == post_id)
+    ).all()
 
     comments_list = [
         {
             "comment_id": comment.comment_id,
             "capsule_id": comment.capsule_id,
+            "post_id": comment.post_id,
             "user_id": comment.user_id,
             "username": username,
             "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else "/default-profile-pic.png",
@@ -902,6 +908,7 @@ def get_comments():
     ]
 
     return jsonify(comments_list), 200
+
 
 # Route to toggle likes for capsules or posts
 @app.route('/like', methods=['POST'])
