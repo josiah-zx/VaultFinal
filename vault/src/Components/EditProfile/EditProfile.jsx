@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {Link, useParams} from 'react-router-dom';
 import './EditProfile.css'
 import Navbar from '../HomeHeader/HomeHeader';
+import { useNavigate } from 'react-router-dom';
 
 
 const EditProfile = () => {
@@ -11,6 +12,7 @@ const EditProfile = () => {
     const [currentUserId, setCurrentUserId] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [file, setFile] = useState(null);
+    const navigate = useNavigate();
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -91,6 +93,7 @@ const EditProfile = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Bio updated successfully!');
+                navigate(`/${currentUser}`);
             } else {
                 console.error('Failed to update bio.');
             }
