@@ -109,21 +109,45 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     comment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # relationships for querying
     user = db.relationship('User', backref='comments', lazy=True)
     capsule = db.relationship('Capsule', backref='comments', lazy=True)
+    post = db.relationship('Post', backref='comments', lazy=True)
+
 
 class Bookmark(db.Model):
     __tablename__ = 'bookmarks'
     bookmark_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     capsule = db.relationship('Capsule', backref='bookmarks', lazy=True)
+    post = db.relationship('Post', backref='bookmarks', lazy=True)
+
+
+# Define Like model for posts and capsules.
+class Like(db.Model):
+    __tablename__ = 'likes'
+    like_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships for querying
+    user = db.relationship('User', backref='likes', lazy=True)
+    capsule = db.relationship('Capsule', backref='likes', lazy=True)
+    post = db.relationship('Post', backref='likes', lazy=True)
+
+
+
 # Initialize the database
 with app.app_context():
     db.create_all()
@@ -150,6 +174,8 @@ def get_users():
     ]
     return jsonify(users_list)
 
+
+# Toggle bookmark for a capsule or post
 @app.route('/bookmark', methods=['POST'])
 def toggle_bookmark():
     if 'user_id' not in session:
@@ -157,23 +183,24 @@ def toggle_bookmark():
 
     data = request.json
     capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
 
-    if not capsule_id:
-        return jsonify({"error": "Capsule ID is required"}), 400
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
 
     user_id = session['user_id']
 
     # Check if the bookmark exists
-    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id).first()
+    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
 
     if bookmark:
-        # If it exists, remove it
+        # If exists, remove it
         db.session.delete(bookmark)
         db.session.commit()
         return jsonify({"message": "Bookmark removed"}), 200
     else:
-        # Otherwise, create a new bookmark
-        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id)
+        # Otherwise, create new bookmark
+        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
         db.session.add(new_bookmark)
         db.session.commit()
         return jsonify({"message": "Bookmark added"}), 201
@@ -819,25 +846,25 @@ def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
 
-# Route to add new comment - debug logs as well
+# Add comment for a capsule or post
 @app.route('/comments', methods=['POST'])
 def add_comment():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.json
-
-
     capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
     text = data.get('text')
 
-    if not capsule_id or not text:
+    if not text or (not capsule_id and not post_id):
         return jsonify({"error": "Invalid data"}), 400
 
     try:
         new_comment = Comment(
             user_id=session['user_id'],
             capsule_id=capsule_id,
+            post_id=post_id,
             text=text,
             created_at=datetime.utcnow()
         )
@@ -846,6 +873,7 @@ def add_comment():
         return jsonify({
             "comment_id": new_comment.comment_id,
             "capsule_id": new_comment.capsule_id,
+            "post_id": new_comment.post_id,
             "user_id": new_comment.user_id,
             "username": session['username'],
             "text": new_comment.text,
@@ -854,24 +882,29 @@ def add_comment():
     except Exception as e:
         return jsonify({"error": "Failed to add comment"}), 500
 
-# Route to get all comments on a capsule
+# Get comments for a capsule or post
 @app.route('/comments', methods=['GET'])
 def get_comments():
     capsule_id = request.args.get('capsule_id')
-    if not capsule_id:
-        return jsonify({"error": "Capsule ID is required"}), 400
+    post_id = request.args.get('post_id')
 
-    # Fetch comments for the given capsule ID, joining with the users table
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    # Fetch comments for the specific capsule or post
     comments = db.session.query(
         Comment,
         User.username,
         User.profile_pic
-    ).join(User, Comment.user_id == User.user_id).filter(Comment.capsule_id == capsule_id).all()
+    ).join(User, Comment.user_id == User.user_id).filter(
+        (Comment.capsule_id == capsule_id) | (Comment.post_id == post_id)
+    ).all()
 
     comments_list = [
         {
             "comment_id": comment.comment_id,
             "capsule_id": comment.capsule_id,
+            "post_id": comment.post_id,
             "user_id": comment.user_id,
             "username": username,
             "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else "/default-profile-pic.png",
@@ -884,5 +917,56 @@ def get_comments():
     return jsonify(comments_list), 200
 
 
+# Route to toggle likes for capsules or posts
+@app.route('/like', methods=['POST'])
+def toggle_like():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    user_id = session['user_id']
+
+    # Check if the like exists
+    like = Like.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
+
+    if like:
+        # If prev. liked, remove it (unlike)
+        db.session.delete(like)
+        db.session.commit()
+        return jsonify({"message": "Like removed"}), 200
+    else:
+        # Otherwise create a new like
+        new_like = Like(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify({"message": "Like added"}), 201
+
+# Endpoint to get likes count for a capsule or post
+@app.route('/likes', methods=['GET'])
+def get_all_likes():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    likes = Like.query.filter_by(user_id=user_id).all()
+
+    likes_data = [
+        {
+            "capsule_id": like.capsule_id,
+            "post_id": like.post_id,
+            "is_liked": True,  # User's like status
+            "like_count": Like.query.filter_by(capsule_id=like.capsule_id, post_id=like.post_id).count()
+        }
+        for like in likes
+    ]
+
+    return jsonify(likes_data), 200
 if __name__ == "__main__":
     app.run(debug=True)
