@@ -124,9 +124,13 @@ class Bookmark(db.Model):
     __tablename__ = 'bookmarks'
     bookmark_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     capsule = db.relationship('Capsule', backref='bookmarks', lazy=True)
+    post = db.relationship('Post', backref='bookmarks', lazy=True)
+
 
 # Define Like model for posts and capsules.
 class Like(db.Model):
