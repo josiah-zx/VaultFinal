@@ -900,6 +900,49 @@ def get_comments():
 
     return jsonify(comments_list), 200
 
+# Route to toggle likes for capsules or posts
+@app.route('/like', methods=['POST'])
+def toggle_like():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    user_id = session['user_id']
+
+    # Check if the like exists
+    like = Like.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
+
+    if like:
+        # If prev. liked, remove it (unlike)
+        db.session.delete(like)
+        db.session.commit()
+        return jsonify({"message": "Like removed"}), 200
+    else:
+        # Otherwise create a new like
+        new_like = Like(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify({"message": "Like added"}), 201
+
+# Endpoint to get likes count for a capsule or post
+@app.route('/likes', methods=['GET'])
+def get_likes():
+    capsule_id = request.args.get('capsule_id')
+    post_id = request.args.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    # Count likes for the specific capsule or post
+    likes_count = Like.query.filter_by(capsule_id=capsule_id, post_id=post_id).count()
+
+    return jsonify({"likes_count": likes_count}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
