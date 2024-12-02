@@ -174,6 +174,8 @@ def get_users():
     ]
     return jsonify(users_list)
 
+
+# Toggle bookmark for a capsule or post
 @app.route('/bookmark', methods=['POST'])
 def toggle_bookmark():
     if 'user_id' not in session:
@@ -181,23 +183,24 @@ def toggle_bookmark():
 
     data = request.json
     capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
 
-    if not capsule_id:
-        return jsonify({"error": "Capsule ID is required"}), 400
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
 
     user_id = session['user_id']
 
     # Check if the bookmark exists
-    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id).first()
+    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
 
     if bookmark:
-        # If it exists, remove it
+        # If exists, remove it
         db.session.delete(bookmark)
         db.session.commit()
         return jsonify({"message": "Bookmark removed"}), 200
     else:
-        # Otherwise, create a new bookmark
-        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id)
+        # Otherwise, create new bookmark
+        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
         db.session.add(new_bookmark)
         db.session.commit()
         return jsonify({"message": "Bookmark added"}), 201
