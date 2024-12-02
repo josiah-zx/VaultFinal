@@ -20,9 +20,12 @@ const TimeCapsule = () => {
     };
 
     const handleSubmit = async () => {
+        const naiveEstTime = selectedDate;
+        const estDate = new Date(naiveEstTime);
+
         const formData = new FormData();
         formData.append('content', description);
-        formData.append('open_at', selectedDate);
+        formData.append('open_at', estDate.toISOString().slice(0, 16));
         if (file) {
             formData.append('image_url', file);
         }
