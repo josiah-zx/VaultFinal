@@ -254,33 +254,33 @@ const PostFeed = () => {
         setShowCommentPopup(false);
     };
 
-    const handleSendComment = async (newComment) => {
-        try {
-            const response = await fetch("http://127.0.0.1:5000/comments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", 
-                body: JSON.stringify({
-                    capsule_id: currentCapsule,
-                    text: newComment,
-                }),
-            });
+    // const handleSendComment = async (newComment) => {
+    //     try {
+    //         const response = await fetch("http://127.0.0.1:5000/comments", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             credentials: "include", 
+    //             body: JSON.stringify({
+    //                 capsule_id: currentCapsule,
+    //                 text: newComment,
+    //             }),
+    //         });
 
-            if (response.ok) {
-                const savedComment = await response.json();
-                setCommentsMap((prev) => ({
-                    ...prev,
-                    [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], 
-                }));
-            } else {
-                console.error("Failed to send comment:", await response.json());
-            }
-        } catch (error) {
-            console.error("Error sending comment:", error);
-        }
-    };
+    //         if (response.ok) {
+    //             const savedComment = await response.json();
+    //             setCommentsMap((prev) => ({
+    //                 ...prev,
+    //                 [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], 
+    //             }));
+    //         } else {
+    //             console.error("Failed to send comment:", await response.json());
+    //         }
+    //     } catch (error) {
+    //         console.error("Error sending comment:", error);
+    //     }
+    // };
     const handleOpenTimeCapsulePopup = () => {
         setShowTimeCapsulePopup(true);
     };
@@ -465,14 +465,12 @@ const PostFeed = () => {
                     {showCommentPopup && (
                         <CommentPopup
                             capsuleContent={{
+                                type: 'capsule',
                                 capsule_id: currentCapsule, 
-                                username: username || errorMessage,
                                 image: uploadedImageUrl || '/time-stopwatch-sand.jpg',
                                 caption: 'Caption goes here.'
                             }}
-                            comments={commentsMap[currentCapsule] || []} 
                             onClose={handleCloseCommentPopup}
-                            onSendComment={handleSendComment}
                         />
                     )}
                     {showAddPostPopup && (
