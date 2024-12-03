@@ -939,13 +939,13 @@ def toggle_like():
         # If prev. liked, remove it (unlike)
         db.session.delete(like)
         db.session.commit()
-        return jsonify({"message": "Like removed"}), 200
+        return jsonify({"message": "Like removed", "is_liked": False}), 200
     else:
         # Otherwise create a new like
         new_like = Like(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
         db.session.add(new_like)
         db.session.commit()
-        return jsonify({"message": "Like added"}), 201
+        return jsonify({"message": "Like added", "is_liked": True}), 201
 
 # Endpoint to get likes count for a capsule or post
 @app.route('/likes', methods=['GET'])
@@ -968,5 +968,36 @@ def get_all_likes():
     ]
 
     return jsonify(likes_data), 200
+
+# Route to get post data
+@app.route('/post-data/<int:post_id>', methods=['GET'])
+def get_post_data(post_id):
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+    
+    user_id = session['user_id']
+
+    return jsonify({
+        'like_status': Like.query.filter_by(user_id=user_id, post_id=post_id).first() is not None,
+        'like_count': Like.query.filter_by(post_id=post_id).count(),
+        'comment_count': Comment.query.filter_by(post_id=post_id).count(),
+        'bookmark_status': Bookmark.query.filter_by(user_id=user_id, post_id=post_id).first() is not None
+    }), 200
+
+# Route to get capsule data
+@app.route('/capsule-data/<int:capsule_id>', methods=['GET'])
+def get_capsule_data(capsule_id):
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+    
+    user_id = session['user_id']
+
+    return jsonify({
+        'like_status': Like.query.filter_by(user_id=user_id, capsule_id=capsule_id).first() is not None,
+        'like_count': Like.query.filter_by(capsule_id=capsule_id).count(),
+        'comment_count': Comment.query.filter_by(capsule_id=capsule_id).count(),
+        'bookmark_status': Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id).first() is not None
+    }), 200
+
 if __name__ == "__main__":
     app.run(debug=True)

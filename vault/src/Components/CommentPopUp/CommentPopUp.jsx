@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CommentPopUp.css';
 import { FaTimes, FaPaperPlane } from 'react-icons/fa';
 
-const CommentPopup = ({ capsuleContent, onClose, onSendComment }) => {
+const CommentPopup = ({ capsuleContent, onClose }) => {
     const [newComment, setNewComment] = useState('');
     const [comments, setComments] = useState([]);
 
