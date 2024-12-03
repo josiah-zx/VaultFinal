@@ -892,13 +892,14 @@ def get_comments():
         return jsonify({"error": "Capsule ID or Post ID is required"}), 400
 
     # Fetch comments for the specific capsule or post
-    comments = db.session.query(
-        Comment,
-        User.username,
-        User.profile_pic
-    ).join(User, Comment.user_id == User.user_id).filter(
-        (Comment.capsule_id == capsule_id) | (Comment.post_id == post_id)
-    ).all()
+    query = db.session.query(Comment, User.username, User.profile_pic).join(User, Comment.user_id == User.user_id)
+    
+    if capsule_id:
+        query = query.filter(Comment.capsule_id == capsule_id)
+    if post_id:
+        query = query.filter(Comment.post_id == post_id)
+
+    comments = query.all()
 
     comments_list = [
         {
