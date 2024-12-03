@@ -28,60 +28,60 @@ const PostFeed = () => {
     const [selectedType, setSelectedType] = useState('');
 
     useEffect(() => {
-    const fetchLikeStatus = async () => {
-        try {
-            const response = await fetch("http://127.0.0.1:5000/likes", {
-                credentials: "include",
-            });
+        const fetchLikeStatus = async () => {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/likes", {
+                    credentials: "include",
+                });
 
-            if (response.ok) {
-                const data = await response.json();
-                const likesMap = data.reduce((acc, { capsule_id, is_liked, like_count }) => {
-                    acc[capsule_id] = { isLiked: is_liked, likes: like_count };
-                    return acc;
-                }, {});
-                setLikeStatus(likesMap);
-            } else {
-                console.error("Failed to fetch like status:", await response.json());
+                if (response.ok) {
+                    const data = await response.json();
+                    const likesMap = data.reduce((acc, { capsule_id, is_liked, like_count }) => {
+                        acc[capsule_id] = { isLiked: is_liked, likes: like_count };
+                        return acc;
+                    }, {});
+                    setLikeStatus(likesMap);
+                } else {
+                    console.error("Failed to fetch like status:", await response.json());
+                }
+            } catch (error) {
+                console.error("Error fetching like status:", error);
             }
-        } catch (error) {
-            console.error("Error fetching like status:", error);
-        }
-    };
+        };
 
-    fetchLikeStatus();
-}, []);
+        fetchLikeStatus();
+    }, []);
 
     useEffect(() => {
-    const fetchAvailableCapsules = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:5000/available-capsules');
-            if (response.ok) {
-                const data = await response.json();
-                setAvailableCapsules(data);
+        const fetchAvailableCapsules = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/available-capsules');
+                if (response.ok) {
+                    const data = await response.json();
+                    setAvailableCapsules(data);
 
-                const capsuleIds = data.map(capsule => capsule.capsule_id);
-                const commentsResponse = await Promise.all(
-                    capsuleIds.map(id => fetch(`http://127.0.0.1:5000/comments?capsule_id=${id}`))
-                );
-                const commentsData = await Promise.all(commentsResponse.map(res => res.json()));
-                const commentsMap = commentsData.reduce((acc, comments, index) => {
-                    acc[capsuleIds[index]] = comments;
-                    return acc;
-                }, {});
-                setCommentsMap(commentsMap);
-            } else {
-                setErrorMessage("Failed to load available capsules.");
+                    const capsuleIds = data.map(capsule => capsule.capsule_id);
+                    const commentsResponse = await Promise.all(
+                        capsuleIds.map(id => fetch(`http://127.0.0.1:5000/comments?capsule_id=${id}`))
+                    );
+                    const commentsData = await Promise.all(commentsResponse.map(res => res.json()));
+                    const commentsMap = commentsData.reduce((acc, comments, index) => {
+                        acc[capsuleIds[index]] = comments;
+                        return acc;
+                    }, {});
+                    setCommentsMap(commentsMap);
+                } else {
+                    setErrorMessage("Failed to load available capsules.");
+                }
+            } catch (error) {
+                console.error("Error fetching available capsules:", error);
             }
-        } catch (error) {
-            console.error("Error fetching available capsules:", error);
-        }
-    };
+        };
 
-    fetchAvailableCapsules();
-    const interval = setInterval(fetchAvailableCapsules, 60000);
-    return () => clearInterval(interval);
-}, []);
+        fetchAvailableCapsules();
+        const interval = setInterval(fetchAvailableCapsules, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
 
     useEffect(() => {
@@ -108,6 +108,14 @@ const PostFeed = () => {
 
         fetchBookmarkedCapsules();
     }, []);
+
+    useEffect(() => {
+        availableCapsules.forEach(capsule => {
+            if (capsule.is_open && !capsulePosts[capsule.capsule_id]) {
+                fetchPosts(capsule.capsule_id);
+            }
+        });
+    }, [availableCapsules, capsulePosts]);
 
     const fetchPosts = async (capsuleId) => {
         try {
@@ -147,33 +155,47 @@ const PostFeed = () => {
     };
 
     const handleLike = async (capsuleId) => {
-    const isLiked = likeStatus[capsuleId]?.isLiked || false;
+        const isLiked = likeStatus[capsuleId]?.isLiked || false;
 
-    // Optimistically update UI
-    setLikeStatus((prevStatus) => ({
-        ...prevStatus,
-        [capsuleId]: {
-            isLiked: !isLiked,
-            likes: isLiked
-                ? (prevStatus[capsuleId]?.likes || 1) - 1
-                : (prevStatus[capsuleId]?.likes || 0) + 1,
-        },
-    }));
-
-    try {
-        const response = await fetch("http://127.0.0.1:5000/like", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+        // Optimistically update UI
+        setLikeStatus((prevStatus) => ({
+            ...prevStatus,
+            [capsuleId]: {
+                isLiked: !isLiked,
+                likes: isLiked
+                    ? (prevStatus[capsuleId]?.likes || 1) - 1
+                    : (prevStatus[capsuleId]?.likes || 0) + 1,
             },
-            credentials: "include",
-            body: JSON.stringify({ capsule_id: capsuleId, like: !isLiked }),
-        });
+        }));
 
-        if (!response.ok) {
-            console.error("Failed to update like status:", await response.json());
+        try {
+            const response = await fetch("http://127.0.0.1:5000/like", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ capsule_id: capsuleId, like: !isLiked }),
+            });
 
-            // Revert optimistic UI update if API fails
+            if (!response.ok) {
+                console.error("Failed to update like status:", await response.json());
+
+                // Revert optimistic UI update if API fails
+                setLikeStatus((prevStatus) => ({
+                    ...prevStatus,
+                    [capsuleId]: {
+                        isLiked: isLiked,
+                        likes: isLiked
+                            ? (prevStatus[capsuleId]?.likes || 0) + 1
+                            : (prevStatus[capsuleId]?.likes || 1) - 1,
+                    },
+                }));
+            }
+        } catch (error) {
+            console.error("Error updating like status:", error);
+
+            // Revert optimistic UI update if an error occurs
             setLikeStatus((prevStatus) => ({
                 ...prevStatus,
                 [capsuleId]: {
@@ -184,21 +206,7 @@ const PostFeed = () => {
                 },
             }));
         }
-    } catch (error) {
-        console.error("Error updating like status:", error);
-
-        // Revert optimistic UI update if an error occurs
-        setLikeStatus((prevStatus) => ({
-            ...prevStatus,
-            [capsuleId]: {
-                isLiked: isLiked,
-                likes: isLiked
-                    ? (prevStatus[capsuleId]?.likes || 0) + 1
-                    : (prevStatus[capsuleId]?.likes || 1) - 1,
-            },
-        }));
-    }
-};
+    };
 
     const handleBookmark = async (capsuleId) => {
         // Optimistically toggle the bookmark state
