@@ -10,20 +10,34 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
         window.scrollTo(0, 0);
         document.body.style.overflow = 'hidden';
 
-        console.log("Fetching comments for capsule_id:", capsuleContent?.capsule_id);
-
         const fetchComments = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleContent.capsule_id}`, {
-                    credentials: 'include',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching comments: ${response.statusText}`);
+                if (capsuleContent.type === 'capsule') {
+                    console.log("Fetching comments for capsule_id:", capsuleContent?.capsule_id);
+                    const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleContent.capsule_id}`, {
+                        credentials: 'include',
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error(`Error fetching comments: ${response.statusText}`);
+                    }
+    
+                    const data = await response.json();
+                    setComments(data);
                 }
-
-                const data = await response.json();
-                setComments(data);
+                if (capsuleContent.type === 'post') {
+                    console.log("Fetching comments for post_id:", capsuleContent?.post_id);
+                    const response = await fetch(`http://127.0.0.1:5000/comments?post_id=${capsuleContent.post_id}`, {
+                        credentials: 'include',
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error(`Error fetching comments: ${response.statusText}`);
+                    }
+    
+                    const data = await response.json();
+                    setComments(data);
+                }
             } catch (error) {
                 console.error('Error fetching comments:', error);
             }
@@ -34,41 +48,64 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
         return () => {
             document.body.style.overflow = '';
         };
-    }, [capsuleContent.capsule_id]);
+    }, []);
 
     const handleSendComment = async () => {
         if (newComment.trim()) {
-            console.log("Sending comment with capsule_id:", capsuleContent?.capsule_id);
-
             try {
-                const response = await fetch('http://127.0.0.1:5000/comments', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        capsule_id: capsuleContent.capsule_id,
-                        text: newComment.trim(),
-                    }),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('Error:', errorData);
-                    throw new Error(`Error sending comment: ${response.statusText}`);
+                if (capsuleContent.type === 'capsule') {
+                    console.log("Sending comment with capsule_id:", capsuleContent?.capsule_id);
+                    const response = await fetch('http://127.0.0.1:5000/comments', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            capsule_id: capsuleContent.capsule_id,
+                            text: newComment.trim(),
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error:', errorData);
+                        throw new Error(`Error sending comment: ${response.statusText}`);
+                    }
+    
+                    const newCommentData = await response.json();
+                    setComments([...comments, newCommentData]);
+                    setNewComment('');
                 }
-
-                const newCommentData = await response.json();
-                setComments([...comments, newCommentData]);
-                setNewComment('');
+                if (capsuleContent.type === 'post') {
+                    console.log("Sending comment with post_id:", capsuleContent?.post_id);
+                    const response = await fetch('http://127.0.0.1:5000/comments', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            post_id: capsuleContent.post_id,
+                            text: newComment.trim(),
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error:', errorData);
+                        throw new Error(`Error sending comment: ${response.statusText}`);
+                    }
+    
+                    const newCommentData = await response.json();
+                    setComments([...comments, newCommentData]);
+                    setNewComment('');
+                }
             } catch (error) {
                 console.error('Error sending comment:', error);
             }
         }
     };
-
-    console.log("Rendering CommentPopup for capsule_id:", capsuleContent?.capsule_id);
 
     return (
         <div className="comment-popup">
@@ -86,7 +123,7 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
                             comments.map((comment, index) => (
                                 <div key={index} className="comment">
                                     <img
-                                        src={comment.profile_pic || '/default-profile-pic.png'}
+                                        src={comment.profile_pic}
                                         alt="Profile"
                                         className="comment-profile-pic"
                                     />

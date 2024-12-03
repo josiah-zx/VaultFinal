@@ -969,34 +969,29 @@ def get_all_likes():
 
     return jsonify(likes_data), 200
 
-# Route to get post data
-@app.route('/post-data/<int:post_id>', methods=['GET'])
-def get_post_data(post_id):
+# Route to get capsule/post data
+@app.route('/post-data', methods=['GET'])
+def get_post_data():
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
-    
+
     user_id = session['user_id']
+    capsule_id = request.args.get('capsule_id')
+    post_id = request.args.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    like_status = Like.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first() is not None
+    like_count = Like.query.filter_by(capsule_id=capsule_id, post_id=post_id).count()
+    comment_count = Comment.query.filter_by(capsule_id=capsule_id, post_id=post_id).count()
+    bookmark_status = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first() is not None
 
     return jsonify({
-        'like_status': Like.query.filter_by(user_id=user_id, post_id=post_id).first() is not None,
-        'like_count': Like.query.filter_by(post_id=post_id).count(),
-        'comment_count': Comment.query.filter_by(post_id=post_id).count(),
-        'bookmark_status': Bookmark.query.filter_by(user_id=user_id, post_id=post_id).first() is not None
-    }), 200
-
-# Route to get capsule data
-@app.route('/capsule-data/<int:capsule_id>', methods=['GET'])
-def get_capsule_data(capsule_id):
-    if 'user_id' not in session:
-        return jsonify({"error": "User not logged in"}), 401
-    
-    user_id = session['user_id']
-
-    return jsonify({
-        'like_status': Like.query.filter_by(user_id=user_id, capsule_id=capsule_id).first() is not None,
-        'like_count': Like.query.filter_by(capsule_id=capsule_id).count(),
-        'comment_count': Comment.query.filter_by(capsule_id=capsule_id).count(),
-        'bookmark_status': Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id).first() is not None
+        'like_status': like_status,
+        'like_count': like_count,
+        'comment_count': comment_count,
+        'bookmark_status': bookmark_status
     }), 200
 
 if __name__ == "__main__":

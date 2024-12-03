@@ -4,20 +4,19 @@ import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPape
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 
 
-const PostModal = ({ closeModal, post, type, handleSendComment }) => {
+const PostModal = ({ closeModal, post, type }) => {
     const [likeStatus, setLikeStatus] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
     const [bookmarkStatus, setBookmarkStatus] = useState(false);
-    const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
 
     useEffect(() => {
         const fetchPostData = async () => {
             try {
-                if (type === 'post') {
-                    const response = await fetch(`http://127.0.0.1:5000/post-data/${post.post_id}`, {
+                if (type === 'capsule') {
+                    const response = await fetch(`http://127.0.0.1:5000/post-data?capsule_id=${post.capsule_id}`, {
                         credentials: 'include',
                     });
                     if (response.ok) {
@@ -30,8 +29,8 @@ const PostModal = ({ closeModal, post, type, handleSendComment }) => {
                         setErrorMessage('Failed to load post data');
                     }
                 }
-                if (type === 'capsule') {
-                    const response = await fetch(`http://127.0.0.1:5000/capsule-data/${post.capsule_id}`, {
+                if (type === 'post') {
+                    const response = await fetch(`http://127.0.0.1:5000/post-data?post_id=${post.post_id}`, {
                         credentials: 'include',
                     });
                     if (response.ok) {
@@ -41,7 +40,7 @@ const PostModal = ({ closeModal, post, type, handleSendComment }) => {
                         setCommentCount(data.comment_count);
                         setBookmarkStatus(data.bookmark_status);
                     } else {
-                        setErrorMessage('Failed to load capsule data');
+                        setErrorMessage('Failed to load post data');
                     }
                 }
             } catch (error) {
@@ -142,49 +141,6 @@ const PostModal = ({ closeModal, post, type, handleSendComment }) => {
         }
     }
 
-    // const fetchComments = async () => {
-    //     try {
-    //         if (type === 'capsule') {
-    //             const response = await fetch('http://127.0.0.1:5000/comments', {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify({
-    //                     capsule_id: post.capsule_id
-    //                 }),
-    //                 credentials: 'include'
-    //             });
-    //             if (response.ok) {
-    //                 const data = await response.json();
-    //                 setComments(data);
-    //             } else {
-    //                 console.error("Failed to fetch comments:", await response.json());
-    //             }
-    //         } 
-    //         if (type === 'post') {
-    //             const response = await fetch('http://127.0.0.1:5000/comments', {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify({
-    //                     post_id: post.post_id
-    //                 }),
-    //                 credentials: 'include'
-    //             });
-    //             if (response.ok) {
-    //                 const data = await response.json();
-    //                 setComments(data);
-    //             } else {
-    //                 console.error("Failed to fetch comments:", await response.json());
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching comments:", error);
-    //     }
-    // }
-
     const handleOpenCommentPopup = () => {
         setShowCommentPopup(true);  
     };
@@ -220,8 +176,7 @@ const PostModal = ({ closeModal, post, type, handleSendComment }) => {
                                         <FaHeart className="icon filled" style={{color: "red"}}/> :
                                         <FaRegHeart className="icon"/>}
                                 </span>
-                                <span className="comment-icon"
-                                    onClick={() => handleOpenCommentPopup}>
+                                <span className="comment-icon" onClick={() => handleOpenCommentPopup()}>
                                     <FaRegComment className="icon"/>
                                 </span>
                                 <span className="bookmark-icon" onClick={() => handleBookmark()}>
@@ -239,23 +194,23 @@ const PostModal = ({ closeModal, post, type, handleSendComment }) => {
                     </div>
                 </div>
                 <button className="modal-close-btn" onClick={closeModal}>X</button>
-                {showCommentPopup && type === 'capsule' (
+                {showCommentPopup && type === 'capsule' && (
                     <CommentPopup
                         capsuleContent={{
-                            type: 'capsule',
+                            type: type,
                             capsule_id: post.capsule_id, 
-                            image: post.image_url || '/time-stopwatch-sand.jpg',
+                            image: post.image_url,
                             caption: post.content
                         }}
                         onClose={handleCloseCommentPopup}
                     />
                 )}
-                {showCommentPopup && type === 'post' (
+                {showCommentPopup && type === 'post'&& (
                     <CommentPopup
                         capsuleContent={{
-                            type: 'post',
-                            capsule_id: post.post_id, 
-                            image: post.image_url || '/time-stopwatch-sand.jpg',
+                            type: type,
+                            post_id: post.post_id, 
+                            image: post.image_url,
                             caption: post.content
                         }}
                         onClose={handleCloseCommentPopup}
