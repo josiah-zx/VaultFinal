@@ -53,33 +53,36 @@ const PostFeed = () => {
 }, []);
 
     useEffect(() => {
-        const fetchAvailableCapsules = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/available-capsules');
-                if (response.ok) {
-                    const data = await response.json();
-                    setAvailableCapsules(data);
-                } else {
-                    setErrorMessage("Failed to load available capsules.");
-                }
-            } catch (error) {
-                console.error("Error fetching available capsules:", error);
+    const fetchAvailableCapsules = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/available-capsules');
+            if (response.ok) {
+                const data = await response.json();
+                setAvailableCapsules(data);
+
+                const capsuleIds = data.map(capsule => capsule.capsule_id);
+                const commentsResponse = await Promise.all(
+                    capsuleIds.map(id => fetch(`http://127.0.0.1:5000/comments?capsule_id=${id}`))
+                );
+                const commentsData = await Promise.all(commentsResponse.map(res => res.json()));
+                const commentsMap = commentsData.reduce((acc, comments, index) => {
+                    acc[capsuleIds[index]] = comments;
+                    return acc;
+                }, {});
+                setCommentsMap(commentsMap);
+            } else {
+                setErrorMessage("Failed to load available capsules.");
             }
-        };
+        } catch (error) {
+            console.error("Error fetching available capsules:", error);
+        }
+    };
 
-        fetchAvailableCapsules();
-        const interval = setInterval(fetchAvailableCapsules, 60000);
+    fetchAvailableCapsules();
+    const interval = setInterval(fetchAvailableCapsules, 60000);
+    return () => clearInterval(interval);
+}, []);
 
-        return () => clearInterval(interval);
-    }, [])
-
-    useEffect(() => {
-        availableCapsules.forEach(capsule => {
-            if (capsule.is_open && !capsulePosts[capsule.capsule_id]) {
-                fetchPosts(capsule.capsule_id);
-            }
-        });
-    }, [availableCapsules, capsulePosts]);
 
     useEffect(() => {
         const fetchBookmarkedCapsules = async () => {
