@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './CommentPopUp.css';
 import { FaTimes, FaPaperPlane } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const CommentPopup = ({ capsuleContent, onClose }) => {
     const [newComment, setNewComment] = useState('');
     const [comments, setComments] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -126,9 +128,11 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
                                         src={comment.profile_pic}
                                         alt="Profile"
                                         className="comment-profile-pic"
+                                        onClick={() => navigate(`/${comment.username}`)}
                                     />
                                     <p>
-                                        <strong>{comment.username}</strong> {comment.text}
+                                        <strong className="comment-username" onClick={() => navigate(`/${comment.username}`)}>
+                                            {comment.username}</strong>  {comment.text}
                                     </p>
                                 </div>
                             ))

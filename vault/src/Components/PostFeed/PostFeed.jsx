@@ -254,37 +254,6 @@ const PostFeed = () => {
         setShowCommentPopup(false);
     };
 
-    // const handleSendComment = async (newComment) => {
-    //     try {
-    //         const response = await fetch("http://127.0.0.1:5000/comments", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             credentials: "include", 
-    //             body: JSON.stringify({
-    //                 capsule_id: currentCapsule,
-    //                 text: newComment,
-    //             }),
-    //         });
-
-    //         if (response.ok) {
-    //             const savedComment = await response.json();
-    //             setCommentsMap((prev) => ({
-    //                 ...prev,
-    //                 [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], 
-    //             }));
-    //         } else {
-    //             console.error("Failed to send comment:", await response.json());
-    //         }
-    //     } catch (error) {
-    //         console.error("Error sending comment:", error);
-    //     }
-    // };
-    const handleOpenTimeCapsulePopup = () => {
-        setShowTimeCapsulePopup(true);
-    };
-
     const handleCloseTimeCapsulePopup = () => {
         setShowTimeCapsulePopup(false);
     };
@@ -337,9 +306,10 @@ const PostFeed = () => {
                                                 <img
                                                     src={capsule.profile_pic || '/profile-pic.png'} 
                                                     alt="Profile Picture"
-                                                    className="profile-pic"
+                                                    className="post-profile-pic"
+                                                    onClick={() => navigate(`/${capsule.username}`)}
                                                 />
-                                                <span className="username">{capsule.username || errorMessage}</span>
+                                                <span className="post-username" onClick={() => navigate(`/${capsule.username}`)}>{capsule.username || errorMessage}</span>
                                             </div>
                                             <div className="capsule-contents">
                                                 <div className="capsule-image">
@@ -377,7 +347,9 @@ const PostFeed = () => {
                                             </div>
                                             <div className="capsule-info">
                                                 <p className="caption">
-                                                    <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                                    <strong className="post-username" onClick={() => navigate(`/${capsule.username}`)}>
+                                                        {capsule.username || errorMessage}</strong> {capsule.content}
+                                                </p>
                                                 <div className="capsule-stats">
                                                     <span>{capsuleStatus.likes} likes</span>
                                                     <span>{(commentsMap[capsule.capsule_id]?.length || 0)} comments</span>

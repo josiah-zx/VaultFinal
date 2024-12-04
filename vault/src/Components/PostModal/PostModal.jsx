@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './PostModal.css';
 import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPaperPlane } from 'react-icons/fa';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
+import { useNavigate } from 'react-router-dom';
 
 
 const PostModal = ({ closeModal, post, type }) => {
@@ -11,6 +12,7 @@ const PostModal = ({ closeModal, post, type }) => {
     const [bookmarkStatus, setBookmarkStatus] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPostData = async () => {
@@ -158,14 +160,17 @@ const PostModal = ({ closeModal, post, type }) => {
                             <img
                                 src={post.profile_pic || '/profile-pic.png'} 
                                 alt="Profile Picture"
-                                className="profile-pic"
+                                className="post-profile-pic"
+                                onClick={() => navigate(`/${post.username}`)}
                             />
-                            <span className="username">{post.username}</span>
+                            <span className="post-username" onClick={() => navigate(`/${post.username}`)}>{post.username}</span>
                         </div>
                         <img src={post.image_url} alt="Modal photo" className="modal-photo"/>
                         <div className="capsule-info">
                             <p className="caption">
-                                <strong>{post.username}</strong> {post.content}</p>
+                                <strong className="post-username" onClick={() => navigate(`/${post.username}`)}>
+                                    {post.username}</strong> {post.content}
+                            </p>
                             <div className="capsule-stats">
                                 <span>{likeCount} likes</span>
                                 <span>{commentCount} comments</span>

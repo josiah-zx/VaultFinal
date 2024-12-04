@@ -311,7 +311,7 @@ def get_session_user():
                 "user_id": user.user_id,
                 "username": user.username,
                 "email": user.email,
-                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
+                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else None
             }), 200
     return jsonify({"error": "User not logged in"}), 401
 
@@ -541,6 +541,7 @@ def search():
 
     results = [
         {
+            'user_id': user.user_id,
             'username': user.username,
             'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
         }
@@ -652,18 +653,23 @@ def get_conversations(username):
             ).order_by(Message.timestamp.desc()).first()
 
             conversations.append({
+                "user_id": convo_user.user_id,
                 "username": convo_user.username,
-                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else "https://via.placeholder.com/150",
+                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else None,
                 "last_message": last_message.content if last_message else "",
                 "timestamp": last_message.timestamp if last_message else ""
             })
+
+    conversations.sort(key=lambda convo: convo["timestamp"], reverse=True)
 
     return jsonify(conversations)
 
 
 # Route to get a conversation (list of all msgs ) between user1 and user2 by ID
-@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
-def get_messages(user1_id, user2_id):
+@app.route('/messages/<int:user2_id>', methods=['GET'])
+def get_messages(user2_id):
+    user1_id = session.get('user_id')
+
     messages = Message.query.filter(
         ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
         ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
