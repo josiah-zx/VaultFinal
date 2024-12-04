@@ -311,7 +311,7 @@ def get_session_user():
                 "user_id": user.user_id,
                 "username": user.username,
                 "email": user.email,
-                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
+                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else None
             }), 200
     return jsonify({"error": "User not logged in"}), 401
 
@@ -541,6 +541,7 @@ def search():
 
     results = [
         {
+            'user_id': user.user_id,
             'username': user.username,
             'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
         }
@@ -652,18 +653,23 @@ def get_conversations(username):
             ).order_by(Message.timestamp.desc()).first()
 
             conversations.append({
+                "user_id": convo_user.user_id,
                 "username": convo_user.username,
-                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else "https://via.placeholder.com/150",
+                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else None,
                 "last_message": last_message.content if last_message else "",
                 "timestamp": last_message.timestamp if last_message else ""
             })
+
+    conversations.sort(key=lambda convo: convo["timestamp"], reverse=True)
 
     return jsonify(conversations)
 
 
 # Route to get a conversation (list of all msgs ) between user1 and user2 by ID
-@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
-def get_messages(user1_id, user2_id):
+@app.route('/messages/<int:user2_id>', methods=['GET'])
+def get_messages(user2_id):
+    user1_id = session.get('user_id')
+
     messages = Message.query.filter(
         ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
         ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
@@ -707,6 +713,9 @@ def get_available_capsules():
         }
         for capsule, username, profile_pic in available_capsules
     ]
+
+    capsules_list.sort(key=lambda cap: cap["created_at"], reverse=True)
+
     return jsonify(capsules_list)
 
 @app.route('/capsules/<int:capsule_id>/posts', methods=['GET'])
@@ -796,6 +805,31 @@ def delete_all():
         db.session.rollback()
         return jsonify({"error": "Failed to delete capsules and related data", "details": str(e)}), 500
 
+# Route to delete a capsule or post
+@app.route('/delete-post', methods=['POST'])
+def delete_post():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 403
+    
+    capsule_id = request.json.get('capsule_id')
+    post_id = request.json.get('post_id')
+
+    try:
+        if capsule_id:
+            capsule_posts = Post.query.filter_by(capsule_id=capsule_id).all()
+            for post in capsule_posts:
+                db.session.delete(post)
+            Capsule.query.filter_by(capsule_id=capsule_id).delete()
+
+        if post_id:
+            Post.query.filter_by(post_id=post_id).delete()
+
+        db.session.commit()
+        return jsonify({"message": "Deleted successfully."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete capsule/posts", "details": str(e)}), 500
 
 
 

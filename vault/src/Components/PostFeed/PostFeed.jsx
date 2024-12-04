@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './PostFeed.css';
 import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPaperPlane } from 'react-icons/fa';
 import { FaRegSquarePlus } from "react-icons/fa6";
+import { HiDotsHorizontal } from "react-icons/hi";
 import AddPostPopup from '../AddPostPopup/AddPostPopup';
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 import PostModal from '../PostModal/PostModal';
@@ -26,6 +27,27 @@ const PostFeed = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPostData, setCurrentPostData] = useState([]);
     const [selectedType, setSelectedType] = useState('');
+    const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);
+                } else {
+                    console.error('Not logged in.');
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+        fetchSessionUser();
+    }, [navigate]);
 
     useEffect(() => {
         const fetchLikeStatus = async () => {
@@ -254,37 +276,6 @@ const PostFeed = () => {
         setShowCommentPopup(false);
     };
 
-    // const handleSendComment = async (newComment) => {
-    //     try {
-    //         const response = await fetch("http://127.0.0.1:5000/comments", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             credentials: "include", 
-    //             body: JSON.stringify({
-    //                 capsule_id: currentCapsule,
-    //                 text: newComment,
-    //             }),
-    //         });
-
-    //         if (response.ok) {
-    //             const savedComment = await response.json();
-    //             setCommentsMap((prev) => ({
-    //                 ...prev,
-    //                 [currentCapsule]: [...(prev[currentCapsule] || []), savedComment], 
-    //             }));
-    //         } else {
-    //             console.error("Failed to send comment:", await response.json());
-    //         }
-    //     } catch (error) {
-    //         console.error("Error sending comment:", error);
-    //     }
-    // };
-    const handleOpenTimeCapsulePopup = () => {
-        setShowTimeCapsulePopup(true);
-    };
-
     const handleCloseTimeCapsulePopup = () => {
         setShowTimeCapsulePopup(false);
     };
@@ -319,6 +310,44 @@ const PostFeed = () => {
         document.body.style.overflow = "auto";
     }
 
+    const openMoreModal = (data, type) => {
+        setIsMoreModalOpen(true);
+        setCurrentPostData(data);
+        setSelectedType(type);
+        document.body.style.overflow = "hidden";
+    }
+
+    const closeMoreModal = () => {
+        setIsMoreModalOpen(false);
+        setCurrentPostData([]);
+        setSelectedType('');
+        document.body.style.overflow = "auto";
+    }
+
+    //Test
+    const deleteCapsule = async (data, type) => {
+        try {
+            if (type === 'capsule') {
+                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ capsule_id: data.capsule_id }), 
+                });
+
+                if (response.ok) {
+                    console.log("Successfully deleted capsule and its posts.");
+                } else {
+                    console.error("Failed to delete capsule and its posts:", await response.json());
+                }
+            }
+        } catch (error) {
+            console.error("Error deleting capsule and its posts:", error);
+        }
+    }
+
     return (
         <div>
             <div className="feed-container">
@@ -337,9 +366,13 @@ const PostFeed = () => {
                                                 <img
                                                     src={capsule.profile_pic || '/profile-pic.png'} 
                                                     alt="Profile Picture"
-                                                    className="profile-pic"
+                                                    className="post-profile-pic"
+                                                    onClick={() => navigate(`/${capsule.username}`)}
                                                 />
-                                                <span className="username">{capsule.username || errorMessage}</span>
+                                                <span className="post-username" onClick={() => navigate(`/${capsule.username}`)}>{capsule.username || errorMessage}</span>
+                                                {capsule.username === username && (
+                                                    <HiDotsHorizontal className="more-btn" onClick={() => deleteCapsule(capsule, 'capsule')}/>
+                                                )}
                                             </div>
                                             <div className="capsule-contents">
                                                 <div className="capsule-image">
@@ -377,7 +410,9 @@ const PostFeed = () => {
                                             </div>
                                             <div className="capsule-info">
                                                 <p className="caption">
-                                                    <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
+                                                    <strong className="post-username" onClick={() => navigate(`/${capsule.username}`)}>
+                                                        {capsule.username || errorMessage}</strong> {capsule.content}
+                                                </p>
                                                 <div className="capsule-stats">
                                                     <span>{capsuleStatus.likes} likes</span>
                                                     <span>{(commentsMap[capsule.capsule_id]?.length || 0)} comments</span>

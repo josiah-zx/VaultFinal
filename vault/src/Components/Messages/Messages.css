@@ -122,6 +122,8 @@
     border: none;
     cursor: pointer;
     font-size: 16px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .send-message-btn:hover {
@@ -256,6 +258,10 @@
     cursor: pointer;
 }
 
+.other-user-header h3:hover {
+    cursor: pointer;
+}
+
 /* Updated placeholder for other-user-icon */
 .other-user-icon {
     width: 50px;
@@ -264,6 +270,10 @@
     object-fit: cover;
     margin-right: 10px;
     background-color: #333;
+}
+
+.other-user-icon:hover {
+    cursor: pointer;
 }
 
 /* Placeholder using FaUserCircle for other-user-icon */
@@ -278,6 +288,10 @@
     height: 50px;
     border-radius: 50%;
     background-color: #333;
+}
+
+.other-user-icon-placeholder:hover {
+    cursor: pointer;
 }
 
 .message-bar {

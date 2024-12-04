@@ -86,6 +86,10 @@
     color: #ddd;
 }
 
+.comment img:hover {
+    cursor: pointer;
+}
+
 .comment-profile-pic {
     width: 30px;
     height: 30px;
@@ -134,4 +138,8 @@
 
 .send-btn:hover {
     background: #0077cc; 
+}
+
+.comment-username:hover {
+    cursor: pointer
 }

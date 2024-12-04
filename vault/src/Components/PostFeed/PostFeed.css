@@ -58,6 +58,7 @@
 .open-time{
     margin-left: 4px;
 }
+
 .capsule-header {
     display: flex;
     align-items: center;
@@ -70,7 +71,7 @@
     border-radius: 8px;
 }
 
-.profile-pic {
+.post-profile-pic {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -78,9 +79,27 @@
     margin-right: 10px;
 }
 
-.username {
+.post-profile-pic:hover {
+    cursor: pointer;
+}
+
+.post-username {
     font-weight: bold;
     color: white;
+}
+
+.post-username:hover {
+    cursor: pointer;
+}
+
+.more-btn {
+    font-size: 20px;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.more-btn:hover {
+    cursor: pointer;
 }
 
 .capsule-contents {
@@ -89,6 +108,8 @@
     justify-content: center;
     width: 650px;
     height: 650px;
+    border-top: 1px solid rgb(79, 79, 79);
+    border-bottom: 1px solid rgb(79, 79, 79);
 }
   
 .capsule-image {
