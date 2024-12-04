@@ -32,12 +32,12 @@ const Home = () => {
 
     return (
         <div className="home-container">
-            <Navbar/>
+            <Navbar username={username}/>
             <div className="homepage-profile">
                 <HomePageProfile/>
             </div>
             <div className="post-feed">
-                <PostFeed/>
+                <PostFeed username={username}/>
             </div>
         </div>
     );

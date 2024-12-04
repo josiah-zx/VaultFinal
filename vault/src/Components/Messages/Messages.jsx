@@ -107,9 +107,15 @@ const Messages = () => {
         return () => clearInterval(interval);
     }, [selectedUsername, username]);
 
-    const handleClose = () => {
+    const handleDeleteSearch = () => {
         setSearch('');
         setSearchData([]);
+    }
+
+    const handleCloseSearch = () => {
+        setSearch('');
+        setSearchData([]);
+        setIsSearchOpen(false);
     }
 
     const sendMessage = async (e) => {
@@ -158,7 +164,7 @@ const Messages = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar username={username}/>
             <div className="messages-container">
                 <div className="sidebar">
                     <div className="user-profile">
@@ -187,7 +193,8 @@ const Messages = () => {
                                         className={`conversation-item ${selectedUsername === conv.username ? 'active' : ''}`}
                                         onClick={() => {
                                             setSelectedUsername(conv.username);
-                                            setSelectedUserId(conv.user_id)
+                                            setSelectedUserId(conv.user_id);
+                                            handleCloseSearch();
                                         }}
                                     >
                                         {conv.profile_pic ? (
@@ -221,7 +228,7 @@ const Messages = () => {
                 <div className="chat-area">
                     {isSearchOpen ? (
                         <div className="new-message">
-                            <button className="back-button" onClick={() => setIsSearchOpen(false)}>
+                            <button className="back-button" onClick={() => handleCloseSearch()}>
                                 <IoArrowUndo />
                             </button>
                             <h2>New Message</h2>
@@ -230,7 +237,7 @@ const Messages = () => {
                                     {search === '' ? (
                                         <FaSearch />
                                     ) : (
-                                        <ImCross onClick={handleClose} />
+                                        <ImCross onClick={handleDeleteSearch} />
                                     )}
                                 </div>
                                 <input
@@ -251,7 +258,7 @@ const Messages = () => {
                                             setSelectedUserId(data.user_id);
                                             setSelectedUsername(data.username);
                                             setIsSearchOpen(false);
-                                            handleClose();
+                                            handleDeleteSearch();
                                         }}
                                     >
                                         {data.profile_pic ? (
@@ -264,7 +271,7 @@ const Messages = () => {
                                         ) : (
                                             <FaUserCircle className="search-result-icon-placeholder" />
                                         )}
-                                        {data.username}
+                                        <span>{data.username}</span>
                                     </div>
                                 ))}
                             </div>

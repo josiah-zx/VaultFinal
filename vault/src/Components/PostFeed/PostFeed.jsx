@@ -10,12 +10,11 @@ import TimeCapsule from '../TimeCapsule/TimeCapsule';
 import { useNavigate } from 'react-router-dom';
 
 
-const PostFeed = () => {
+const PostFeed = ({ username }) => {
     const navigate = useNavigate();
     const [likeStatus, setLikeStatus] = useState({});
     const [commentsMap, setCommentsMap] = useState({});
     const [bookmarkedPosts, setBookmarkedPosts] = useState({});
-    const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
@@ -29,26 +28,6 @@ const PostFeed = () => {
     const [currentPostData, setCurrentPostData] = useState([]);
     const [selectedType, setSelectedType] = useState('');
     const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
-
-    useEffect(() => {
-        const fetchSessionUser = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
-                    credentials: 'include'
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUsername(data.username);
-                } else {
-                    console.error('Not logged in.');
-                    navigate('/login');
-                }
-            } catch (error) {
-                console.error("Failed to fetch user data:", error);
-            }
-        };
-        fetchSessionUser();
-    }, [navigate]);
 
     useEffect(() => {
         const fetchLikeStatus = async () => {
@@ -501,7 +480,7 @@ const PostFeed = () => {
                                                     </span>
                                                     <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
                                                         {bookmarkedPosts[capsule.capsule_id] ?
-                                                            <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                            <FaBookmark className="icon" style={{ color: "gold" }} /> :
                                                             <FaRegBookmark className="icon" />}
                                                     </span>
                                                     <span className="share-icon">

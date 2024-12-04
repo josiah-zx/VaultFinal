@@ -543,7 +543,7 @@ def search():
         {
             'user_id': user.user_id,
             'username': user.username,
-            'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else "https://via.placeholder.com/150"
+            'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else None
         }
         for user in users
     ]
