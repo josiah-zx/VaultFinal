@@ -180,6 +180,7 @@
 }
 
 .capsule-actions {
+    padding-top: 10px;
     display: flex;
     justify-content: space-between;
     margin: 5px 40px;

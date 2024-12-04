@@ -818,10 +818,37 @@ def delete_post():
         if capsule_id:
             capsule_posts = Post.query.filter_by(capsule_id=capsule_id).all()
             for post in capsule_posts:
+                post_comments = Comment.query.filter_by(post_id=post.post_id).all()
+                for pcomment in post_comments:
+                    db.session.delete(pcomment)
+                post_likes = Like.query.filter_by(post_id=post.post_id).all()
+                for plike in post_likes:
+                    db.session.delete(plike)
+                post_bmarks = Bookmark.query.filter_by(post_id=post.post_id).all()
+                for pbmark in post_bmarks:
+                    db.session.delete(pbmark)
                 db.session.delete(post)
+            capsule_comments = Comment.query.filter_by(capsule_id=capsule_id).all()
+            for ccomment in capsule_comments:
+                db.session.delete(ccomment)
+            capsule_likes = Like.query.filter_by(capsule_id=capsule_id).all()
+            for clike in capsule_likes:
+                db.session.delete(clike)
+            capsule_bmarks = Bookmark.query.filter_by(capsule_id=capsule_id).all()
+            for cbmarks in capsule_bmarks:
+                db.session.delete(cbmarks)
             Capsule.query.filter_by(capsule_id=capsule_id).delete()
 
         if post_id:
+            post_comments = Comment.query.filter_by(post_id=post_id).all()
+            for pcomment in post_comments:
+                db.session.delete(pcomment)
+            post_likes = Like.query.filter_by(post_id=post_id).all()
+            for plike in post_likes:
+                db.session.delete(plike)
+            post_bmarks = Bookmark.query.filter_by(post_id=post_id).all()
+            for pbmark in post_bmarks:
+                db.session.delete(pbmark)
             Post.query.filter_by(post_id=post_id).delete()
 
         db.session.commit()
