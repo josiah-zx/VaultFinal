@@ -89,7 +89,7 @@ const Settings = () => {
 
     return (
         <>
-            <Navbar />
+            <Navbar username={username}/>
             <div className="settings-container">
                 <h1>Settings</h1>
                 <div className="settings-box">

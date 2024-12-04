@@ -19,7 +19,7 @@ const Profile = () => {
     const [selectedTab, setSelectedTab] = useState('capsules');
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
-    const [profilePicture, setProfilePicture] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
     const navigate = useNavigate();
 
     // Fetch session user
@@ -66,7 +66,7 @@ const Profile = () => {
                         const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
                         setProfilePicture(imageUrl);
                     } else {
-                        setProfilePicture('https://via.placeholder.com/150');
+                        setProfilePicture(null);
                     }
                 } else {
                     setErrorMessage('Failed to load profile data');
@@ -169,13 +169,13 @@ const Profile = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar username={currentUser}/>
             <div className={selectedTab === "capsules" ? "capsule-profile" : "post-profile"}>
                 <div className="profile-avatar">
                     {profilePicture ? (
                         <img src={profilePicture} alt="Profile" className="profile-picture" />
                     ) : (
-                        <FaUserCircle />
+                        <FaUserCircle className="profile-picture-placeholder"/>
                     )}
                 </div>
                 <div className="profile-info">

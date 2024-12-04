@@ -164,7 +164,7 @@ const Messages = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar username={username}/>
             <div className="messages-container">
                 <div className="sidebar">
                     <div className="user-profile">

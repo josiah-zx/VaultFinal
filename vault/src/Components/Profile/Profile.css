@@ -56,6 +56,12 @@
     object-fit: cover;
 }
 
+.profile-picture-placeholder {
+    font-size: 100px;
+    margin-bottom: 20px;
+    object-fit: cover;
+}
+
 .capsule-content {
     border: none;
     padding: 20px;
