@@ -17,6 +17,7 @@ const PostFeed = () => {
     const [bookmarkedPosts, setBookmarkedPosts] = useState({});
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
     const [showTimeCapsulePopup, setShowTimeCapsulePopup] = useState(false);
     const [showAddPostPopup, setShowAddPostPopup] = useState(false);
@@ -24,7 +25,7 @@ const PostFeed = () => {
     const [availableCapsules, setAvailableCapsules] = useState([]);
     const [capsulePosts, setCapsulePosts] = useState({});
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const [currentPostData, setCurrentPostData] = useState([]);
     const [selectedType, setSelectedType] = useState('');
     const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
@@ -296,28 +297,28 @@ const PostFeed = () => {
         setShowAddPostPopup(false);
     };
 
-    const openModal = (data, type) => {
-        setIsModalOpen(true);
+    const handleOpenPostModal = (data, type) => {
+        setIsPostModalOpen(true);
         setCurrentPostData(data);
         setSelectedType(type);
         document.body.style.overflow = "hidden";
     }
 
-    const closeModal = () => {
-        setIsModalOpen(false);
+    const handleClosePostModal = () => {
+        setIsPostModalOpen(false);
         setCurrentPostData([]);
         setSelectedType('');
         document.body.style.overflow = "auto";
     }
 
-    const openMoreModal = (data, type) => {
+    const handleOpenMoreModal = (data, type) => {
         setIsMoreModalOpen(true);
         setCurrentPostData(data);
         setSelectedType(type);
         document.body.style.overflow = "hidden";
     }
 
-    const closeMoreModal = () => {
+    const handleCloseMoreModal = () => {
         setIsMoreModalOpen(false);
         setCurrentPostData([]);
         setSelectedType('');
@@ -325,7 +326,7 @@ const PostFeed = () => {
     }
 
     //Test
-    const deleteCapsule = async (data, type) => {
+    const handleDeleteCapsule = async (data, type) => {
         try {
             if (type === 'capsule') {
                 const response = await fetch('http://127.0.0.1:5000/delete-post', {
@@ -338,15 +339,34 @@ const PostFeed = () => {
                 });
 
                 if (response.ok) {
-                    console.log("Successfully deleted capsule and its posts.");
+                    setSuccessMessage('Capsule deleted successfully.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    console.error("Failed to delete capsule and its posts:", await response.json());
+                    setErrorMessage('Failed to delete capsule.');
                 }
             }
         } catch (error) {
             console.error("Error deleting capsule and its posts:", error);
         }
     }
+
+    const formatToEST = (gmtDateString) => {
+        const date = new Date(gmtDateString);
+    
+        const options = {
+          timeZone: "America/New_York",
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        };
+    
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+    };
 
     return (
         <div>
@@ -371,7 +391,7 @@ const PostFeed = () => {
                                                 />
                                                 <span className="post-username" onClick={() => navigate(`/${capsule.username}`)}>{capsule.username || errorMessage}</span>
                                                 {capsule.username === username && (
-                                                    <HiDotsHorizontal className="more-btn" onClick={() => deleteCapsule(capsule, 'capsule')}/>
+                                                    <HiDotsHorizontal className="more-btn" onClick={() => handleDeleteCapsule(capsule, 'capsule')}/>
                                                 )}
                                             </div>
                                             <div className="capsule-contents">
@@ -380,7 +400,7 @@ const PostFeed = () => {
                                                         src={capsule.image_url} 
                                                         alt="Capsule photo" 
                                                         className="capsule-photo"
-                                                        onClick={() => openModal(capsule, 'capsule')}
+                                                        onClick={() => handleOpenPostModal(capsule, 'capsule')}
                                                     />
                                                 </div>
                                                 <div className="capsule-posts">
@@ -401,7 +421,7 @@ const PostFeed = () => {
                                                                 src={post.image_url} 
                                                                 alt={`Post ${index}`} 
                                                                 className="photo-circle" 
-                                                                onClick={() => openModal(post, 'post')}
+                                                                onClick={() => handleOpenPostModal(post, 'post')}
                                                             />
                                                             </div>
                                                         );
@@ -449,7 +469,10 @@ const PostFeed = () => {
                                                     className="profile-pic"
                                                 />
                                                 <span className="username">{capsule.username || errorMessage}</span>
-                                                <span className="open-time">Opens: {capsule.open_at}</span>
+                                                <span className="open-time">Opens: {formatToEST(capsule.open_at)}</span>
+                                                {capsule.username === username && (
+                                                    <HiDotsHorizontal className="more-btn" onClick={() => handleDeleteCapsule(capsule, 'capsule')}/>
+                                                )}
                                             </div>
                                             <div className="vault">
                                                 <div className="vault-lock"></div>
@@ -522,9 +545,9 @@ const PostFeed = () => {
                 )}
             </div>
             <div className="modal">
-                {isModalOpen && (
+                {isPostModalOpen && (
                     <PostModal
-                        closeModal={closeModal}
+                        closeModal={handleClosePostModal}
                         post={currentPostData}
                         type={selectedType}
                     />
