@@ -1,18 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import './PostModal.css';
 import { FaRegHeart, FaHeart, FaRegComment, FaRegBookmark, FaBookmark, FaRegPaperPlane } from 'react-icons/fa';
+import { HiDotsHorizontal } from "react-icons/hi";
 import CommentPopup from '../CommentPopUp/CommentPopUp';
 import { useNavigate } from 'react-router-dom';
 
 
 const PostModal = ({ closeModal, post, type }) => {
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');
     const [likeStatus, setLikeStatus] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
     const [bookmarkStatus, setBookmarkStatus] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [showCommentPopup, setShowCommentPopup] = useState(false);
-    const navigate = useNavigate();
+    const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);
+                } else {
+                    console.error('Not logged in.');
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+        fetchSessionUser();
+    }, [navigate]);
 
     useEffect(() => {
         const fetchPostData = async () => {
@@ -151,11 +175,67 @@ const PostModal = ({ closeModal, post, type }) => {
         setShowCommentPopup(false);
     }
 
+    const handleOpenMoreModal = () => {
+        setIsMoreModalOpen(true);
+    }
+
+    const handleCloseMoreModal = () => {
+        setIsMoreModalOpen(false);
+    }
+
+    const handleDeletePost = async () => {
+        try {
+            if (type === 'capsule') {
+                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ capsule_id: post.capsule_id }), 
+                });
+
+                if (response.ok) {
+                    setSuccessMessage('Capsule deleted successfully.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    setErrorMessage('Failed to delete capsule.');
+                }
+            }
+            if (type === 'post') {
+                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ post_id: post.post_id }), 
+                });
+
+                if (response.ok) {
+                    setSuccessMessage('Post deleted successfully.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    setErrorMessage('Failed to delete post.');
+                }
+            }
+        } catch (error) {
+            console.error("Error deleting capsule and its posts:", error);
+            setErrorMessage("Error deleting capsule/post.")
+        }
+    }
+
     return (
         <div className="modal-overlay" onClick={closeModal}>
             <div className="feed-container" onClick={(e) => e.stopPropagation()}>
                 <div className="feed">
                     <div className="capsule-card">
+                        {errorMessage && <p className="error-message">{errorMessage}</p>}
+                        {successMessage && <p className="success-message">{successMessage}</p>} 
                         <div className="capsule-header">
                             <img
                                 src={post.profile_pic || '/profile-pic.png'} 
@@ -164,6 +244,9 @@ const PostModal = ({ closeModal, post, type }) => {
                                 onClick={() => navigate(`/${post.username}`)}
                             />
                             <span className="post-username" onClick={() => navigate(`/${post.username}`)}>{post.username}</span>
+                            {post.username === username && (
+                                <HiDotsHorizontal className="more-btn" onClick={() => handleDeletePost()}/>
+                            )}
                         </div>
                         <img src={post.image_url} alt="Modal photo" className="modal-photo"/>
                         <div className="capsule-info">
