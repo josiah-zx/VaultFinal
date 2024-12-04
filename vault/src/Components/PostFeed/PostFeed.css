@@ -92,6 +92,16 @@
     cursor: pointer;
 }
 
+.more-btn {
+    font-size: 20px;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.more-btn:hover {
+    cursor: pointer;
+}
+
 .capsule-contents {
     display: flex;
     align-items: center;

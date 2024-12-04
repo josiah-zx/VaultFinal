@@ -713,6 +713,9 @@ def get_available_capsules():
         }
         for capsule, username, profile_pic in available_capsules
     ]
+
+    capsules_list.sort(key=lambda cap: cap["created_at"], reverse=True)
+
     return jsonify(capsules_list)
 
 @app.route('/capsules/<int:capsule_id>/posts', methods=['GET'])
@@ -802,6 +805,31 @@ def delete_all():
         db.session.rollback()
         return jsonify({"error": "Failed to delete capsules and related data", "details": str(e)}), 500
 
+# Route to delete a capsule or post
+@app.route('/delete-post', methods=['POST'])
+def delete_post():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 403
+    
+    capsule_id = request.json.get('capsule_id')
+    post_id = request.json.get('post_id')
+
+    try:
+        if capsule_id:
+            capsule_posts = Post.query.filter_by(capsule_id=capsule_id).all()
+            for post in capsule_posts:
+                db.session.delete(post)
+            Capsule.query.filter_by(capsule_id=capsule_id).delete()
+
+        if post_id:
+            Post.query.filter_by(post_id=post_id).delete()
+
+        db.session.commit()
+        return jsonify({"message": "Deleted successfully."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete capsule/posts", "details": str(e)}), 500
 
 
 
