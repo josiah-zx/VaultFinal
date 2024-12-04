@@ -501,7 +501,7 @@ const PostFeed = () => {
                                                     </span>
                                                     <span className="bookmark-icon" onClick={() => handleBookmark(capsule.capsule_id)}>
                                                         {bookmarkedPosts[capsule.capsule_id] ?
-                                                            <FaBookmark className="icon" style={{ color: "white" }} /> :
+                                                            <FaBookmark className="icon" style={{ color: "gold" }} /> :
                                                             <FaRegBookmark className="icon" />}
                                                     </span>
                                                     <span className="share-icon">
