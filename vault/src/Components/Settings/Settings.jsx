@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './Settings.css';
-import { FaUser, FaEnvelope, FaBell, FaUserCircle } from "react-icons/fa";  
+import { FaUser, FaEnvelope, FaBell, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../HomeHeader/HomeHeader';
 
+
 const Settings = () => {
-    // State to store the user's settings
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [profilePic, setProfilePic] = useState(null); // State for profile picture
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    // Fetch the session user data when the component loads
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
@@ -23,6 +23,7 @@ const Settings = () => {
                     const data = await response.json();
                     setUsername(data.username);
                     setEmail(data.email);
+                    setProfilePic(data.profile_pic); // Directly set the profile picture URL
                 } else {
                     console.error('Not logged in.');
                     navigate('/login');
@@ -33,8 +34,6 @@ const Settings = () => {
         };
         fetchSessionUser();
     }, [navigate]);
-
-    // Handle form submission to update settings in the backend
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -43,12 +42,12 @@ const Settings = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, email, notificationsEnabled }), 
+                body: JSON.stringify({ username, email, notificationsEnabled }),
                 credentials: 'include',
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 console.log('Settings updated successfully:', data.message);
                 setErrorMessage('');
@@ -73,29 +72,37 @@ const Settings = () => {
                 credentials: 'include',
             });
 
-            const data = await response.json()
+            const data = await response.json();
 
             if (response.ok) {
                 console.log('Logged out successfully:', data.message);
                 setErrorMessage('');
                 navigate('/login');
             } else {
-                setErrorMessage(data.message)
+                setErrorMessage(data.message);
             }
         } catch (error) {
-            console.error('Error during logging out:', error)
+            console.error('Error during logging out:', error);
             setErrorMessage('Something went wrong. Please try again.');
         }
     };
 
     return (
         <>
-            <Navbar />
+            <Navbar username={username}/>
             <div className="settings-container">
                 <h1>Settings</h1>
                 <div className="settings-box">
                     <div className="profile-avatar">
-                        <FaUserCircle />
+                        {profilePic ? (
+                            <img
+                                src={profilePic}
+                                alt="Profile"
+                                className="profile-picture"
+                            />
+                        ) : (
+                            <FaUserCircle className="user-icon" />
+                        )}
                     </div>
                     <div className="settings-item">
                         <FaUser className='icons' />

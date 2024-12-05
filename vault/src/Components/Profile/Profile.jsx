@@ -19,6 +19,8 @@ const Profile = () => {
     const [selectedTab, setSelectedTab] = useState('capsules');
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
     const navigate = useNavigate();
 
     // Fetch session user
@@ -59,6 +61,14 @@ const Profile = () => {
                     setFollowingCount(data.following_count);
                     setBio(data.bio);
                     setIsFollowing(data.is_following);
+    
+                    // Set the profile picture
+                    if (data.profile_pic) {
+                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        setProfilePicture(imageUrl);
+                    } else {
+                        setProfilePicture(null);
+                    }
                 } else {
                     setErrorMessage('Failed to load profile data');
                 }
@@ -110,6 +120,27 @@ const Profile = () => {
         fetchUserPosts();
     }, [profileUsername]);
 
+    useEffect(() => {
+        const fetchBookmarkedPosts = async () => {
+            if (selectedTab !== 'favorites') return;
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/bookmarked-items', {
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setBookmarkedPosts(data); 
+                } else {
+                    console.error("Failed to fetch bookmarked posts:", await response.json());
+                }
+            } catch (error) {
+                console.error("Error fetching bookmarked posts:", error);
+            }
+        };
+
+        fetchBookmarkedPosts();
+    }, [selectedTab]);
     const toggleFollow = async () => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/follow/${profileUsername}`, {
@@ -137,10 +168,14 @@ const Profile = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar username={currentUser}/>
             <div className={selectedTab === "capsules" ? "capsule-profile" : "post-profile"}>
                 <div className="profile-avatar">
-                    <FaUserCircle />
+                    {profilePicture ? (
+                        <img src={profilePicture} alt="Profile" className="profile-picture" />
+                    ) : (
+                        <FaUserCircle className="profile-picture-placeholder"/>
+                    )}
                 </div>
                 <div className="profile-info">
                     <h2>{profileUsername || errorMessage}</h2>
@@ -187,44 +222,60 @@ const Profile = () => {
 
                 <div className="profile-content">
                     {selectedTab === "capsules" && (
-                        <div className="capsules-tab popup-style">
+                        <div className="capsules-tab">
                             <h3>Capsules Content</h3>
-                            {capsulePosts.length > 0 ? (
-                                <div className="capsule-posts">
-                                    {capsulePosts.map((post) => (
-                                        <div key={post.post_id} className="capsule-post">
-                                            <img src={post.image_url} alt="Capsule content" className="capsule-image" />
+                            <div className="capsules-tab profile-capsule-content">
+                                {capsulePosts.length > 0 ? (
+                                    capsulePosts.map((post) => (
+                                        <div key={post.post_id} className="profile-capsule-post">
+                                            <img src={post.image_url} alt="Capsule content" className="profile-capsule-image" />
                                             <p>{post.content}</p>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No capsules available to open yet.</p>
-                            )}
+                                    ))
+                                ) : (
+                                    <p className="empty-tab-text">No capsules available to open yet.</p>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {selectedTab === "posts" && (
-                         <div className="posts-tab post-content">
-                            <h3 className="posts-heading">Posts Content</h3>
-                            {regularPosts.length > 0 ? (
-                                regularPosts.map((post) => (
-                                    <div key={post.post_id} className="post">
-                                        <img src={post.image_url} alt="Post content" className="post-image" />
-                                        <p>{post.content}</p>
-                                    </div>
-                                ))
-                            
-                            ) : (
-                                <p>No posts available.</p>
-                            )}
+                        <div className="posts-tab">
+                            <h3>Posts Content</h3>
+                            <div className="posts-tab profile-post-content">
+                                {regularPosts.length > 0 ? (
+                                    regularPosts.map((post) => (
+                                        <div key={post.post_id} className="profile-post">
+                                            <img src={post.image_url} alt="Post content" className="profile-post-image" />
+                                            <p>{post.content}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="empty-tab-text">No posts available.</p>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {selectedTab === "favorites" && (
                         <div className="favorites-tab">
-                            <h3>Favorites Content</h3>
-                            <p>Show all favorites here.</p>
+                            <h3>Bookmarked Content</h3>
+                            <div className="favorites-tab profile-favorites-content">
+                                {bookmarkedPosts.length > 0 ? (
+                                    bookmarkedPosts.map((bookmark) => (
+                                        <div key={bookmark.capsule_id} className="profile-favorite-post"> 
+                                            <img
+                                                src={bookmark.image_url} 
+                                                alt="Favorite content"
+                                                className="profile-favorite-image" 
+                                            />
+                                            <p>{bookmark.content}</p> 
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="empty-tab-text">No bookmarked capsules available.</p>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

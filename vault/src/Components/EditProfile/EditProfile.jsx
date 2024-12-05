@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {Link, useParams} from 'react-router-dom';
 import './EditProfile.css'
 import Navbar from '../HomeHeader/HomeHeader';
+import { useNavigate } from 'react-router-dom';
 
 
 const EditProfile = () => {
@@ -11,9 +12,19 @@ const EditProfile = () => {
     const [currentUserId, setCurrentUserId] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [file, setFile] = useState(null);
+    const navigate = useNavigate();
 
     const handleFileChange = (e) => {
-       // Add functionality to upload file / pfp
+        const selectedFile = e.target.files[0];
+        if (selectedFile){
+            setFile(selectedFile);
+            const reader = new FileReader();
+            reader.onload = () =>{
+                setProfilePicture(reader.result);
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+       
     };
 
     useEffect(() => {
@@ -40,7 +51,6 @@ const EditProfile = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch user profile data
         const fetchProfileData = async () => {
             if (!currentUser) return;
             try {
@@ -49,10 +59,18 @@ const EditProfile = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Profile Data:', data); // Debugging
                     setBio(data.bio || '');
-                    setProfilePicture(data.profile_pic);
+                    if (data.profile_pic) {
+                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        console.log('Image URL:', imageUrl); // Debugging
+                        setProfilePicture(imageUrl);
+                    } else {
+                        setProfilePicture('https://via.placeholder.com/150');
+                    }
                 } else {
                     setErrorMessage('Failed to load profile data');
+                    console.error('Profile data fetch failed:', response.statusText);
                 }
             } catch (error) {
                 console.error("Error fetching profile data:", error);
@@ -61,7 +79,6 @@ const EditProfile = () => {
         };
         fetchProfileData();
     }, [currentUser]);
-
     const handleSave = async (event) => {
         event.preventDefault();
         try {
@@ -76,6 +93,7 @@ const EditProfile = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Bio updated successfully!');
+                navigate(`/${currentUser}`);
             } else {
                 console.error('Failed to update bio.');
             }
@@ -83,11 +101,37 @@ const EditProfile = () => {
             console.error('Error saving bio:', error);
             console.log('An error occurred while saving your bio.');
         }
+        if (file) {
+            const formData = new FormData();
+            formData.append("profile_picture", file);
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}/upload-picture`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProfilePicture(
+                        data.profile_pic
+                            ? `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`
+                            : 'https://via.placeholder.com/150'
+                    );
+                    console.log('Profile picture updated successfully!');
+                } else {
+                    console.error('Failed to upload profile picture.');
+                }
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+            }
+        }
     };
 
     return (
         <div>
-            <Navbar/>
+            <Navbar />
             <div className="edit-settings-container">
                 <div className="edit-profile-main">
                     <h1 className="edit-settings-title">Edit Profile</h1>
@@ -115,7 +159,7 @@ const EditProfile = () => {
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                                style={{display: "none"}}
+                                style={{ display: "none" }}
                                 id="upload-photo"
                             />
                         </div>
@@ -145,8 +189,6 @@ const EditProfile = () => {
             </div>
         </div>
     );
-
-
 };
 
 export default EditProfile;

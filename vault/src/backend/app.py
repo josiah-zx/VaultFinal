@@ -7,7 +7,6 @@ from flask_cors import cross_origin
 import logging
 import os
 
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -80,6 +79,8 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    user = db.relationship('User')
+
 # Define the Follower model
 class Follower(db.Model):
     __tablename__ = 'followers'
@@ -108,23 +109,52 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     comment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # relationships for querying
     user = db.relationship('User', backref='comments', lazy=True)
     capsule = db.relationship('Capsule', backref='comments', lazy=True)
+    post = db.relationship('Post', backref='comments', lazy=True)
+
+
+class Bookmark(db.Model):
+    __tablename__ = 'bookmarks'
+    bookmark_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    capsule = db.relationship('Capsule', backref='bookmarks', lazy=True)
+    post = db.relationship('Post', backref='bookmarks', lazy=True)
+
+
+# Define Like model for posts and capsules.
+class Like(db.Model):
+    __tablename__ = 'likes'
+    like_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    capsule_id = db.Column(db.Integer, db.ForeignKey('capsules.capsule_id'), nullable=True)  # Nullable for posts
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id'), nullable=True)  # Nullable for capsules
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships for querying
+    user = db.relationship('User', backref='likes', lazy=True)
+    capsule = db.relationship('Capsule', backref='likes', lazy=True)
+    post = db.relationship('Post', backref='likes', lazy=True)
 
 
 
 # Initialize the database
 with app.app_context():
+    db.create_all()
     all_capsules = Capsule.query.all()
     for capsule in all_capsules:
         print(capsule.open_at)
-    db.create_all()
-
+        
 # Returns all the users in the users table
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -143,6 +173,90 @@ def get_users():
         } for user in users
     ]
     return jsonify(users_list)
+
+
+# Toggle bookmark for a capsule or post
+@app.route('/bookmark', methods=['POST'])
+def toggle_bookmark():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    user_id = session['user_id']
+
+    # Check if the bookmark exists
+    bookmark = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
+
+    if bookmark:
+        # If exists, remove it
+        db.session.delete(bookmark)
+        db.session.commit()
+        return jsonify({"message": "Bookmark removed"}), 200
+    else:
+        # Otherwise, create new bookmark
+        new_bookmark = Bookmark(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
+        db.session.add(new_bookmark)
+        db.session.commit()
+        return jsonify({"message": "Bookmark added"}), 201
+
+@app.route('/bookmarked-capsules', methods=['GET'])
+def get_bookmarked_capsules():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    # Query for bookmarked capsules and their related capsule details
+    bookmarks = Bookmark.query.filter_by(user_id=user_id).all()
+    bookmarked_capsules = [
+        {
+            "capsule_id": bookmark.capsule_id,
+            "content": bookmark.capsule.content,
+            "image_url": f"http://127.0.0.1:5000{bookmark.capsule.image_url}" if bookmark.capsule.image_url else None,
+            "created_at": bookmark.capsule.created_at,
+            "open_at": bookmark.capsule.open_at
+        }
+        for bookmark in bookmarks if bookmark.capsule
+    ]
+    print(bookmarked_capsules)
+    return jsonify(bookmarked_capsules), 200
+
+@app.route('/bookmarked-items', methods=['GET'])
+def get_bookmarked_items():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    # Query for bookmarked capsules and their related capsule details
+    bookmarks = Bookmark.query.filter_by(user_id=user_id).all()
+
+    bookmarked_items = []
+    for bookmark in bookmarks:
+        if bookmark.capsule:
+            bookmarked_items.append({
+                "capsule_id": bookmark.capsule_id,
+                "content": bookmark.capsule.content,
+                "image_url": f"http://127.0.0.1:5000{bookmark.capsule.image_url}" if bookmark.capsule.image_url else None,
+                "created_at": bookmark.capsule.created_at,
+                "open_at": bookmark.capsule.open_at
+            })
+        elif bookmark.post:
+            bookmarked_items.append({
+                "post_id": bookmark.post_id,
+                "content": bookmark.post.content,
+                "image_url": f"http://127.0.0.1:5000{bookmark.post.image_url}" if bookmark.post.image_url else None,
+                "created_at": bookmark.post.created_at,
+                # "open_at": bookmark.post.open_at
+            })
+
+    return jsonify(bookmarked_items), 200
 
 
 # Login handling
@@ -223,13 +337,12 @@ def get_session_user():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
         if user:
-            logger.info(f"Session user: {user.user_id}")
             return jsonify({
                 "user_id": user.user_id,
                 "username": user.username,
-                "email": user.email  
+                "email": user.email,
+                "profile_pic": f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else None
             }), 200
-    logger.warning("User not logged in")
     return jsonify({"error": "User not logged in"}), 401
 
 
@@ -257,43 +370,37 @@ def get_capsules(username):
 
 @app.route('/create-capsule', methods=['POST'])
 def create_capsule():
-    # Handle POST request to create a new capsule
     if 'user_id' not in session:
-        logger.warning("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
-    
-    # Retrieve the user ID from the session
+
     user_id = session['user_id']
-    logger.info(f"Creating capsule for user_id: {user_id}")
-    
-    # Retrieve form data
     data = request.form
     content = data.get("content")
     open_at_str = data.get("open_at")
 
-    # Parse the open_at date
     try:
         open_at = datetime.strptime(open_at_str, "%Y-%m-%dT%H:%M") if open_at_str else None
     except ValueError:
-        logger.error("Invalid date format for open_at: %s", open_at_str)
         return jsonify({"message": "Invalid date format"}), 400
 
-    # Handle file upload
     file = request.files.get("image_url")
     image_url = None
     if file:
         filename = file.filename
         image_url = f"/uploads/{filename}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        logger.info("Image file saved as %s", image_url)
-    
-    # Create new capsule with session-based user_id
+
     new_capsule = Capsule(user_id=user_id, content=content, open_at=open_at, image_url=image_url)
     db.session.add(new_capsule)
     db.session.commit()
 
-    return jsonify({"message": "Capsule created!", "capsule_id": new_capsule.capsule_id, "image_url": new_capsule.image_url}), 201
+    app.logger.info(f"Capsule created with ID: {new_capsule.capsule_id}")  # Debug log
 
+    return jsonify({
+        "message": "Capsule created!",
+        "capsule_id": new_capsule.capsule_id,
+        "image_url": new_capsule.image_url
+    }), 201
 
 @app.route('/user-capsules', methods=['GET']) 
 def get_user_capsules():
@@ -342,12 +449,10 @@ def get_posts(username):
 def create_post():
     # Handle POST request to create a new post
     if 'user_id' not in session:
-        logger.warning("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
     
     # Retrieve the user ID from the session
     user_id = session['user_id']
-    logger.info(f"Creating post for user_id: {user_id}")
     
     # Retrieve form data
     data = request.form
@@ -361,7 +466,6 @@ def create_post():
         filename = file.filename
         image_url = f"/uploads/{filename}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        logger.info("Image file saved as %s", image_url)
     
     # Create new capsule with session-based user_id
     new_post = Post(capsule_id=capsule_id, user_id=user_id, content=content, image_url=image_url)
@@ -398,6 +502,7 @@ def get_user(username):
         'follower_count': follower_count,
         'following_count': following_count,
         'bio': user.bio,
+        'profile_pic': user.profile_pic,
         'is_following': is_following
     })
 
@@ -445,12 +550,14 @@ def update_settings():
 
 from flask import send_from_directory
 
+from mimetypes import guess_type
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
-        # Dynamically set the mimetype based on the file extension
-        return send_file(file_path, mimetype='image/jpeg')  
+        mime_type, _ = guess_type(file_path)
+        return send_file(file_path, mimetype=mime_type)
     else:
         return jsonify({"error": "File not found"}), 404
 
@@ -462,9 +569,44 @@ def search():
     # Search users by username using a LIKE query
     users = User.query.filter(User.username.like(f"%{query}%")).limit(7).all()
 
-    results = [{'username': user.username} for user in users]
+    results = [
+        {
+            'user_id': user.user_id,
+            'username': user.username,
+            'profile_pic': f"http://127.0.0.1:5000{user.profile_pic}" if user.profile_pic else None
+        }
+        for user in users
+    ]
 
     return jsonify(results)
+
+
+@app.route('/users/<int:user_id>/upload-picture', methods=['POST'])
+def upload_profile_picture(user_id):
+    # Check if the user exists
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Check if a file is in the request
+    if 'profile_picture' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files['profile_picture']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Save the file
+    filename = f"user_{user_id}_{file.filename}"
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(file_path)
+
+    # Update user's profile picture path in the database
+    user.profile_pic = f"/uploads/{filename}"
+    db.session.commit()
+
+    return jsonify({"profile_pic": user.profile_pic, "message": "Profile picture updated successfully!"}), 200
+
 
 # Route for resetting password
 @app.route('/reset-password', methods=['POST'])
@@ -541,17 +683,23 @@ def get_conversations(username):
             ).order_by(Message.timestamp.desc()).first()
 
             conversations.append({
+                "user_id": convo_user.user_id,
                 "username": convo_user.username,
+                "profile_pic": f"http://127.0.0.1:5000{convo_user.profile_pic}" if convo_user.profile_pic else None,
                 "last_message": last_message.content if last_message else "",
                 "timestamp": last_message.timestamp if last_message else ""
             })
+
+    conversations.sort(key=lambda convo: convo["timestamp"], reverse=True)
 
     return jsonify(conversations)
 
 
 # Route to get a conversation (list of all msgs ) between user1 and user2 by ID
-@app.route('/messages/<int:user1_id>/<int:user2_id>', methods=['GET'])
-def get_messages(user1_id, user2_id):
+@app.route('/messages/<int:user2_id>', methods=['GET'])
+def get_messages(user2_id):
+    user1_id = session.get('user_id')
+
     messages = Message.query.filter(
         ((Message.sender_id == user1_id) & (Message.receiver_id == user2_id)) |
         ((Message.sender_id == user2_id) & (Message.receiver_id == user1_id))
@@ -575,25 +723,48 @@ def get_messages(user1_id, user2_id):
 @app.route('/available-capsules', methods=['GET'])
 def get_available_capsules():
     current_time = datetime.utcnow()
-    # Fetch capsules along with the associated usernames
-    available_capsules = db.session.query(Capsule, User.username).join(User, Capsule.user_id == User.user_id).all()
+    # Fetch capsules along with associated usernames and profile pictures
+    available_capsules = db.session.query(
+        Capsule, User.username, User.profile_pic
+    ).join(User, Capsule.user_id == User.user_id).all()
 
     capsules_list = [
         {
             "capsule_id": capsule.capsule_id,
             "user_id": capsule.user_id,
-            "username": username,  
+            "username": username,
             "content": capsule.content,
+            "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else None,
             "image_url": f"http://127.0.0.1:5000{capsule.image_url}" if capsule.image_url else None,
             "created_at": capsule.created_at,
             "updated_at": capsule.updated_at,
             "open_at": capsule.open_at,
             "is_open": capsule.open_at <= current_time
         }
-        for capsule, username in available_capsules
+        for capsule, username, profile_pic in available_capsules
     ]
+
+    capsules_list.sort(key=lambda cap: cap["created_at"], reverse=True)
+
     return jsonify(capsules_list)
 
+@app.route('/capsules/<int:capsule_id>/posts', methods=['GET'])
+def get_capsule_posts(capsule_id):
+    posts = Post.query.filter_by(capsule_id=capsule_id).all()
+    if not posts:
+        return jsonify([])
+    
+    posts_data = [{
+        'post_id': post.post_id,
+        'user_id': post.user_id,
+        'username': post.user.username,
+        'content': post.content,
+        'profile_pic': f"http://127.0.0.1:5000{post.user.profile_pic}" if post.user.profile_pic else None,
+        'image_url': f"http://127.0.0.1:5000{post.image_url}" if post.image_url else None,
+        'created_at': post.created_at
+    } for post in posts]
+
+    return jsonify(posts_data)
 
 # Route to mark messages as read
 @app.route('/read-message/<int:message_id>', methods=['POST'])
@@ -641,18 +812,81 @@ def delete_all():
         return jsonify({"error": "Unauthorized access"}), 403
 
     try:
-        # Delete database entries
-        num_deleted_capsules = Capsule.query.delete()
-        num_deleted_posts = Post.query.delete()
+        user_id = session['user_id']
+
+        # Fetch all capsules created by the current user
+        user_capsules = Capsule.query.filter_by(user_id=user_id).all()
+
+        # Delete related comments, posts, and other associated data
+        for capsule in user_capsules:
+            Comment.query.filter_by(capsule_id=capsule.capsule_id).delete()
+            Post.query.filter_by(capsule_id=capsule.capsule_id).delete()
+
+        # Delete capsules themselves
+        num_deleted_capsules = Capsule.query.filter_by(user_id=user_id).delete()
+
+        # Commit the deletions
         db.session.commit()
 
         return jsonify({
-            "message": f"Deleted {num_deleted_capsules} capsules successfully. "
-                       f"Deleted {num_deleted_posts} posts successfully."
+            "message": f"Deleted {num_deleted_capsules} capsules and all related data successfully."
         }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to delete capsules and posts", "details": str(e)}), 500
+        return jsonify({"error": "Failed to delete capsules and related data", "details": str(e)}), 500
+
+# Route to delete a capsule or post
+@app.route('/delete-post', methods=['POST'])
+def delete_post():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 403
+    
+    capsule_id = request.json.get('capsule_id')
+    post_id = request.json.get('post_id')
+
+    try:
+        if capsule_id:
+            capsule_posts = Post.query.filter_by(capsule_id=capsule_id).all()
+            for post in capsule_posts:
+                post_comments = Comment.query.filter_by(post_id=post.post_id).all()
+                for pcomment in post_comments:
+                    db.session.delete(pcomment)
+                post_likes = Like.query.filter_by(post_id=post.post_id).all()
+                for plike in post_likes:
+                    db.session.delete(plike)
+                post_bmarks = Bookmark.query.filter_by(post_id=post.post_id).all()
+                for pbmark in post_bmarks:
+                    db.session.delete(pbmark)
+                db.session.delete(post)
+            capsule_comments = Comment.query.filter_by(capsule_id=capsule_id).all()
+            for ccomment in capsule_comments:
+                db.session.delete(ccomment)
+            capsule_likes = Like.query.filter_by(capsule_id=capsule_id).all()
+            for clike in capsule_likes:
+                db.session.delete(clike)
+            capsule_bmarks = Bookmark.query.filter_by(capsule_id=capsule_id).all()
+            for cbmarks in capsule_bmarks:
+                db.session.delete(cbmarks)
+            Capsule.query.filter_by(capsule_id=capsule_id).delete()
+
+        if post_id:
+            post_comments = Comment.query.filter_by(post_id=post_id).all()
+            for pcomment in post_comments:
+                db.session.delete(pcomment)
+            post_likes = Like.query.filter_by(post_id=post_id).all()
+            for plike in post_likes:
+                db.session.delete(plike)
+            post_bmarks = Bookmark.query.filter_by(post_id=post_id).all()
+            for pbmark in post_bmarks:
+                db.session.delete(pbmark)
+            Post.query.filter_by(post_id=post_id).delete()
+
+        db.session.commit()
+        return jsonify({"message": "Deleted successfully."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete capsule/posts", "details": str(e)}), 500
 
 
 
@@ -703,66 +937,154 @@ def logout():
     session.pop('user_id', None)
     return jsonify({"message": "Logged out successfully!"}), 200
 
-# Route to add new comment - debug logs as well
+# Add comment for a capsule or post
 @app.route('/comments', methods=['POST'])
 def add_comment():
     if 'user_id' not in session:
-        app.logger.error("User not logged in.")
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.json
-    app.logger.info("Received comment data: %s", data)
-
     capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
     text = data.get('text')
 
-    if not capsule_id or not text:
-        app.logger.error("Invalid data: capsule_id=%s, text=%s", capsule_id, text)
+    if not text or (not capsule_id and not post_id):
         return jsonify({"error": "Invalid data"}), 400
 
     try:
         new_comment = Comment(
             user_id=session['user_id'],
             capsule_id=capsule_id,
+            post_id=post_id,
             text=text,
             created_at=datetime.utcnow()
         )
         db.session.add(new_comment)
         db.session.commit()
-        app.logger.info("Comment added: %s", new_comment)
         return jsonify({
             "comment_id": new_comment.comment_id,
             "capsule_id": new_comment.capsule_id,
+            "post_id": new_comment.post_id,
             "user_id": new_comment.user_id,
             "username": session['username'],
             "text": new_comment.text,
             "created_at": new_comment.created_at
         }), 201
     except Exception as e:
-        app.logger.error("Error adding comment: %s", e)
         return jsonify({"error": "Failed to add comment"}), 500
 
-# Route to get all comments on a capsule
+# Get comments for a capsule or post
 @app.route('/comments', methods=['GET'])
 def get_comments():
     capsule_id = request.args.get('capsule_id')
-    if not capsule_id:
-        return jsonify({"error": "Capsule ID is required"}), 400
+    post_id = request.args.get('post_id')
 
-    # Fetch comments for the given capsule ID
-    comments = Comment.query.filter_by(capsule_id=capsule_id).all()
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    # Fetch comments for the specific capsule or post
+    query = db.session.query(Comment, User.username, User.profile_pic).join(User, Comment.user_id == User.user_id)
+    
+    if capsule_id:
+        query = query.filter(Comment.capsule_id == capsule_id)
+    if post_id:
+        query = query.filter(Comment.post_id == post_id)
+
+    comments = query.all()
+
     comments_list = [
         {
             "comment_id": comment.comment_id,
             "capsule_id": comment.capsule_id,
+            "post_id": comment.post_id,
             "user_id": comment.user_id,
+            "username": username,
+            "profile_pic": f"http://127.0.0.1:5000{profile_pic}" if profile_pic else "/default-profile-pic.png",
             "text": comment.text,
-            "timestamp": comment.timestamp,
+            "created_at": comment.created_at
         }
-        for comment in comments
+        for comment, username, profile_pic in comments
     ]
 
     return jsonify(comments_list), 200
+
+
+# Route to toggle likes for capsules or posts
+@app.route('/like', methods=['POST'])
+def toggle_like():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    data = request.json
+    capsule_id = data.get('capsule_id')
+    post_id = data.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    user_id = session['user_id']
+
+    # Check if the like exists
+    like = Like.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first()
+
+    if like:
+        # If prev. liked, remove it (unlike)
+        db.session.delete(like)
+        db.session.commit()
+        return jsonify({"message": "Like removed", "is_liked": False}), 200
+    else:
+        # Otherwise create a new like
+        new_like = Like(user_id=user_id, capsule_id=capsule_id, post_id=post_id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify({"message": "Like added", "is_liked": True}), 201
+
+# Endpoint to get likes count for a capsule or post
+@app.route('/likes', methods=['GET'])
+def get_all_likes():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    likes = Like.query.filter_by(user_id=user_id).all()
+
+    likes_data = [
+        {
+            "capsule_id": like.capsule_id,
+            "post_id": like.post_id,
+            "is_liked": True,  # User's like status
+            "like_count": Like.query.filter_by(capsule_id=like.capsule_id, post_id=like.post_id).count()
+        }
+        for like in likes
+    ]
+
+    return jsonify(likes_data), 200
+
+# Route to get capsule/post data
+@app.route('/post-data', methods=['GET'])
+def get_post_data():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+    capsule_id = request.args.get('capsule_id')
+    post_id = request.args.get('post_id')
+
+    if not capsule_id and not post_id:
+        return jsonify({"error": "Capsule ID or Post ID is required"}), 400
+
+    like_status = Like.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first() is not None
+    like_count = Like.query.filter_by(capsule_id=capsule_id, post_id=post_id).count()
+    comment_count = Comment.query.filter_by(capsule_id=capsule_id, post_id=post_id).count()
+    bookmark_status = Bookmark.query.filter_by(user_id=user_id, capsule_id=capsule_id, post_id=post_id).first() is not None
+
+    return jsonify({
+        'like_status': like_status,
+        'like_count': like_count,
+        'comment_count': comment_count,
+        'bookmark_status': bookmark_status
+    }), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

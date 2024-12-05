@@ -26,6 +26,15 @@
     border-radius: 20px;
 }
 
+.edit-profile-picture img {
+    margin-left: 20px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f0f0f0; /* Optional: fallback background for transparency issues */
+}
+
 .edit-profile-header {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid transparent;
