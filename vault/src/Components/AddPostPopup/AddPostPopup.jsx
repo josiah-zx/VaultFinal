@@ -7,7 +7,7 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
     const [username, setUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [imageUrl, setImageUrl] = useState('');  
+    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -38,28 +38,27 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
             setErrorMessage("Username not available. Please try again.");
             return;
         }
-    
+
         const formData = new FormData();
         formData.append('capsule_id', capsuleId);
         formData.append('content', description);
         if (file) {
             formData.append('image_url', file);
         }
-    
+
         try {
             const response = await fetch('http://127.0.0.1:5000/create-post', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
-                setImageUrl(data.image_url); 
+                setImageUrl(data.image_url);
                 setSuccessMessage("Post saved successfully!");
                 setErrorMessage('');
-                
-               
+
                 onImageUpload(data.image_url);
             } else {
                 setErrorMessage("Failed to save post.");
@@ -74,22 +73,22 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
         <div className="add-post-popup">
             <div className="add-post-popup-content">
                 <button className="add-post-close-btn" onClick={onClose}>X</button>
-                
+
                 <h2>Add To Capsule</h2>
-                
-                {errorMessage && <p className="add-post-error-message">{errorMessage}</p>}
-                {successMessage && <p className="add-post-success-message">{successMessage}</p>}
-                
-                <input 
-                    type="file" 
-                    onChange={handleFileChange} 
+
+                {errorMessage && <p className="error-message">{errorMessage}</p>}
+                {successMessage && <p className="success-message">{successMessage}</p>}
+
+                <input
+                    type="file"
+                    onChange={handleFileChange}
                     accept="image/*"
                 />
-                
-                <textarea 
-                    placeholder="Add a description" 
-                    value={description} 
-                    onChange={(e) => setDescription(e.target.value)} 
+
+                <textarea
+                    placeholder="Add a description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                 />
 
                 <button onClick={handleSubmit}>Post</button>

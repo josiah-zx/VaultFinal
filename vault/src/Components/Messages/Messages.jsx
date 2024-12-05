@@ -329,9 +329,6 @@ const Messages = () => {
                             <button className="send-message-btn" onClick={() => setIsSearchOpen(true)}>
                                 Send message
                             </button>
-                            <button className="delete-capsules-btn" onClick={handleDeleteCapsules}>
-                                Delete All Capsules
-                            </button>
                         </div>
                     )}
                 </div>
