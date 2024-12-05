@@ -223,59 +223,60 @@ const Profile = () => {
 
                 <div className="profile-content">
                     {selectedTab === "capsules" && (
-                        <div className="capsules-tab popup-style">
+                        <div className="capsules-tab">
                             <h3>Capsules Content</h3>
-                            {capsulePosts.length > 0 ? (
-                                <div className="capsule-posts">
-                                    {capsulePosts.map((post) => (
+                            <div className="capsules-tab capsule-content">
+                                {capsulePosts.length > 0 ? (
+                                    capsulePosts.map((post) => (
                                         <div key={post.post_id} className="capsule-post">
                                             <img src={post.image_url} alt="Capsule content" className="capsule-image" />
                                             <p>{post.content}</p>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No capsules available to open yet.</p>
-                            )}
+                                    ))
+                                ) : (
+                                    <p>No capsules available to open yet.</p>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {selectedTab === "posts" && (
-                         <div className="posts-tab post-content">
-                            <h3 className="posts-heading">Posts Content</h3>
-                            {regularPosts.length > 0 ? (
-                                regularPosts.map((post) => (
-                                    <div key={post.post_id} className="post">
-                                        <img src={post.image_url} alt="Post content" className="post-image" />
-                                        <p>{post.content}</p>
-                                    </div>
-                                ))
-                            
-                            ) : (
-                                <p>No posts available.</p>
-                            )}
+                        <div className="posts-tab">
+                            <h3>Posts Content</h3>
+                            <div className="posts-tab post-content">
+                                {regularPosts.length > 0 ? (
+                                    regularPosts.map((post) => (
+                                        <div key={post.post_id} className="post">
+                                            <img src={post.image_url} alt="Post content" className="post-image" />
+                                            <p>{post.content}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No posts available.</p>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {selectedTab === "favorites" && (
                         <div className="favorites-tab">
-                            <h3>Bookmarked Capsules</h3>
-                            {bookmarkedPosts.length > 0 ? (
-                                <div className="capsule-posts"> 
-                                    {bookmarkedPosts.map((bookmark) => (
-                                        <div key={bookmark.capsule_id} className="capsule-post"> 
+                            <h3>Bookmarked Content</h3>
+                            <div className="favorites-tab favorites-content">
+                                {bookmarkedPosts.length > 0 ? (
+                                    bookmarkedPosts.map((bookmark) => (
+                                        <div key={bookmark.capsule_id} className="favorite-post"> 
                                             <img
                                                 src={bookmark.image_url} 
-                                                alt="Capsule content"
-                                                className="capsule-image" 
+                                                alt="Favorite content"
+                                                className="favorite-image" 
                                             />
                                             <p>{bookmark.content}</p> 
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No bookmarked capsules available.</p>
-                            )}
+                                    ))
+                                ) : (
+                                    <p>No bookmarked capsules available.</p>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
