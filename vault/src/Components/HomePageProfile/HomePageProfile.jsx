@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './HomePageProfile.css';
 import { FaUserCircle } from 'react-icons/fa';
+import {useNavigate} from "react-router-dom";
 
 
 const HomePageProfile = () => {
     const [username, setUsername] = useState('');
     const [profilePicture, setProfilePicture] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     // Fetch username and profile picture from Flask session
     useEffect(() => {
@@ -52,12 +54,14 @@ const HomePageProfile = () => {
                             src={profilePicture}
                             alt="Profile"
                             className="profile-avatar-image"
+                            onClick={() => navigate(`/${username}`)}
+                            style={{ cursor: 'pointer' }}
                         />
                     ) : (
                         <FaUserCircle className="profile-avatar-placeholder" />
                     )}
                 </div>
-                <div className='profile-username'>
+                <div className='profile-username' onClick={() => navigate(`/${username}`)} style={{ cursor: 'pointer' }}>
                     {username || <span className="error-text">{errorMessage}</span>}
                 </div>
                 <div className="profile-stats">
