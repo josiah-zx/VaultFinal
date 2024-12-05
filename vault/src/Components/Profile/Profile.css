@@ -62,7 +62,7 @@
     object-fit: cover;
 }
 
-.capsule-content {
+.profile-capsule-content {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     gap: 10px; 
@@ -74,7 +74,7 @@
 
 
 /* Individual Capsule Post Styling */
-.capsule-post {
+.profile-capsule-post {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: rgba(0, 0, 0, 0.1);
@@ -87,14 +87,14 @@
 }
 
 /* Capsule Image Styling (Larger) */
-.capsule-image {
+.profile-capsule-image {
     width: 100%;
     height: 100%;
     object-fit: cover; 
 }
 
 /* Regular Post Content Styling (Smaller) */
-.post-content {
+.profile-post-content {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     gap: 10px; 
@@ -104,16 +104,9 @@
     text-align: center;
 }
 
-/* Regular Posts */
-.regular-posts {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 5px;
-}
 
 /* Individual Regular Post Styling */
-.post {
+.profile-post {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: rgba(0, 0, 0, 0.1);
@@ -126,13 +119,13 @@
 }
 
 /* Regular Post Image Styling (Smaller) */
-.post-image {
+.profile-post-image {
     width: 100%;
     height: 100%;
     object-fit: cover; 
 }
 
-.favorites-content {
+.profile-favorites-content {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     gap: 10px; 
@@ -142,7 +135,7 @@
     text-align: center;
 }
 
-.favorite-post {
+.profile-favorite-post {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: rgba(0, 0, 0, 0.1);
@@ -154,7 +147,7 @@
     align-items: center;
 }
 
-.favorite-image {
+.profile-favorite-image {
     width: 100%;
     height: 100%;
     object-fit: cover; 
@@ -317,7 +310,7 @@
 
 
 @media (min-width: 600px) {
-    .capsules-tab {
+    .profile-capsules-tab {
         grid-template-columns: repeat(3, 1fr);
     }
     .posts-tab {
@@ -328,14 +321,19 @@
     }
 }
 
-.capsule-post p {
+.profile-capsule-post p {
     display: none;
 }
 
-.post p {
+.profile-post p {
     display: none; 
 }
 
-.favorite-post p {
+.profile-favorite-post p {
     display: none;
+}
+
+.empty-tab-text {
+    align-items: center;
+    justify-content: center;
 }

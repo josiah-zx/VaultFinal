@@ -445,7 +445,7 @@ const PostFeed = ({ username }) => {
                                                 <img
                                                     src={capsule.profile_pic || '/profile-pic.png'} 
                                                     alt="Profile Picture"
-                                                    className="profile-pic"
+                                                    className="post-profile-pic"
                                                 />
                                                 <span className="username">{capsule.username || errorMessage}</span>
                                                 <span className="open-time">Opens: {formatToEST(capsule.open_at)}</span>

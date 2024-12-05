@@ -20,6 +20,7 @@ const Profile = () => {
     const [capsulePosts, setCapsulePosts] = useState([]);
     const [regularPosts, setRegularPosts] = useState([]);
     const [profilePicture, setProfilePicture] = useState(null);
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
     const navigate = useNavigate();
 
     // Fetch session user
@@ -119,14 +120,12 @@ const Profile = () => {
         fetchUserPosts();
     }, [profileUsername]);
 
-    const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
-
     useEffect(() => {
         const fetchBookmarkedPosts = async () => {
             if (selectedTab !== 'favorites') return;
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/bookmarked-capsules', {
+                const response = await fetch('http://127.0.0.1:5000/bookmarked-items', {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -225,16 +224,16 @@ const Profile = () => {
                     {selectedTab === "capsules" && (
                         <div className="capsules-tab">
                             <h3>Capsules Content</h3>
-                            <div className="capsules-tab capsule-content">
+                            <div className="capsules-tab profile-capsule-content">
                                 {capsulePosts.length > 0 ? (
                                     capsulePosts.map((post) => (
-                                        <div key={post.post_id} className="capsule-post">
-                                            <img src={post.image_url} alt="Capsule content" className="capsule-image" />
+                                        <div key={post.post_id} className="profile-capsule-post">
+                                            <img src={post.image_url} alt="Capsule content" className="profile-capsule-image" />
                                             <p>{post.content}</p>
                                         </div>
                                     ))
                                 ) : (
-                                    <p>No capsules available to open yet.</p>
+                                    <p className="empty-tab-text">No capsules available to open yet.</p>
                                 )}
                             </div>
                         </div>
@@ -243,16 +242,16 @@ const Profile = () => {
                     {selectedTab === "posts" && (
                         <div className="posts-tab">
                             <h3>Posts Content</h3>
-                            <div className="posts-tab post-content">
+                            <div className="posts-tab profile-post-content">
                                 {regularPosts.length > 0 ? (
                                     regularPosts.map((post) => (
-                                        <div key={post.post_id} className="post">
-                                            <img src={post.image_url} alt="Post content" className="post-image" />
+                                        <div key={post.post_id} className="profile-post">
+                                            <img src={post.image_url} alt="Post content" className="profile-post-image" />
                                             <p>{post.content}</p>
                                         </div>
                                     ))
                                 ) : (
-                                    <p>No posts available.</p>
+                                    <p className="empty-tab-text">No posts available.</p>
                                 )}
                             </div>
                         </div>
@@ -261,20 +260,20 @@ const Profile = () => {
                     {selectedTab === "favorites" && (
                         <div className="favorites-tab">
                             <h3>Bookmarked Content</h3>
-                            <div className="favorites-tab favorites-content">
+                            <div className="favorites-tab profile-favorites-content">
                                 {bookmarkedPosts.length > 0 ? (
                                     bookmarkedPosts.map((bookmark) => (
-                                        <div key={bookmark.capsule_id} className="favorite-post"> 
+                                        <div key={bookmark.capsule_id} className="profile-favorite-post"> 
                                             <img
                                                 src={bookmark.image_url} 
                                                 alt="Favorite content"
-                                                className="favorite-image" 
+                                                className="profile-favorite-image" 
                                             />
                                             <p>{bookmark.content}</p> 
                                         </div>
                                     ))
                                 ) : (
-                                    <p>No bookmarked capsules available.</p>
+                                    <p className="empty-tab-text">No bookmarked capsules available.</p>
                                 )}
                             </div>
                         </div>

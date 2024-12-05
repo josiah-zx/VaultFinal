@@ -205,7 +205,6 @@ def toggle_bookmark():
         db.session.commit()
         return jsonify({"message": "Bookmark added"}), 201
 
-
 @app.route('/bookmarked-capsules', methods=['GET'])
 def get_bookmarked_capsules():
     if 'user_id' not in session:
@@ -227,6 +226,37 @@ def get_bookmarked_capsules():
     ]
     print(bookmarked_capsules)
     return jsonify(bookmarked_capsules), 200
+
+@app.route('/bookmarked-items', methods=['GET'])
+def get_bookmarked_items():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+
+    # Query for bookmarked capsules and their related capsule details
+    bookmarks = Bookmark.query.filter_by(user_id=user_id).all()
+
+    bookmarked_items = []
+    for bookmark in bookmarks:
+        if bookmark.capsule:
+            bookmarked_items.append({
+                "capsule_id": bookmark.capsule_id,
+                "content": bookmark.capsule.content,
+                "image_url": f"http://127.0.0.1:5000{bookmark.capsule.image_url}" if bookmark.capsule.image_url else None,
+                "created_at": bookmark.capsule.created_at,
+                "open_at": bookmark.capsule.open_at
+            })
+        elif bookmark.post:
+            bookmarked_items.append({
+                "post_id": bookmark.post_id,
+                "content": bookmark.post.content,
+                "image_url": f"http://127.0.0.1:5000{bookmark.post.image_url}" if bookmark.post.image_url else None,
+                "created_at": bookmark.post.created_at,
+                # "open_at": bookmark.post.open_at
+            })
+
+    return jsonify(bookmarked_items), 200
 
 
 # Login handling
