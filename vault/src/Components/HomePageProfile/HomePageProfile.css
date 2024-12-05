@@ -45,8 +45,11 @@
 }
 
 .profile-card .profile-stats {
-    display: flex;
-    justify-content: space-between;
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+    gap: 10px;
+    padding: 20px;
     font-size: 0.9rem;
     color: #ddd; 
 }

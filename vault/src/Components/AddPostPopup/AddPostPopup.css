@@ -1,125 +1,137 @@
-/* AddPostPopup.css */
+
 .add-post-popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     overflow-y: auto;
+    font-family: 'Arial', sans-serif;
 }
 
 .add-post-popup-content {
-    background-color: #f9f9f9;
+    position: relative;
+    background: #22243e;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 30px;
     width: 90%;
     max-width: 500px;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    color: #fff;
     position: relative;
+    overflow: hidden;
 }
 
-.add-post-close-btn {
-    background: transparent;
+.add-post-popup-content:before {
+    content: '';
     position: absolute;
-    top: 20px;
-    left: 220px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(135deg, #6a87d6 20%, #7887e5 40%, #3a4f92 70%, #223370 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.add-post-popup-close-btn {
+    background: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     border: none;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
-    color: #888;
+    color: rgba(255, 255, 255, 0.8);
     padding: 0;
-    line-height: 1;
     outline: none;
-    box-shadow: none;
+    line-height: 1;
     transition: color 0.3s ease;
 }
 
-.add-post-close-btn:focus {
-    outline: none;
-    box-shadow: none;
+.add-post-popup-close-btn:hover {
+    color: #fff;
 }
 
-.add-post-close-btn:hover {
-    color: #333;
-    background: none; /* Ensures no background color appears on hover */
-}
-h2 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #333;
-    text-align: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-
-input[type="file"],
-textarea,
-input[type="datetime-local"],
-button {
+/* Inputs and Textarea */
+.add-post-popup-content textarea,
+.add-post-popup-content input[type="file"],
+.add-post-popup-content button {
     width: 100%;
     padding: 12px;
-    font-size: 1rem;
-    border: 1px solid #ddd;
+    margin-bottom: 15px;
+    font-size: 16px;
     border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     outline: none;
-    transition: border-color 0.3s ease;
     font-family: inherit;
-}
-
-input[type="file"]:hover,
-textarea:focus,
-input[type="datetime-local"]:focus {
-    border-color: #66afe9;
-}
-
-textarea {
-    min-height: 80px;
-    resize: vertical;
-}
-
-button {
-    background-color: #4CAF50;
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-weight: 600;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styling */
+.add-post-popup-content button {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: bold;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 8px;
+    transition: background 0.3s ease;
 }
 
-button:hover {
-    background-color: #45a049;
+.add-post-popup-content button:hover {
+    background: rgba(255, 255, 255, 0.4);
+    color: #000;
 }
 
-.uploaded-image {
+/* Uploaded Image Styling */
+.add-post-popup-uploaded-image {
     margin-top: 15px;
     width: 100%;
     max-width: 100%;
     height: auto;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.error-message {
+/* Success and Error Messages */
+.add-post-popup-error-message {
     color: #d9534f;
-    font-weight: 500;
+    font-weight: bold;
     text-align: center;
+    margin-bottom: 10px;
 }
 
-.success-message {
+.add-post-popup-success-message {
     color: #5cb85c;
-    font-weight: 500;
+    font-weight: bold;
     text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Heading Styling */
+.add-post-popup-content h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
 }
