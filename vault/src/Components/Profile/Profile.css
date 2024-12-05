@@ -62,37 +62,7 @@
     object-fit: cover;
 }
 
-.capsule-content {
-    border: none;
-    padding: 20px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
-    width: 90%;
-    max-width: 600px;
-    text-align: center;
-    overflow-y: auto;
-    max-height: 500px;
-    margin-left: 200px;
-}
-
-
-/* Individual Capsule Post Styling */
-.capsule-post {
-    padding: 20px;
-    border-radius: 10px;
-}
-
-/* Capsule Image Styling (Larger) */
-.capsule-image {
-    max-width: 30%; 
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-/* Regular Post Content Styling (Smaller) */
-.post-content {
+.profile-capsule-content {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     gap: 10px; 
@@ -102,16 +72,41 @@
     text-align: center;
 }
 
-/* Regular Posts */
-.regular-posts {
+
+/* Individual Capsule Post Styling */
+.profile-capsule-post {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 5px;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Capsule Image Styling (Larger) */
+.profile-capsule-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+/* Regular Post Content Styling (Smaller) */
+.profile-post-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; 
+    width: 100%;
+    max-width: 900px; 
+    margin: 20px auto;
+    text-align: center;
+}
+
+
 /* Individual Regular Post Styling */
-.post {
+.profile-post {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: rgba(0, 0, 0, 0.1);
@@ -124,7 +119,35 @@
 }
 
 /* Regular Post Image Styling (Smaller) */
-.post-image {
+.profile-post-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+.profile-favorites-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; 
+    width: 100%;
+    max-width: 900px; 
+    margin: 20px auto;
+    text-align: center;
+}
+
+.profile-favorite-post {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-favorite-image {
     width: 100%;
     height: 100%;
     object-fit: cover; 
@@ -162,7 +185,7 @@
 }
 
 .profile-tab-navbar {
-    margin-top: -40px;
+    margin-top: -60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -219,7 +242,7 @@
     border: none !important;
     flex-grow: 1;
     max-height: calc(100vh - 250px);
-    margin-top: 30px;
+    margin-top: 15px;
     padding: 20px;
     border-radius: 20px;
     width: 70%;
@@ -229,7 +252,7 @@
 
 .profile-content h3 {
     font-size: 24px;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
     color: #f1f1f1;
 }
 
@@ -273,7 +296,6 @@
     grid-column: 1 / -1; 
     font-size: 24px;
     color: white;
-    margin-top: 20px; 
 }
 
 .post:hover .overlay {
@@ -288,11 +310,30 @@
 
 
 @media (min-width: 600px) {
+    .profile-capsules-tab {
+        grid-template-columns: repeat(3, 1fr);
+    }
     .posts-tab {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .favorites-tab {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-.post p {
+.profile-capsule-post p {
+    display: none;
+}
+
+.profile-post p {
     display: none; 
+}
+
+.profile-favorite-post p {
+    display: none;
+}
+
+.empty-tab-text {
+    align-items: center;
+    justify-content: center;
 }
