@@ -467,7 +467,7 @@ const PostFeed = ({ username }) => {
                                                     <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
                                                 <div className="capsule-stats">
                                                     <span>{capsuleStatus.likes} likes</span>
-                                                    <span>0 contributors</span>
+                                                    <span>{capsule.post_count} posts</span>
                                                 </div>
                                                 <div className="capsule-actions">
                                                     <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>

@@ -157,6 +157,11 @@
     left: -40px;
 }
 
+.back-button:hover {
+    cursor: pointer;
+    background-color: transparent;
+}
+
 .back-button-chat {
     background-color: transparent;
     width: 20px;

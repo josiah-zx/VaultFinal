@@ -728,8 +728,10 @@ def get_available_capsules():
         Capsule, User.username, User.profile_pic
     ).join(User, Capsule.user_id == User.user_id).all()
 
-    capsules_list = [
-        {
+    capsules_list = []
+    for capsule, username, profile_pic in available_capsules:
+        post_count = Post.query.filter_by(capsule_id=capsule.capsule_id).count()
+        capsules_list.append({
             "capsule_id": capsule.capsule_id,
             "user_id": capsule.user_id,
             "username": username,
@@ -739,10 +741,9 @@ def get_available_capsules():
             "created_at": capsule.created_at,
             "updated_at": capsule.updated_at,
             "open_at": capsule.open_at,
-            "is_open": capsule.open_at <= current_time
-        }
-        for capsule, username, profile_pic in available_capsules
-    ]
+            "is_open": capsule.open_at <= current_time,
+            "post_count": post_count
+        })
 
     capsules_list.sort(key=lambda cap: cap["created_at"], reverse=True)
 
