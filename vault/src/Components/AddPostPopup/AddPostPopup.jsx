@@ -44,6 +44,9 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
         formData.append('content', description);
         if (file) {
             formData.append('image_url', file);
+        } else {
+            setErrorMessage("File required for post.")
+            return;
         }
 
         try {
@@ -58,8 +61,10 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
                 setImageUrl(data.image_url);
                 setSuccessMessage("Post saved successfully!");
                 setErrorMessage('');
-
-                onImageUpload(data.image_url);
+                setTimeout(() => {
+                    onClose();
+                    onImageUpload(data.image_url);
+                }, 1500);
             } else {
                 setErrorMessage("Failed to save post.");
             }
@@ -70,31 +75,32 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
     };
 
     return (
-        <div className="add-post-popup">
-            <div className="add-post-popup-content">
-                <button className="add-post-close-btn" onClick={onClose}>X</button>
+        <div className="add-post-modal-overlay" onClick={onClose}>
+            <div className="add-post-popup" onClick={(e) => e.stopPropagation()}>
+                <div className="add-post-popup-content">
+                    <div className="add-post-header">
+                        <h2>Add To Capsule</h2>
+                        <button className="add-post-close-btn" onClick={onClose}>X</button>
+                        {errorMessage && <p className="add-post-popup-error-message">{errorMessage}</p>}
+                        {successMessage && <p className="add-post-popup-success-message">{successMessage}</p>}
+                    </div>
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept="image/*"
+                    />
 
-                <h2>Add To Capsule</h2>
+                    <textarea
+                        placeholder="Add a description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
 
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-                {successMessage && <p className="success-message">{successMessage}</p>}
+                    <button className="add-post-popup-content-btn" onClick={handleSubmit}>Post</button>
 
-                <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                />
-
-                <textarea
-                    placeholder="Add a description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-
-                <button onClick={handleSubmit}>Post</button>
-
-                {/* Display uploaded image */}
-                {imageUrl && <img src={imageUrl} alt="Uploaded Post" className="uploaded-image" />}
+                    {/* Display uploaded image */}
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Post" className="uploaded-image" />}
+                </div>
             </div>
         </div>
     );

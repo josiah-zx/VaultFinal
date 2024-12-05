@@ -263,11 +263,13 @@ const PostFeed = ({ username }) => {
     const handleOpenAddPostPopup = (capsuleId) => {
         setShowAddPostPopup(true);
         setCurrentCapsule(capsuleId);
+        document.body.style.overflow = "hidden";
     };
 
     const handleCloseAddPostPopup = () => {
         setShowAddPostPopup(false);
         setCurrentCapsule('');
+        document.body.style.overflow = "auto";
     };
 
     const handleImageUpload = (imageUrl) => {
@@ -467,7 +469,7 @@ const PostFeed = ({ username }) => {
                                                     <strong>{capsule.username || errorMessage}</strong> {capsule.content}</p>
                                                 <div className="capsule-stats">
                                                     <span>{capsuleStatus.likes} likes</span>
-                                                    <span>0 contributors</span>
+                                                    <span>{capsule.post_count} posts</span>
                                                 </div>
                                                 <div className="capsule-actions">
                                                     <span className="like-icon" onClick={() => handleLike(capsule.capsule_id)}>
@@ -510,20 +512,22 @@ const PostFeed = ({ username }) => {
                             onClose={handleCloseCommentPopup}
                         />
                     )}
-                    {showAddPostPopup && (
-                        <AddPostPopup 
-                            capsuleId={currentCapsule} 
-                            onClose={handleCloseAddPostPopup} 
-                            onImageUpload={handleImageUpload}
-                        />
-                    )}
                 </div>
 
                 {showTimeCapsulePopup && (
                     <TimeCapsule onClose={handleCloseTimeCapsulePopup} onImageUpload={handleImageUpload}/>
                 )}
             </div>
-            <div className="modal">
+            <div className="add-post-modal">
+                {showAddPostPopup && (
+                    <AddPostPopup 
+                        capsuleId={currentCapsule} 
+                        onClose={handleCloseAddPostPopup} 
+                        onImageUpload={handleImageUpload}
+                    />
+                )}
+            </div>
+            <div className="post-modal">
                 {isPostModalOpen && (
                     <PostModal
                         closeModal={handleClosePostModal}
