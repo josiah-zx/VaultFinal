@@ -637,6 +637,7 @@ def reset_password():
     return jsonify({"status": "success", "message": "Password reset successful!"}), 200
 
 # Route to send a message
+# Route to send a message
 @app.route('/send-message', methods=['POST'])
 def send_message():
     data = request.json
@@ -644,19 +645,26 @@ def send_message():
     content = data['content']
     attachment_url = data.get('attachment_url')
 
+    # Get sender_id from the session (this is already authenticated)
     sender_id = session.get('user_id')
-    receiver_user = User.query.filter_by(username=receiver_username).first()
+    if not sender_id:
+        return jsonify({"status": "failure", "message": "User not logged in."}), 401
 
+    # Find receiver user by username
+    receiver_user = User.query.filter_by(username=receiver_username).first()
     if not receiver_user:
         return jsonify({"status": "failure", "message": "Receiver not found"}), 404
 
     receiver_id = receiver_user.user_id
+
+    # Create and save the message
     message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, attachment_url=attachment_url)
     
     db.session.add(message)
     db.session.commit()
 
     return jsonify({"status": "success", "message": "Message sent!"}), 201
+
 
 # Endpoint to retrieve list of conversations for the logged-in user
 @app.route('/conversations/<username>', methods=['GET'])
