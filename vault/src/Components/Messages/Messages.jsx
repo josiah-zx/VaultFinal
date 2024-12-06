@@ -121,6 +121,7 @@ const Messages = () => {
     const sendMessage = async (e) => {
         e.preventDefault();
         if (message.trim() === "") return;
+
         try {
             const response = await fetch('http://127.0.0.1:5000/send-message', {
                 method: 'POST',
@@ -128,23 +129,25 @@ const Messages = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    receiver_username: selectedUsername,
+                    receiver_username: selectedUsername,  // Receiver username passed
                     content: message
                 }),
                 credentials: 'include'
             });
 
             if (response.ok) {
-                setMessages([...messages, { sender_id: username, receiver_id: selectedUsername, content: message }]);
-                setMessage("");
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { sender_id: username, receiver_id: selectedUsername, content: message }
+                ]);
+                setMessage("");  // Clear message input
             } else {
                 console.log("An error occurred");
             }
         } catch (error) {
-            console.error('Error during login:', error);
+            console.error('Error during message sending:', error);
         }
     };
-
     const handleDeleteCapsules = async () => {
         try {
             const response = await fetch('http://127.0.0.1:5000/delete-all', {
@@ -284,28 +287,35 @@ const Messages = () => {
                             }}>
                                 <IoArrowUndo />
                             </button>
-                            <div className="other-user-header">
-                                {conversations.find((conv) => conv.username === selectedUsername)?.profile_pic ? (
-                                    <img
-                                        src={conversations.find((conv) => conv.username === selectedUsername).profile_pic}
-                                        alt="Profile"
-                                        className="other-user-icon"
-                                        onError={(e) => { e.target.style.display = "none"; e.target.parentNode.appendChild(document.createElement('span')).classList.add('other-user-icon-placeholder'); }}
-                                        onClick={() => navigate(`/${selectedUsername}`)}
-                                    />
-                                ) : (
-                                    <FaUserCircle className="other-user-icon-placeholder" onClick={() => navigate(`/${selectedUsername}`)}/>
-                                )}
-                                <h3 onClick={() => navigate(`/${selectedUsername}`)}>{selectedUsername}</h3>
-                            </div>
-                            <div className="chat-content">
-                                {messages.map((msg, index) => (
-                                    <div key={index} className="message-item">
-                                        <strong>{msg.sender_id === username ? "You" : selectedUsername}:</strong>
-                                        <span>{msg.content}</span>
-                                    </div>
-                                ))}
-                            </div>
+                                <div className="other-user-header">
+                                    {conversations.find((conv) => conv.username === selectedUsername)?.profile_pic ? (
+                                        <img
+                                            src={conversations.find((conv) => conv.username === selectedUsername).profile_pic}
+                                            alt="Profile"
+                                            className="other-user-icon"
+                                            onError={(e) => {
+                                                e.target.style.display = "none";
+                                                e.target.parentNode.appendChild(document.createElement('span')).classList.add('other-user-icon-placeholder');
+                                            }}
+                                            onClick={() => navigate(`/${selectedUsername}`)}
+                                        />
+                                    ) : (
+                                        <FaUserCircle className="other-user-icon-placeholder" onClick={() => navigate(`/${selectedUsername}`)} />
+                                    )}
+                                    <h3 className={conversations.find((conv) => conv.username === selectedUsername)?.profile_pic ? "user-name-with-pic" : "user-name-placeholder"} onClick={() => navigate(`/${selectedUsername}`)}>
+                                        {selectedUsername}
+                                    </h3>
+                                </div>
+                                <div className="chat-content">
+                                    {messages.map((msg, index) => (
+                                        <div
+                                            key={index}
+                                            className={`message-item ${msg.sender_id === selectedUserId ? "their" : "own"}`}
+                                        >
+                                            <span>{msg.content}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             <form onSubmit={sendMessage}>
                                 <div className="message-bar">
                                     <input

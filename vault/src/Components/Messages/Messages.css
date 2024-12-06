@@ -4,7 +4,6 @@
     font-family: 'Arial', sans-serif;
     min-width: 60vw;
     min-height: 90vh;
-    overflow: hidden;
     padding: 20px;
     display: flex;
     margin-left: 15vw;
@@ -32,6 +31,7 @@
     align-items: center;
     margin-bottom: 30px;
     padding-left: 10px;
+
 }
 
 /* Profile picture styling */
@@ -84,17 +84,30 @@
     color: #999;
 }
 
+.chat-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 70px;
+}
+
+
 /* Main chat area (Messages section) */
 .chat-area {
     flex: 6;
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    justify-content: center;
+    align-items: flex;
     background: linear-gradient(135deg, #0e1026 0%, #181a30 50%, #22243e 100%);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.7);
     border-radius: 0 20px 20px 0;
-    padding: 50px;
+    padding: 20px;
+    overflow: hidden;
+    position: relative;
 }
 
 /* Empty message box styling */
@@ -144,6 +157,8 @@
 }
 
 .back-button {
+    margin-top: 30px;
+    margin-left: 50px;
     background-color: transparent;
     width: 20px;
     height: 20px;
@@ -158,11 +173,14 @@
 }
 
 .back-button:hover {
-    cursor: pointer;
-    background-color: transparent;
+    background-color: rgba(255, 0, 0, 0.8);
+    color: #fff;
 }
 
 .back-button-chat {
+    margin-bottom: 300px;
+    /* Adjust to create space from the top */
+    margin-left: 550px;
     background-color: transparent;
     width: 20px;
     height: 20px;
@@ -172,8 +190,8 @@
     padding: 0;
     font-size: 30px;
     position: absolute;
-    top: -220px;
-    left: 165px;
+    top: 50px;
+    /* Adjust this value to move the chat button down */
 }
 
 .back-button-chat:hover {
@@ -196,6 +214,69 @@
     color: black;
     cursor: pointer;
 }
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 14px;
+    position: relative;
+}
+
+/* Align user messages to the right */
+.message-item.own {
+    align-self: flex-end;
+    /* Align to the right */
+    margin-left: auto;
+    /* Push all other content to the left */
+    background-color: rgba(0, 123, 255, 0.8);
+    /* User message background */
+    color: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    margin-top: 60px;
+    margin-bottom: 30px;
+    max-width: 70%;
+    /* Optional: limit message width */
+}
+
+/* Align received messages to the left edge */
+.message-item.their {
+    margin-left: 10px;
+    align-self: flex-start;
+    /* Align to the left */
+    margin-right: auto;
+    /* Push all other content to the right */
+    background-color: rgba(255, 255, 255, 0.2);
+    /* Received message background */
+    color: #fff;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.message-item.own::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 123, 255, 0.8) transparent;
+}
+
+.message-item.their::after {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent rgba(255, 255, 255, 0.2) transparent transparent;
+}
+
 
 .message-search {
     border: 1px solid #ccc;
@@ -223,23 +304,20 @@
     flex-direction: column;
 }
 
-.message-search-result::-webkit-scrollbar {
-    display: none;
-}
-
 .message-search-result-item {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
     display: flex;
-    text-decoration: none;
-    color: white;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    transition: background-color 0.2s ease-in-out;
     align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s;
 }
 
 .message-search-result-item:hover {
-    background-color: rgb(78, 78, 78);
-    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .user-message {
@@ -248,21 +326,35 @@
 }
 
 .other-user-header {
-    position: relative;
     display: flex;
-    align-items: center;
-    margin-top: -410px;
-    margin-left: -190px;
-    width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    /* Use flexbox for alignment */
+    align-items: flex;
+    /* Align items vertically */
+    justify-content: flex-start;
+    /* Align items to the left */
+    position: relative;
+    top: 10px;
+    /* Distance from the top of the chat area */
+    left: 10px;
+    /* Distance from the left of the chat area */
+    z-index: 10;
+    margin-bottom: 100px;
+    background: transparent;
 }
 
 .other-user-header h3 {
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     cursor: pointer;
+    margin-bottom: 100px;
+}
+
+.user-name-placeholder {
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 60px;
+    margin-top: 10px;
 }
 
 .other-user-header h3:hover {
@@ -271,12 +363,18 @@
 
 /* Updated placeholder for other-user-icon */
 .other-user-icon {
+    display: flex;
+    align-items: flex;
+    justify-content: flex-start;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 10px;
     background-color: #333;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    margin-right: 10px;
+    margin-bottom: 100px;
+    /* Space between icon and username */
 }
 
 .other-user-icon:hover {
@@ -284,17 +382,39 @@
 }
 
 /* Placeholder using FaUserCircle for other-user-icon */
+/* Placeholder for other-user-icon with name or initials inside */
 .other-user-icon-placeholder {
-    font-size: 45px;
-    color: #fff;
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    top: 10px;
+    left: 10px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     background-color: #333;
+    display: flex;
+    align-items: center;
+    /* Vertically align the text */
+    justify-content: center;
+    /* Horizontally align the text */
+    color: #fff;
+    font-size: 22px;
+    /* Adjust font-size to fit the name or initials */
+    font-weight: bold;
+    /* Bold for better visibility */
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    z-index: 10;
+    margin-right: 10px;
+    margin-bottom: 100px;
+    /* Ensure alignment with the user icon */
+    text-transform: uppercase;
+    /* Optional: transform name to uppercase */
+}
+
+/* The name or initial (e.g., a letter) can be added dynamically here */
+.other-user-icon-placeholder span {
+    display: block;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .other-user-icon-placeholder:hover {
@@ -302,20 +422,20 @@
 }
 
 .message-bar {
-    background-color: transparent;
-    width: calc(100% + 370px);
-    margin-left: -195px;
-    margin-top: 185px;
-    border-radius: 10px;
-    min-height: 2.5rem;
-    height: auto;
-    max-height: 7.5rem;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     position: absolute;
-    box-shadow: 0 0 0 0.5px rgb(109, 109, 109);
+    bottom: 10px;
+    left: 20px;
+    right: 20px;
+    margin-left: -20px;
+    margin-top: 185px;
+    min-height: 2.5rem;
+    background-color: rgba(30, 30, 50, 0.9);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px 20px;
+    display: flex;
+    align-self: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     overflow-wrap: break-word;
     white-space: normal;
 }
@@ -341,7 +461,6 @@
     padding-right: 30px;
     font-size: 12px;
 }
-
 .conversation-item {
     display: flex;
     align-items: center;
@@ -353,7 +472,6 @@
     text-align: left;
     transition: background-color 0.2s ease-in-out;
 }
-
 .conversation-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
@@ -369,7 +487,6 @@
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
-    background-color: #333;
 }
 
 /* Placeholder using FaUserCircle for conversation-icon */
@@ -436,6 +553,7 @@
     border-radius: 50%;
     margin-right: 10px;
 }
+
 .other-user-icon-placeholder {
     font-size: 40px;
     color: #fff;
