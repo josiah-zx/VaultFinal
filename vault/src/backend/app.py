@@ -1051,21 +1051,26 @@ def toggle_like():
 # Endpoint to get likes count for a capsule or post
 @app.route('/likes', methods=['GET'])
 def get_all_likes():
+    # Get current user
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
 
     user_id = session['user_id']
 
-    likes = Like.query.filter_by(user_id=user_id).all()
+    # Query all capsules and posts with their like counts
+    all_likes = db.session.query(
+        Capsule.capsule_id,
+        db.func.count(Like.like_id).label('like_count'),
+        db.func.sum(db.case((Like.user_id == user_id, 1), else_=0)).label('is_liked')
+    ).outerjoin(Like, Capsule.capsule_id == Like.capsule_id).group_by(Capsule.capsule_id).all()
 
     likes_data = [
         {
             "capsule_id": like.capsule_id,
-            "post_id": like.post_id,
-            "is_liked": True,  # User's like status
-            "like_count": Like.query.filter_by(capsule_id=like.capsule_id, post_id=like.post_id).count()
+            "like_count": like.like_count,
+            "is_liked": like.is_liked > 0
         }
-        for like in likes
+        for like in all_likes
     ]
 
     return jsonify(likes_data), 200
