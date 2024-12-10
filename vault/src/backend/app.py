@@ -23,7 +23,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'va
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
+# Set the allowed origins, localhost for development
+allowed_origins = [
+    "https://vault.robo-zx.dev",  # my domain
+    "https://vaultfinal.pages.dev",  # Cloudflare Pages fallback
+    "http://localhost:3000"  # React development server
+]
+
+# Configure CORS w these
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": allowed_origins}})
 bcrypt = Bcrypt(app)
 
 

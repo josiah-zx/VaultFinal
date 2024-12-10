@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="Updated requirements including gunicorn">
+    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="LoginForm remote backend test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vault/src/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/backend/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +105,7 @@
       <workItem from="1727219318672" duration="18000" />
       <workItem from="1727219353128" duration="85000" />
       <workItem from="1733802355920" duration="266000" />
-      <workItem from="1733802633305" duration="2184000" />
+      <workItem from="1733802633305" duration="3362000" />
     </task>
     <task id="LOCAL-00001" summary="Setup initial React app">
       <option name="closed" value="true" />
@@ -139,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733803003798</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="LoginForm remote backend test">
+      <option name="closed" value="true" />
+      <created>1733804911831</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1733804911832</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,7 +167,8 @@
     <MESSAGE value="Setup initial React app" />
     <MESSAGE value="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far." />
     <MESSAGE value="Updated requirements including gunicorn" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated requirements including gunicorn" />
+    <MESSAGE value="LoginForm remote backend test" />
+    <option name="LAST_COMMIT_MESSAGE" value="LoginForm remote backend test" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Vault$Vault.coverage" NAME="app Coverage Results" MODIFIED="1733176129135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\josiah\PycharmProjects\Vault" />
