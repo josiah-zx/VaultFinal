@@ -10,6 +10,9 @@ import os
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+# Backend URL from environment variable
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:5000')
+
 # Allows cross-site usage
 # Do not remove at all costs 
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  

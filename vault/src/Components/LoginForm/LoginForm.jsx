@@ -5,6 +5,9 @@ import { FaLock } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
+    // Backend URL from environment variable
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
     // State to store the username and password
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,35 +17,35 @@ const LoginForm = () => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
-                    credentials: 'include'
+                const response = await fetch(`${BACKEND_URL}/session-user`, {
+                    credentials: 'include',
                 });
                 if (response.ok) {
-                    navigate('/home')
+                    navigate('/home');
                 }
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
             }
         };
         fetchSessionUser();
-    }, [navigate]);
+    }, [navigate, BACKEND_URL]);
 
     // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevents page reload or default form submission
         try {
             // Send a POST request to backend
-            const response = await fetch('http://127.0.0.1:5000/login', {
+            const response = await fetch(`${BACKEND_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }), 
+                body: JSON.stringify({ username, password }),
                 credentials: 'include',  // Include credentials (session cookies)
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 console.log('Login successful:', data.message);
                 setErrorMessage('');
@@ -55,7 +58,6 @@ const LoginForm = () => {
             setErrorMessage('Something went wrong. Please try again.');
         }
     };
-    
 
     return (
         <div className='login-page'>
