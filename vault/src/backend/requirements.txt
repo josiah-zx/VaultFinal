@@ -2,3 +2,4 @@ flask
 flask-bcrypt
 flask-cors
 flask-sqlalchemy
+gunicorn
