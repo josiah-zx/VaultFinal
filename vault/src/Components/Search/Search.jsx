@@ -17,7 +17,7 @@ export const Search = () => {
 
     useEffect(() => {
         if(search !== '') {
-            fetch(`http://127.0.0.1:5000/search?q=${search}`)
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/search?q=${search}`)
             .then((res) => res.json())
             .then((data) => setSearchData(data));
         } else {

@@ -12,7 +12,7 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -50,7 +50,7 @@ const AddPostPopup = ({ capsuleId, onClose, onImageUpload }) => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/create-post', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/create-post`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'

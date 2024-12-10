@@ -18,7 +18,7 @@ const HomePageProfile = () => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include', // Include session cookies
                 });
                 if (response.ok) {
@@ -26,13 +26,13 @@ const HomePageProfile = () => {
                     setUsername(data.username); // Set the username from session data
 
                     // Fetch profile data for additional details (profile picture, etc.)
-                    const profileResponse = await fetch(`http://127.0.0.1:5000/users/${data.username}`, {
+                    const profileResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${data.username}`, {
                         credentials: 'include',
                     });
                     if (profileResponse.ok) {
                         const profileData = await profileResponse.json();
                         setProfilePicture(profileData.profile_pic
-                            ? `http://127.0.0.1:5000${profileData.profile_pic}`
+                            ? `${process.env.REACT_APP_BACKEND_URL}${profileData.profile_pic}`
                             : null
                         );
                         setPostCount(profileData.post_count);

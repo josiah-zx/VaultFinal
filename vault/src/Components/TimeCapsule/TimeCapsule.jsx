@@ -31,7 +31,7 @@ const TimeCapsule = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/create-capsule', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/create-capsule`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',

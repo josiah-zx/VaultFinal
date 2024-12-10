@@ -31,7 +31,7 @@ const EditProfile = () => {
         // Fetch session user
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -54,7 +54,7 @@ const EditProfile = () => {
         const fetchProfileData = async () => {
             if (!currentUser) return;
             try {
-                const response = await fetch(`http://127.0.0.1:5000/users/${currentUser}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUser}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -62,7 +62,7 @@ const EditProfile = () => {
                     console.log('Profile Data:', data); // Debugging
                     setBio(data.bio || '');
                     if (data.profile_pic) {
-                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        const imageUrl = `${process.env.REACT_APP_BACKEND_URL}${data.profile_pic}?t=${new Date().getTime()}`;
                         console.log('Image URL:', imageUrl); // Debugging
                         setProfilePicture(imageUrl);
                     } else {
@@ -82,7 +82,7 @@ const EditProfile = () => {
     const handleSave = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const EditProfile = () => {
             formData.append("profile_picture", file);
 
             try {
-                const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}/upload-picture`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}/upload-picture`, {
                     method: 'POST',
                     body: formData,
                     credentials: 'include',
@@ -116,7 +116,7 @@ const EditProfile = () => {
                     const data = await response.json();
                     setProfilePicture(
                         data.profile_pic
-                            ? `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`
+                            ? `${process.env.REACT_APP_BACKEND_URL}${data.profile_pic}?t=${new Date().getTime()}`
                             : 'https://via.placeholder.com/150'
                     );
                     console.log('Profile picture updated successfully!');

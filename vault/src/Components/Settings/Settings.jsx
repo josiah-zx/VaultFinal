@@ -16,7 +16,7 @@ const Settings = () => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -37,7 +37,7 @@ const Settings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://127.0.0.1:5000/settings', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/settings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const Settings = () => {
     const handleLogout = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://127.0.0.1:5000/logout', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -32,7 +32,7 @@ const PostFeed = ({ username }) => {
     useEffect(() => {
         const fetchLikeStatus = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:5000/likes", {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/likes`, {
                     credentials: "include",
                 });
 
@@ -57,14 +57,14 @@ const PostFeed = ({ username }) => {
     useEffect(() => {
         const fetchAvailableCapsules = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/available-capsules');
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/available-capsules`);
                 if (response.ok) {
                     const data = await response.json();
                     setAvailableCapsules(data);
 
                     const capsuleIds = data.map(capsule => capsule.capsule_id);
                     const commentsResponse = await Promise.all(
-                        capsuleIds.map(id => fetch(`http://127.0.0.1:5000/comments?capsule_id=${id}`))
+                        capsuleIds.map(id => fetch(`${process.env.REACT_APP_BACKEND_URL}/comments?capsule_id=${id}`))
                     );
                     const commentsData = await Promise.all(commentsResponse.map(res => res.json()));
                     const commentsMap = commentsData.reduce((acc, comments, index) => {
@@ -89,7 +89,7 @@ const PostFeed = ({ username }) => {
     useEffect(() => {
         const fetchBookmarkedCapsules = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/bookmarked-capsules', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/bookmarked-capsules`, {
                     credentials: 'include',
                 });
 
@@ -121,7 +121,7 @@ const PostFeed = ({ username }) => {
 
     const fetchPosts = async (capsuleId) => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/capsules/${capsuleId}/posts`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/capsules/${capsuleId}/posts`, {
                 credentials: 'include',
             });
 
@@ -141,7 +141,7 @@ const PostFeed = ({ username }) => {
 
     const fetchComments = async (capsuleId) => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleId}`);
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/comments?capsule_id=${capsuleId}`);
             if (response.ok) {
                 const data = await response.json();
                 setCommentsMap((prev) => ({
@@ -171,7 +171,7 @@ const PostFeed = ({ username }) => {
         }));
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/like", {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/like`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -218,7 +218,7 @@ const PostFeed = ({ username }) => {
         }));
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/bookmark', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/bookmark`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ const PostFeed = ({ username }) => {
     const handleDeleteCapsule = async (data, type) => {
         try {
             if (type === 'capsule') {
-                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/delete-post`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

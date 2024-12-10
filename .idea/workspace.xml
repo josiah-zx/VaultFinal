@@ -4,8 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="LoginForm remote backend test">
+    <list default="true" id="646368da-53fd-4124-a849-60a1b5d92b03" name="Changes" comment="Backend CORS configuration fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/AddPostPopup/AddPostPopup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/AddPostPopup/AddPostPopup.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/CommentPopUp/CommentPopUp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/CommentPopUp/CommentPopUp.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/EditProfile/EditProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/EditProfile/EditProfile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/Home/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/Home/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/HomePageProfile/HomePageProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/HomePageProfile/HomePageProfile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/PostFeed/PostFeed.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/PostFeed/PostFeed.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/RegistrationForm/RegistrationForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/RegistrationForm/RegistrationForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/ResetPasswordForm/ResetPasswordForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/ResetPasswordForm/ResetPasswordForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/Search/Search.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/Search/Search.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/Settings/Settings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/Settings/Settings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/src/Components/TimeCapsule/TimeCapsule.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vault/src/Components/TimeCapsule/TimeCapsule.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +116,7 @@
       <workItem from="1727219318672" duration="18000" />
       <workItem from="1727219353128" duration="85000" />
       <workItem from="1733802355920" duration="266000" />
-      <workItem from="1733802633305" duration="3362000" />
+      <workItem from="1733802633305" duration="5277000" />
     </task>
     <task id="LOCAL-00001" summary="Setup initial React app">
       <option name="closed" value="true" />
@@ -146,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733804911832</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Backend CORS configuration fix">
+      <option name="closed" value="true" />
+      <created>1733808445559</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1733808445559</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,7 +187,8 @@
     <MESSAGE value="Started on implementing Vault's database and Flask. Also included a README for the backend for some explanation of the code so far." />
     <MESSAGE value="Updated requirements including gunicorn" />
     <MESSAGE value="LoginForm remote backend test" />
-    <option name="LAST_COMMIT_MESSAGE" value="LoginForm remote backend test" />
+    <MESSAGE value="Backend CORS configuration fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Backend CORS configuration fix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Vault$Vault.coverage" NAME="app Coverage Results" MODIFIED="1733176129135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\josiah\PycharmProjects\Vault" />

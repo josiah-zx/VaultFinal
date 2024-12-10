@@ -16,7 +16,7 @@ const ResetPasswordForm = () => {
         
         // Send the reset password request to the backend
         try {
-            const response = await fetch('http://127.0.0.1:5000/reset-password', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/reset-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

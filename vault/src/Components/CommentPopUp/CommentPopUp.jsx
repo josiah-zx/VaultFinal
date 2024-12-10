@@ -16,7 +16,7 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
             try {
                 if (capsuleContent.type === 'capsule') {
                     console.log("Fetching comments for capsule_id:", capsuleContent?.capsule_id);
-                    const response = await fetch(`http://127.0.0.1:5000/comments?capsule_id=${capsuleContent.capsule_id}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/comments?capsule_id=${capsuleContent.capsule_id}`, {
                         credentials: 'include',
                     });
     
@@ -29,7 +29,7 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
                 }
                 if (capsuleContent.type === 'post') {
                     console.log("Fetching comments for post_id:", capsuleContent?.post_id);
-                    const response = await fetch(`http://127.0.0.1:5000/comments?post_id=${capsuleContent.post_id}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/comments?post_id=${capsuleContent.post_id}`, {
                         credentials: 'include',
                     });
     
@@ -57,7 +57,7 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
             try {
                 if (capsuleContent.type === 'capsule') {
                     console.log("Sending comment with capsule_id:", capsuleContent?.capsule_id);
-                    const response = await fetch('http://127.0.0.1:5000/comments', {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/comments`, {
                         method: 'POST',
                         credentials: 'include',
                         headers: {
@@ -81,7 +81,7 @@ const CommentPopup = ({ capsuleContent, onClose }) => {
                 }
                 if (capsuleContent.type === 'post') {
                     console.log("Sending comment with post_id:", capsuleContent?.post_id);
-                    const response = await fetch('http://127.0.0.1:5000/comments', {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/comments`, {
                         method: 'POST',
                         credentials: 'include',
                         headers: {
