@@ -27,7 +27,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -50,7 +50,7 @@ const Profile = () => {
         const fetchProfileData = async () => {
             if (!profileUsername) return;
             try {
-                const response = await fetch(`http://127.0.0.1:5000/users/${profileUsername}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -64,7 +64,7 @@ const Profile = () => {
     
                     // Set the profile picture
                     if (data.profile_pic) {
-                        const imageUrl = `http://127.0.0.1:5000${data.profile_pic}?t=${new Date().getTime()}`;
+                        const imageUrl = `${process.env.REACT_APP_BACKEND_URL}${data.profile_pic}?t=${new Date().getTime()}`;
                         setProfilePicture(imageUrl);
                     } else {
                         setProfilePicture(null);
@@ -84,7 +84,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserCapsules = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/capsules/${profileUsername}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/capsules/${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -104,7 +104,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/posts/${profileUsername}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/posts/${profileUsername}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -125,7 +125,7 @@ const Profile = () => {
             if (selectedTab !== 'favorites') return;
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/bookmarked-items', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/bookmarked-items`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -143,7 +143,7 @@ const Profile = () => {
     }, [selectedTab]);
     const toggleFollow = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/follow/${profileUsername}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/follow/${profileUsername}`, {
                 method: isFollowing ? 'DELETE' : 'POST',
                 credentials: 'include',
             });

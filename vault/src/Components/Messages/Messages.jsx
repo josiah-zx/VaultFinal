@@ -24,7 +24,7 @@ const Messages = () => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -47,7 +47,7 @@ const Messages = () => {
             if (!username) return;
 
             try {
-                const response = await fetch(`http://127.0.0.1:5000/conversations/${username}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/conversations/${username}`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -84,7 +84,7 @@ const Messages = () => {
         const fetchMessages = async () => {
             if (selectedUsername) {
                 try {
-                    const response = await fetch(`http://127.0.0.1:5000/messages/${selectedUserId}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/messages/${selectedUserId}`, {
                         credentials: 'include'
                     });
                     if (response.ok) {
@@ -123,7 +123,7 @@ const Messages = () => {
         if (message.trim() === "") return;
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/send-message', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/send-message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const Messages = () => {
     };
     const handleDeleteCapsules = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/delete-all', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/delete-all`, {
                 method: 'POST',
                 credentials: 'include'
             });

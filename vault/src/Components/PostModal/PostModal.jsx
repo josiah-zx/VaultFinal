@@ -21,7 +21,7 @@ const PostModal = ({ closeModal, post, type }) => {
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/session-user', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/session-user`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -42,7 +42,7 @@ const PostModal = ({ closeModal, post, type }) => {
         const fetchPostData = async () => {
             try {
                 if (type === 'capsule') {
-                    const response = await fetch(`http://127.0.0.1:5000/post-data?capsule_id=${post.capsule_id}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/post-data?capsule_id=${post.capsule_id}`, {
                         credentials: 'include',
                     });
                     if (response.ok) {
@@ -56,7 +56,7 @@ const PostModal = ({ closeModal, post, type }) => {
                     }
                 }
                 if (type === 'post') {
-                    const response = await fetch(`http://127.0.0.1:5000/post-data?post_id=${post.post_id}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/post-data?post_id=${post.post_id}`, {
                         credentials: 'include',
                     });
                     if (response.ok) {
@@ -80,7 +80,7 @@ const PostModal = ({ closeModal, post, type }) => {
     const handleLike = async () => {
         try {
             if (type === 'capsule') {
-                const response = await fetch("http://127.0.0.1:5000/like", {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/like`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ const PostModal = ({ closeModal, post, type }) => {
                 }
             }
             if (type === 'post') {
-                const response = await fetch("http://127.0.0.1:5000/like", {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/like`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -131,7 +131,7 @@ const PostModal = ({ closeModal, post, type }) => {
     const handleBookmark = async () => {
         try {
             if (type === 'capsule') {
-                const response = await fetch("http://127.0.0.1:5000/bookmark", {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/bookmark`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const PostModal = ({ closeModal, post, type }) => {
                 }
             }
             if (type === 'post') {
-                const response = await fetch("http://127.0.0.1:5000/bookmark", {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/bookmark`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -186,7 +186,7 @@ const PostModal = ({ closeModal, post, type }) => {
     const handleDeletePost = async () => {
         try {
             if (type === 'capsule') {
-                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/delete-post`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ const PostModal = ({ closeModal, post, type }) => {
                 }
             }
             if (type === 'post') {
-                const response = await fetch('http://127.0.0.1:5000/delete-post', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/delete-post`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
